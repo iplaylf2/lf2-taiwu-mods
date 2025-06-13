@@ -8,4 +8,8 @@
         <TargetFramework Condition="'$(IsBackend)' == 'true'">net6.0</TargetFramework>
         <TargetFramework Condition="'$(IsFrontend)' == 'true'">netstandard2.0</TargetFramework>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>CA2211;CA1707</NoWarn>
+    </PropertyGroup>
 </Project>

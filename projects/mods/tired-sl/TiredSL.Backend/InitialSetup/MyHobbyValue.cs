@@ -186,7 +186,7 @@ public static class MyHobbyValue
 
         AdaptableLog.Info("skillQualificationBonus origin:" + origin.Bonus);
 
-        var result = RandomKit.NiceRetry(
+        var niceValue = RandomKit.NiceRetry(
             () =>
             {
                 var random = context.Random;
@@ -198,6 +198,7 @@ public static class MyHobbyValue
             Comparer<SkillQualificationBonus>.Create((x, y) => x.Bonus.CompareTo(y.Bonus)),
             15
         );
+        var result = origin.Bonus < niceValue.Bonus ? niceValue : origin;
 
         AdaptableLog.Info("skillQualificationBonus: " + result.Bonus);
 

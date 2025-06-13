@@ -50,11 +50,12 @@ public static class AllGoodFeature
 
         Traverse
             .Create(typeof(CharacterCreation))
-            .Method("AddFeature")
-            .GetValue(
+            .Method(
+                "AddFeature",
                 featureGroup2Id,
                 CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
-            );
+            )
+            .GetValue();
     }
 
     [HarmonyPatch(typeof(CharacterCreation), "GenerateRandomBasicFeatures")]
