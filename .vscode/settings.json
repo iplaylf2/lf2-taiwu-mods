@@ -1,6 +1,8 @@
 {
     "cSpell.words": [
-        "Taiwu"
+        "netstandard",
+        "taiwu",
+        "unpatch"
     ],
     "dotnet.defaultSolution": "lf2-taiwu-mods.slnx",
     "files.associations": {

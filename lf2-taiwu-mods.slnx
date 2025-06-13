@@ -1,7 +1,7 @@
 <Solution>
-  <Folder Name="/projects/" />
-  <File Path="projects/global.json" />
-  <File Path="projects/nuget.config" />
+  <Folder Name="/projects/">
+    <File Path="projects/Directory.Build.props" />
+  </Folder>
   <Folder Name="/projects/common/">
     <Project Path="projects/common/Empty/Empty.csproj" />
   </Folder>
@@ -14,4 +14,7 @@
     <Project Path="projects/mods/tired-sl/TiredSL.Backend/TiredSL.Backend.csproj" />
     <Project Path="projects/mods/tired-sl/TiredSL.Frontend/TiredSL.Frontend.csproj" />
   </Folder>
+  <File Path="Directory.Build.props" />
+  <File Path="global.json" />
+  <File Path="nuget.config" />
 </Solution>
