@@ -1,8 +1,11 @@
 {
     "cSpell.words": [
+        "callvirt",
         "ldfld",
         "netstandard",
+        "newobj",
         "redzen",
+        "stfld",
         "taiwu",
         "transil",
         "unpatch"

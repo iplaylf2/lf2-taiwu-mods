@@ -56,7 +56,7 @@ public static class RandomImprove
 
         // 最终输出
         int result = (int)MathF.Round(mean + normalized * stdDev);
-        
+
         return Math.Clamp(result, min, max);
     }
 }

@@ -210,7 +210,7 @@ public static class MyHobbyValue
         var matcher = new CodeMatcher(instructions);
 
         var charType = typeof(Character).GetTypeInfo();
-        
+
         {
             var handleMethodDict = new Dictionary<FieldInfo, Delegate>
             {
