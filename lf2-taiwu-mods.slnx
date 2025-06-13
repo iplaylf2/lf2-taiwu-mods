@@ -1,5 +1,7 @@
 <Solution>
   <Folder Name="/projects/" />
+  <File Path="projects/global.json" />
+  <File Path="projects/nuget.config" />
   <Folder Name="/projects/common/">
     <Project Path="projects/common/Empty/Empty.csproj" />
   </Folder>

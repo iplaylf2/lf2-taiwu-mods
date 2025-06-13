@@ -1,10 +1,11 @@
 {
-    "dotnet.defaultSolution": "lf2-taiwu-mods.slnx",
     "cSpell.words": [
         "Taiwu"
     ],
-    "xml.format.maxLineWidth": 0,
+    "dotnet.defaultSolution": "lf2-taiwu-mods.slnx",
     "files.associations": {
-        "*.slnx": "xml"
+        "*.slnx": "xml",
+        "nuget.config": "xml"
     },
+    "xml.format.maxLineWidth": 0
 }
