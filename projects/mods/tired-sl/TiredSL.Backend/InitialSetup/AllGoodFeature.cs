@@ -3,7 +3,6 @@ using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Utilities;
 using HarmonyLib;
-using TiredSL.Backend.Kit;
 using Redzen.Random;
 using Transil.Attributes;
 using Transil.Operations;
