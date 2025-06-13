@@ -1,9 +1,4 @@
 <Project>
-    <PropertyGroup>
-        <TargetFramework Condition="'$(IsBackend)' == 'true'">net6.0</TargetFramework>
-        <TargetFramework Condition="'$(IsFrontend)' == 'true'">netstandard2.0</TargetFramework>
-    </PropertyGroup>
-
     <ItemGroup Condition="'$(IsFrontend)' == 'true' or '$(IsBackend)' == 'true'">
         <Reference Include="0Harmony">
             <HintPath>$(GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll</HintPath>
