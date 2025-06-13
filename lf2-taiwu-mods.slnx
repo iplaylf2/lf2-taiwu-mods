@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/projects/" />
+  <Folder Name="/projects/common/">
+    <Project Path="projects/common/Empty/Empty.csproj" />
+  </Folder>
+  <Folder Name="/projects/mods/">
+    <File Path="projects/mods/Directory.Build.props" />
+    <File Path="projects/mods/Directory.Build.targets" />
+    <File Path="projects/mods/Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/projects/mods/tired-sl/">
+    <Project Path="projects/mods/tired-sl/TiredSL.Backend/TiredSL.Backend.csproj" />
+    <Project Path="projects/mods/tired-sl/TiredSL.Frontend/TiredSL.Frontend.csproj" />
+  </Folder>
+</Solution>

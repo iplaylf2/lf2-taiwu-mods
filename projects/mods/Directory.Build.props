@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup>
+        <SolutionRoot>
+            $([System.IO.Path]::GetFullPath('$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory),'lf2-taiwu-mods.slnx'))'))
+        </SolutionRoot>
+        <GameLib>$(SolutionRoot)/game-lib</GameLib>
+
+        <IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</IsBackend>
+        <IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</IsFrontend>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+</Project>

@@ -1,0 +1,51 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework Condition="'$(IsBackend)' == 'true'">net6.0</TargetFramework>
+        <TargetFramework Condition="'$(IsFrontend)' == 'true'">netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(IsFrontend)' == 'true' or '$(IsBackend)' == 'true'">
+        <Reference Include="0Harmony">
+            <HintPath>$(GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="TaiwuModdingLib">
+            <HintPath>$(GameLib)/The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IsBackend)' == 'true'">
+        <Reference Include="GameData">
+            <HintPath>$(GameLib)/Backend/GameData.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="GameData.Utilities">
+            <HintPath>$(GameLib)/Backend/GameData.Utilities.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Redzen">
+            <HintPath>$(GameLib)/Backend/Redzen.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IsFrontend)' == 'true'">
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(GameLib)/The Scroll of Taiwu_Data/Managed/Assembly-CSharp.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(GameLib)/The Scroll of Taiwu_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>$(GameLib)/The Scroll of Taiwu_Data/Managed/UnityEngine.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>$(GameLib)/The Scroll of Taiwu_Data/Managed/UnityEngine.InputLegacyModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+</Project>
