@@ -3,5 +3,8 @@
     "cSpell.words": [
         "Taiwu"
     ],
-    "xml.format.joinCDATALines": true
+    "xml.format.maxLineWidth": 0,
+    "files.associations": {
+        "*.slnx": "xml"
+    },
 }
