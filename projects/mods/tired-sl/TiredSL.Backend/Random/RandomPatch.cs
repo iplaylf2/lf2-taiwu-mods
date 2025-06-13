@@ -5,7 +5,7 @@ using Redzen.Random;
 
 namespace TiredSL.Backend.Random;
 
-public static class RandomImprove
+public static class RandomPatch
 {
     [HarmonyPatch(typeof(RedzenHelper), nameof(RedzenHelper.SkewDistribute))]
     [HarmonyPrefix]

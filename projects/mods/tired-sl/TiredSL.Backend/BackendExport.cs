@@ -18,7 +18,7 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
     {
         harmony = new Harmony("lf2");
 
-        harmony.PatchAll(typeof(Random.RandomImprove));
+        harmony.PatchAll(typeof(Random.RandomPatch));
 
         harmony.PatchAll(typeof(Combat.CollapseCatchOdds));
         harmony.PatchAll(typeof(Combat.MissMe));
