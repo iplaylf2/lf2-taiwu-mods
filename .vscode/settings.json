@@ -1,3 +1,7 @@
 {
-    "dotnet.defaultSolution": "lf2-taiwu-mods.slnx"
+    "dotnet.defaultSolution": "lf2-taiwu-mods.slnx",
+    "cSpell.words": [
+        "Taiwu"
+    ],
+    "xml.format.joinCDATALines": true
 }
