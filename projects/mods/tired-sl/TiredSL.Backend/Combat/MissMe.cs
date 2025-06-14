@@ -5,7 +5,7 @@ namespace TiredSL.Backend.Combat;
 
 public static class MissMe
 {
-    public static bool Enabled;
+    public static bool Enabled { get; set; }
 
     [HarmonyPatch(typeof(CombatDomain), nameof(CombatDomain.InAttackRange))]
     [HarmonyPostfix]

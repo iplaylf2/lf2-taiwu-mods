@@ -16,7 +16,7 @@ namespace TiredSL.Backend.InitialSetup;
 [HarmonyPatch(typeof(Character), nameof(Character.OfflineCreateProtagonist))]
 public static class MyHobbyValue
 {
-    public static bool Enabled;
+    public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static MainAttributes HandleMainAttributes(

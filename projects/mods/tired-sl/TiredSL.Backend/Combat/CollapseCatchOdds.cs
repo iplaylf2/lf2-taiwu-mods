@@ -7,7 +7,7 @@ namespace TiredSL.Backend.Combat;
 [HarmonyPatch(typeof(CombatDomain), "CalcRopeOrSwordHitOdds")]
 public static class CollapseCatchOdds
 {
-    public static bool Enabled;
+    public static bool Enabled { get; set; }
 
     public static void Postfix(ref int __result, CombatDomain __instance)
     {

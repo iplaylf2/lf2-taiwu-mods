@@ -10,6 +10,6 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <NoWarn>CA2211;CA1707</NoWarn>
+        <NoWarn>CA1707</NoWarn>
     </PropertyGroup>
 </Project>

@@ -11,7 +11,7 @@ namespace TiredSL.Backend.InitialSetup;
 
 public static class AllGoodFeature
 {
-    public static bool Enabled;
+    public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static bool HandleAllGoodBasicFeature(

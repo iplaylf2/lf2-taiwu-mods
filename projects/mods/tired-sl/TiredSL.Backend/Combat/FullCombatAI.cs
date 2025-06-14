@@ -6,7 +6,7 @@ namespace TiredSL.Backend.Combat;
 
 public static class FullCombatAI
 {
-    public static bool Enabled;
+    public static bool Enabled { get; set; }
 
     [HarmonyPatch(typeof(AiController), nameof(AiController.IsCombatDifficultyLevel1), MethodType.Getter)]
     [HarmonyPrefix]

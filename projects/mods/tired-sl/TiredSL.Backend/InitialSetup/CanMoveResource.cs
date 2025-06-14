@@ -14,7 +14,7 @@ namespace TiredSL.Backend.InitialSetup;
 [HarmonyPatch(typeof(BuildingDomain), nameof(BuildingDomain.CreateBuildingArea))]
 public static class CanMoveResource
 {
-    public static bool Enabled;
+    public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static BuildingBlockData HandleBlockDataNew(

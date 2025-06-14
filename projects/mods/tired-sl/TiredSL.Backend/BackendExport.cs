@@ -32,13 +32,85 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
 
     public override void OnModSettingUpdate()
     {
-        DomainManager.Mod.GetSetting(ModIdStr, "niceCatch", ref Combat.CollapseCatchOdds.Enabled);
-        DomainManager.Mod.GetSetting(ModIdStr, "fullCombatAI", ref Combat.FullCombatAI.Enabled);
-        DomainManager.Mod.GetSetting(ModIdStr, "missMe", ref Combat.MissMe.Enabled);
-        DomainManager.Mod.GetSetting(ModIdStr, "goodFeature", ref InitialSetup.AllGoodFeature.Enabled);
-        DomainManager.Mod.GetSetting(ModIdStr, "canMoveResource", ref InitialSetup.CanMoveResource.Enabled);
-        DomainManager.Mod.GetSetting(ModIdStr, "hobbyValue", ref InitialSetup.MyHobbyValue.Enabled);
-        DomainManager.Mod.GetSetting(ModIdStr, "brightenUp", ref SkillBreakout.BrightenUp.Enabled);
-        DomainManager.Mod.GetSetting(ModIdStr, "endlessStep", ref SkillBreakout.EndlessStep.Enabled);
+        {
+            var enable = Combat.CollapseCatchOdds.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "niceCatch", ref enable)
+                && Combat.CollapseCatchOdds.Enabled != enable
+            )
+            {
+                Combat.CollapseCatchOdds.Enabled = enable;
+            }
+        }
+        {
+            var enable = Combat.FullCombatAI.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "fullCombatAI", ref enable)
+                && Combat.FullCombatAI.Enabled != enable
+            )
+            {
+                Combat.FullCombatAI.Enabled = enable;
+            }
+        }
+        {
+            var enable = Combat.MissMe.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "missMe", ref enable)
+                && Combat.MissMe.Enabled != enable
+            )
+            {
+                Combat.MissMe.Enabled = enable;
+            }
+        }
+        {
+            var enable = InitialSetup.AllGoodFeature.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "goodFeature", ref enable)
+                && InitialSetup.AllGoodFeature.Enabled != enable
+            )
+            {
+                InitialSetup.AllGoodFeature.Enabled = enable;
+            }
+        }
+        {
+            var enable = InitialSetup.CanMoveResource.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "canMoveResource", ref enable)
+                && InitialSetup.CanMoveResource.Enabled != enable
+            )
+            {
+                InitialSetup.CanMoveResource.Enabled = enable;
+            }
+        }
+        {
+            var enable = InitialSetup.MyHobbyValue.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "hobbyValue", ref enable)
+                && InitialSetup.MyHobbyValue.Enabled != enable
+            )
+            {
+                InitialSetup.MyHobbyValue.Enabled = enable;
+            }
+        }
+        {
+            var enable = SkillBreakout.BrightenUp.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "brightenUp", ref enable)
+                && SkillBreakout.BrightenUp.Enabled != enable
+            )
+            {
+                SkillBreakout.BrightenUp.Enabled = enable;
+            }
+        }
+        {
+            var enable = SkillBreakout.EndlessStep.Enabled;
+            if (
+                DomainManager.Mod.GetSetting(ModIdStr, "endlessStep", ref enable)
+                && SkillBreakout.EndlessStep.Enabled != enable
+            )
+            {
+                SkillBreakout.EndlessStep.Enabled = enable;
+            }
+        }
     }
 }

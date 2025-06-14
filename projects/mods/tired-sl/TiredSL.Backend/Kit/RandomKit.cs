@@ -2,7 +2,7 @@ namespace TiredSL.Backend.Kit;
 
 static class RandomKit
 {
-    public static T NiceRetry<T>(this Func<T> generator, IComparer<T> comparer, int retryCount)
+    public static T NiceRetry<T>(Func<T> generator, IComparer<T> comparer, int retryCount)
     {
         return Enumerable
             .Range(0, retryCount + 1)
