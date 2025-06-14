@@ -4,7 +4,7 @@ using TaiwuModdingLib.Core.Plugin;
 
 namespace TiredSL.Backend;
 
-[PluginConfig("MyTaiwu", "lf2", "1.0.0")]
+[PluginConfig("tired-sl", "lf2", "1.0.0")]
 public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     private Harmony? harmony;
@@ -16,7 +16,7 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
 
     public override void Initialize()
     {
-        harmony = new Harmony("lf2");
+        harmony = new Harmony(ModIdStr);
 
         harmony.PatchAll(typeof(Random.RandomPatch));
 

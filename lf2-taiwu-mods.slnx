@@ -1,7 +1,4 @@
 <Solution>
-  <Folder Name="/game-lib/">
-    <File Path="game-lib/version.workflow.info" />
-  </Folder>
   <Folder Name="/projects/">
     <File Path="projects/Directory.Build.props" />
   </Folder>
@@ -14,7 +11,6 @@
     <File Path="projects/mods/Directory.Packages.props" />
   </Folder>
   <Folder Name="/projects/mods/tired-sl/">
-    <File Path="projects/mods/tired-sl/mod.workflow.json" />
     <Project Path="projects/mods/tired-sl/TiredSL.Backend/TiredSL.Backend.csproj" />
     <Project Path="projects/mods/tired-sl/TiredSL.Frontend/TiredSL.Frontend.csproj" />
   </Folder>
