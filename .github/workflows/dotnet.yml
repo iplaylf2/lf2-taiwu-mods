@@ -3,7 +3,7 @@ name: Build and Release Mod
 on:
   push:
     tags:
-      - 'mods/*/v*'  # 匹配格式: mods/<mod-name>/v<version>
+      - "mods/*/v*" # 匹配格式: mods/<mod-name>/v<version>
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -17,120 +17,156 @@ jobs:
       packages: read
 
     steps:
-    - name: Parse tag and set variables
-      id: parse-tag
-      run: |
-        FULL_TAG="${GITHUB_REF#refs/tags/}"
-        MOD_NAME="${FULL_TAG#mods/}"
-        MOD_NAME="${MOD_NAME%%/*}"
-        VERSION="${FULL_TAG##*/}"
-        VERSION="${VERSION#v}"
-        MOD_DIR="projects/mods/$MOD_NAME"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-        echo "MOD_NAME=$MOD_NAME" >> $GITHUB_ENV
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
-        echo "full_tag=$FULL_TAG" >> $GITHUB_ENV
-        echo "MOD_DIR=$MOD_DIR" >> $GITHUB_ENV
+      - name: Parse tag and set variables
+        id: parse-tag
+        run: |
+          set -euo pipefail
+          FULL_TAG="${GITHUB_REF#refs/tags/}"
 
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Resolve game-lib version
-      id: resolve-lib
-      run: |
-        LIB_VERSION=$(cat game-lib/version.workflow.info)
-        echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_ENV
-
-    - name: Download game-lib dependencies
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        curl -sL -H "Authorization: token $GITHUB_TOKEN" \
-          "https://github.com/${{ github.repository }}/releases/download/${{ env.LIB_VERSION }}/game-lib.zip" \
-          -o game-lib.zip
-        unzip -q game-lib.zip -d game-lib
-        rm game-lib.zip
-
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-
-    - name: Setup NuGet authentication
-      run: |
-        echo "NUGET_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-        echo "NUGET_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-
-    - name: Read build configuration
-      id: read-config
-      run: |
-        CONFIG_FILE="${{ env.MOD_DIR }}/mod.workflow.json"
-        if [ ! -f "$CONFIG_FILE" ]; then
-          echo "::error::Build configuration file not found at $CONFIG_FILE"
-          exit 1
-        fi
-
-        PROJECTS=$(jq -r '.buildProjects | join(",")' "$CONFIG_FILE")
-
-        if [ -z "$PROJECTS" ]; then
-          echo "::error::No build projects defined in configuration"
-          exit 1
-        fi
-
-        echo "PROJECTS=$PROJECTS" >> $GITHUB_ENV
-
-    - name: Restore and build projects
-      env:
-        GITHUB_USERNAME: ${{ env.NUGET_USERNAME }}
-        GITHUB_TOKEN: ${{ env.NUGET_PASSWORD }}
-      run: |
-        IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
-
-        for project in "${PROJECT_ARRAY[@]}"; do
-          PROJECT_PATH="${{ env.MOD_DIR }}/$project/$project.csproj"
-
-          if [ ! -f "$PROJECT_PATH" ]; then
-            echo "::error::Project file not found at $PROJECT_PATH"
+          if [[ ! "$FULL_TAG" =~ ^mods/[^/]+/v[^/]+$ ]]; then
+            echo "::error::Invalid tag format. Expected 'mods/<mod-name>/v<version>'"
             exit 1
           fi
 
-          echo "Building $project..."
+          MOD_NAME="${FULL_TAG#mods/}"
+          MOD_NAME="${MOD_NAME%%/*}"
+          VERSION="${FULL_TAG##*/}"
+          VERSION="${VERSION#v}"
+          MOD_DIR="projects/mods/$MOD_NAME"
 
-          dotnet restore "$PROJECT_PATH"
-          dotnet build "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }}
-        done
+          echo "Parsed values:"
+          echo "MOD_NAME=$MOD_NAME"
+          echo "VERSION=$VERSION"
+          echo "MOD_DIR=$MOD_DIR"
 
-    - name: Prepare combined artifacts
-      run: |
-        mkdir -p combined-artifacts
-        IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
+          echo "MOD_NAME=$MOD_NAME" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "full_tag=$FULL_TAG" >> $GITHUB_ENV
+          echo "MOD_DIR=$MOD_DIR" >> $GITHUB_ENV
 
-        for project in "${PROJECT_ARRAY[@]}"; do
-          OUTPUT_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -maxdepth 1 -type d -name "net*" | head -1)
+      - name: Resolve game-lib version
+        id: resolve-lib
+        run: |
+          set -euo pipefail
+          LIB_VERSION_FILE="game-lib/version.workflow.info"
 
-          if [ -z "$OUTPUT_DIR" ]; then
-            echo "::error::Output directory not found for $project"
+          if [ ! -f "$LIB_VERSION_FILE" ]; then
+            echo "::error::game-lib version file not found at $LIB_VERSION_FILE"
             exit 1
           fi
 
-          echo "Copying artifacts from $OUTPUT_DIR"
-          cp -r "$OUTPUT_DIR"/* combined-artifacts/
-        done
+          LIB_VERSION=$(cat "$LIB_VERSION_FILE")
+          echo "Using game-lib version: $LIB_VERSION"
+          echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_ENV
 
-        echo "{
-          \"mod\": \"${{ env.MOD_NAME }}\",
-          \"version\": \"${{ env.VERSION }}\",
-          \"gameLib\": \"${{ env.LIB_VERSION }}\",
-          \"buildDate\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
-        }" > combined-artifacts/version.json
+      - name: Download game-lib dependencies
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.LIB_VERSION }}/game-lib.zip"
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ env.full_tag }}
-        name: ${{ env.MOD_NAME }} v${{ env.VERSION }}
-        files: combined-artifacts/*
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          curl -fLsS -H "Authorization: token $GITHUB_TOKEN" \
+            "$DOWNLOAD_URL" -o game-lib.zip || {
+              echo "::error::Failed to download game-lib"
+              exit 1
+            }
+
+          unzip -q game-lib.zip -d game-lib
+          rm game-lib.zip
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Setup NuGet authentication
+        run: |
+          echo "NUGET_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+          echo "NUGET_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Read build configuration
+        id: read-config
+        run: |
+          set -euo pipefail
+          CONFIG_FILE="${{ env.MOD_DIR }}/mod.workflow.json"
+
+          if [ ! -f "$CONFIG_FILE" ]; then
+            echo "::error::Build configuration file not found at $CONFIG_FILE"
+            exit 1
+          fi
+
+          PROJECTS=$(jq -r '.buildProjects | join(",")' "$CONFIG_FILE")
+
+          if [ -z "$PROJECTS" ]; then
+            echo "::error::No build projects defined in configuration"
+            exit 1
+          fi
+
+          echo "PROJECTS=$PROJECTS" >> $GITHUB_ENV
+
+      - name: Build projects
+        env:
+          GITHUB_USERNAME: ${{ env.NUGET_USERNAME }}
+          GITHUB_TOKEN: ${{ env.NUGET_PASSWORD }}
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
+          BUILD_SUMMARY=""
+
+          for project in "${PROJECT_ARRAY[@]}"; do
+            PROJECT_PATH="${{ env.MOD_DIR }}/$project/$project.csproj"
+            echo "Building project: $project"
+
+            dotnet build "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }} \
+              --verbosity minimal --nologo || {
+                echo "::error::Build failed for $project"
+                exit 1
+              }
+
+            OUTPUT_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -maxdepth 1 -type d -name "net*" | head -1)
+            BUILD_SUMMARY+="• $project → $(basename "$OUTPUT_DIR")\n"
+          done
+
+          echo "BUILD_SUMMARY<<EOF" >> $GITHUB_ENV
+          echo -e "$BUILD_SUMMARY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Prepare artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p combined-artifacts
+          IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
+
+          for project in "${PROJECT_ARRAY[@]}"; do
+            OUTPUT_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -maxdepth 1 -type d -name "net*" | head -1)
+            cp -r "$OUTPUT_DIR"/* combined-artifacts/
+          done
+
+          cat > combined-artifacts/version.json <<EOF
+          {
+            "mod": "${{ env.MOD_NAME }}",
+            "version": "${{ env.VERSION }}",
+            "gameLib": "${{ env.LIB_VERSION }}",
+            "buildDate": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.full_tag }}
+          name: ${{ env.MOD_NAME }} v${{ env.VERSION }}
+          body: |
+            ### Build Summary
+            ${{ env.BUILD_SUMMARY }}
+            **Game Lib Version**: ${{ env.LIB_VERSION }}
+            **Build Date**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          files: combined-artifacts/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
