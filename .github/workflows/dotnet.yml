@@ -182,7 +182,7 @@ jobs:
             ${{ env.BUILD_SUMMARY }}
             **Game Lib Version**: ${{ env.LIB_VERSION }}
             **Build Date**: ${{ env.BUILD_DATE_READABLE }}
-          files: combined-artifacts/*
+          files: combined-artifacts/**
           draft: false
           prerelease: false
         env:
