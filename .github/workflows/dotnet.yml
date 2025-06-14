@@ -1,0 +1,133 @@
+name: Build and Release Mod
+
+on:
+  push:
+    tags:
+      - 'mods/*/v*'  # 匹配格式: mods/<mod-name>/v<version>
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-mod:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+
+    steps:
+    - name: Parse tag and set variables
+      id: parse-tag
+      run: |
+        FULL_TAG="${GITHUB_REF#refs/tags/}"
+        MOD_NAME="${FULL_TAG#mods/}"
+        MOD_NAME="${MOD_NAME%%/*}"
+        VERSION="${FULL_TAG##*/}"
+        VERSION="${VERSION#v}"
+        MOD_DIR="projects/mods/$MOD_NAME"
+
+        echo "MOD_NAME=$MOD_NAME" >> $GITHUB_ENV
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "full_tag=$FULL_TAG" >> $GITHUB_ENV
+        echo "MOD_DIR=$MOD_DIR" >> $GITHUB_ENV
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Resolve game-lib version
+      id: resolve-lib
+      run: |
+        LIB_VERSION=$(cat game-lib/version.workflow.info)
+        echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_ENV
+
+    - name: Download game-lib dependencies
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        curl -sL -H "Authorization: token $GITHUB_TOKEN" \
+          "https://github.com/${{ github.repository }}/releases/download/${{ env.LIB_VERSION }}/game-lib.zip" \
+          -o game-lib.zip
+        unzip -q game-lib.zip -d game-lib
+        rm game-lib.zip
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Setup NuGet authentication
+      run: |
+        echo "NUGET_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+        echo "NUGET_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+    - name: Read build configuration
+      id: read-config
+      run: |
+        CONFIG_FILE="${{ env.MOD_DIR }}/mod.workflow.json"
+        if [ ! -f "$CONFIG_FILE" ]; then
+          echo "::error::Build configuration file not found at $CONFIG_FILE"
+          exit 1
+        fi
+
+        PROJECTS=$(jq -r '.buildProjects | join(",")' "$CONFIG_FILE")
+
+        if [ -z "$PROJECTS" ]; then
+          echo "::error::No build projects defined in configuration"
+          exit 1
+        fi
+
+        echo "PROJECTS=$PROJECTS" >> $GITHUB_ENV
+
+    - name: Restore and build projects
+      run: |
+        IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
+
+        for project in "${PROJECT_ARRAY[@]}"; do
+          PROJECT_PATH="${{ env.MOD_DIR }}/$project/$project.csproj"
+
+          if [ ! -f "$PROJECT_PATH" ]; then
+            echo "::error::Project file not found at $PROJECT_PATH"
+            exit 1
+          fi
+
+          echo "Building $project..."
+
+          dotnet restore "$PROJECT_PATH"
+          dotnet build "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }}
+        done
+
+    - name: Prepare combined artifacts
+      run: |
+        mkdir -p combined-artifacts
+        IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
+
+        for project in "${PROJECT_ARRAY[@]}"; do
+          OUTPUT_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -maxdepth 1 -type d -name "net*" | head -1)
+
+          if [ -z "$OUTPUT_DIR" ]; then
+            echo "::error::Output directory not found for $project"
+            exit 1
+          fi
+
+          echo "Copying artifacts from $OUTPUT_DIR"
+          cp -r "$OUTPUT_DIR"/* combined-artifacts/
+        done
+
+        echo "{
+          \"mod\": \"${{ env.MOD_NAME }}\",
+          \"version\": \"${{ env.VERSION }}\",
+          \"gameLib\": \"${{ env.LIB_VERSION }}\",
+          \"buildDate\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
+        }" > combined-artifacts/version.json
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.full_tag }}
+        name: ${{ env.MOD_NAME }} v${{ env.VERSION }}
+        files: combined-artifacts/*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
