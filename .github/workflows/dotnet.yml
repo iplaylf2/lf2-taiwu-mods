@@ -127,7 +127,7 @@ jobs:
                 exit 1
               }
 
-            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release/net*" -name publish -type d | head -1)
+            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -type d -path "*/publish" | head -1)
             if [ -z "$PUBLISH_DIR" ]; then
               echo "::error::Publish directory not found for $project"
               exit 1
@@ -152,7 +152,7 @@ jobs:
           echo "BUILD_DATE_READABLE=$BUILD_DATE_READABLE" >> $GITHUB_ENV
 
           for project in "${PROJECT_ARRAY[@]}"; do
-            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release/net*" -name publish -type d | head -1)
+            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -type d -path "*/publish" | head -1)
             if [ -z "$PUBLISH_DIR" ]; then
               echo "::error::Publish directory not found for $project in artifact preparation"
               exit 1
