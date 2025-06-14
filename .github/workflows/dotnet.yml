@@ -76,7 +76,6 @@ jobs:
             }
 
           unzip -q game-lib.zip -d game-lib
-          rm game-lib.zip
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
@@ -174,7 +173,7 @@ jobs:
 
           ZIP_NAME="${{ env.MOD_NAME }}.zip"
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
-          zip -r "${ZIP_NAME}" combined-artifacts
+          (cd combined-artifacts && zip -r "../${ZIP_NAME}" .)
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
