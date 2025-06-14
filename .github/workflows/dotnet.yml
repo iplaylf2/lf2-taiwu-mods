@@ -80,6 +80,9 @@ jobs:
         echo "PROJECTS=$PROJECTS" >> $GITHUB_ENV
 
     - name: Restore and build projects
+      env:
+        GITHUB_USERNAME: ${{ env.NUGET_USERNAME }}
+        GITHUB_TOKEN: ${{ env.NUGET_PASSWORD }}
       run: |
         IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
 
