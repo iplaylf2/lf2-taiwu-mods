@@ -141,6 +141,11 @@ jobs:
           mkdir -p combined-artifacts
           IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
 
+          BUILD_DATE_ISO=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          BUILD_DATE_READABLE=$(date -u +'%Y-%m-%d %H:%M:%S UTC')
+
+          echo "BUILD_DATE_READABLE=$BUILD_DATE_READABLE" >> $GITHUB_ENV
+
           for project in "${PROJECT_ARRAY[@]}"; do
             OUTPUT_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -maxdepth 1 -type d -name "net*" | head -1)
             cp -r "$OUTPUT_DIR"/* combined-artifacts/
@@ -151,7 +156,7 @@ jobs:
             "mod": "${{ env.MOD_NAME }}",
             "version": "${{ env.VERSION }}",
             "gameLib": "${{ env.LIB_VERSION }}",
-            "buildDate": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            "buildDate": "$BUILD_DATE_ISO"
           }
           EOF
 
@@ -164,7 +169,7 @@ jobs:
             ### Build Summary
             ${{ env.BUILD_SUMMARY }}
             **Game Lib Version**: ${{ env.LIB_VERSION }}
-            **Build Date**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')
+            **Build Date**: ${{ env.BUILD_DATE_READABLE }}
           files: combined-artifacts/*
           draft: false
           prerelease: false
