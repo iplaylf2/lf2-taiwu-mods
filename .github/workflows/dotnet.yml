@@ -119,16 +119,21 @@ jobs:
 
           for project in "${PROJECT_ARRAY[@]}"; do
             PROJECT_PATH="${{ env.MOD_DIR }}/$project/$project.csproj"
-            echo "Building project: $project"
+            echo "Publishing project: $project"
 
-            dotnet build "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }} \
+            dotnet publish "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }} \
               --verbosity minimal --nologo || {
-                echo "::error::Build failed for $project"
+                echo "::error::Publish failed for $project"
                 exit 1
               }
 
-            OUTPUT_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -maxdepth 1 -type d -name "net*" | head -1)
-            BUILD_SUMMARY+="• $project → $(basename "$OUTPUT_DIR")\n"
+            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -name publish -type d | head -1)
+            if [ -z "$PUBLISH_DIR" ]; then
+              echo "::error::Publish directory not found for $project"
+              exit 1
+            fi
+
+            BUILD_SUMMARY+="• $project → $(basename $(dirname "$PUBLISH_DIR"))\n"
           done
 
           echo "BUILD_SUMMARY<<EOF" >> $GITHUB_ENV
@@ -147,8 +152,12 @@ jobs:
           echo "BUILD_DATE_READABLE=$BUILD_DATE_READABLE" >> $GITHUB_ENV
 
           for project in "${PROJECT_ARRAY[@]}"; do
-            OUTPUT_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -maxdepth 1 -type d -name "net*" | head -1)
-            cp -r "$OUTPUT_DIR"/* combined-artifacts/
+            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -name publish -type d | head -1)
+
+            PROJECT_ARTIFACT_DIR="combined-artifacts/$project"
+            mkdir -p "$PROJECT_ARTIFACT_DIR"
+
+            cp -r "$PUBLISH_DIR"/* "$PROJECT_ARTIFACT_DIR/"
           done
 
           cat > combined-artifacts/version.json <<EOF
