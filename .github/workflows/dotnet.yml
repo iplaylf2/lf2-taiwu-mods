@@ -172,6 +172,10 @@ jobs:
           }
           EOF
 
+          ZIP_NAME="${{ env.MOD_NAME }}.zip"
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+          zip -r "${ZIP_NAME}" combined-artifacts
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -182,7 +186,7 @@ jobs:
             ${{ env.BUILD_SUMMARY }}
             **Game Lib Version**: ${{ env.LIB_VERSION }}
             **Build Date**: ${{ env.BUILD_DATE_READABLE }}
-          files: combined-artifacts/**
+          files: ${{ env.ZIP_NAME }}
           draft: false
           prerelease: false
         env:
