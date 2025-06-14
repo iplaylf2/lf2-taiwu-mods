@@ -1,0 +1,192 @@
+name: Build and Release Mod
+
+on:
+  push:
+    tags:
+      - "mods/*/v*" # 匹配格式: mods/<mod-name>/v<version>
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-mod:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Parse tag and set variables
+        id: parse-tag
+        run: |
+          set -euo pipefail
+          FULL_TAG="${GITHUB_REF#refs/tags/}"
+
+          if [[ ! "$FULL_TAG" =~ ^mods/[^/]+/v[^/]+$ ]]; then
+            echo "::error::Invalid tag format. Expected 'mods/<mod-name>/v<version>'"
+            exit 1
+          fi
+
+          MOD_NAME="${FULL_TAG#mods/}"
+          MOD_NAME="${MOD_NAME%%/*}"
+          VERSION="${FULL_TAG##*/}"
+          VERSION="${VERSION#v}"
+          MOD_DIR="projects/mods/$MOD_NAME"
+
+          echo "Parsed values:"
+          echo "MOD_NAME=$MOD_NAME"
+          echo "VERSION=$VERSION"
+          echo "MOD_DIR=$MOD_DIR"
+
+          echo "MOD_NAME=$MOD_NAME" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "full_tag=$FULL_TAG" >> $GITHUB_ENV
+          echo "MOD_DIR=$MOD_DIR" >> $GITHUB_ENV
+
+      - name: Resolve game-lib version
+        id: resolve-lib
+        run: |
+          set -euo pipefail
+          LIB_VERSION_FILE="game-lib/version.workflow.info"
+
+          if [ ! -f "$LIB_VERSION_FILE" ]; then
+            echo "::error::game-lib version file not found at $LIB_VERSION_FILE"
+            exit 1
+          fi
+
+          LIB_VERSION=$(cat "$LIB_VERSION_FILE")
+          echo "Using game-lib version: $LIB_VERSION"
+          echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_ENV
+
+      - name: Download game-lib dependencies
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.LIB_VERSION }}/game-lib.zip"
+
+          curl -fLsS -H "Authorization: token $GITHUB_TOKEN" \
+            "$DOWNLOAD_URL" -o game-lib.zip || {
+              echo "::error::Failed to download game-lib"
+              exit 1
+            }
+
+          unzip -q game-lib.zip -d game-lib
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Setup NuGet authentication
+        run: |
+          echo "NUGET_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+          echo "NUGET_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Read build configuration
+        id: read-config
+        run: |
+          set -euo pipefail
+          CONFIG_FILE="${{ env.MOD_DIR }}/mod.workflow.json"
+
+          if [ ! -f "$CONFIG_FILE" ]; then
+            echo "::error::Build configuration file not found at $CONFIG_FILE"
+            exit 1
+          fi
+
+          PROJECTS=$(jq -r '.buildProjects | join(",")' "$CONFIG_FILE")
+
+          if [ -z "$PROJECTS" ]; then
+            echo "::error::No build projects defined in configuration"
+            exit 1
+          fi
+
+          echo "PROJECTS=$PROJECTS" >> $GITHUB_ENV
+
+      - name: Build projects
+        env:
+          GITHUB_USERNAME: ${{ env.NUGET_USERNAME }}
+          GITHUB_TOKEN: ${{ env.NUGET_PASSWORD }}
+        run: |
+          set -euo pipefail
+          IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
+          BUILD_SUMMARY=""
+
+          for project in "${PROJECT_ARRAY[@]}"; do
+            PROJECT_PATH="${{ env.MOD_DIR }}/$project/$project.csproj"
+            echo "Publishing project: $project"
+
+            dotnet publish "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }} \
+              --verbosity minimal --nologo || {
+                echo "::error::Publish failed for $project"
+                exit 1
+              }
+
+            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -type d -path "*/publish" | head -1)
+            if [ -z "$PUBLISH_DIR" ]; then
+              echo "::error::Publish directory not found for $project"
+              exit 1
+            fi
+
+            BUILD_SUMMARY+="• $project → $(basename $(dirname "$PUBLISH_DIR"))\n"
+          done
+
+          echo "BUILD_SUMMARY<<EOF" >> $GITHUB_ENV
+          echo -e "$BUILD_SUMMARY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Prepare artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p combined-artifacts
+          IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
+
+          BUILD_DATE_ISO=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          BUILD_DATE_READABLE=$(date -u +'%Y-%m-%d %H:%M:%S UTC')
+
+          echo "BUILD_DATE_READABLE=$BUILD_DATE_READABLE" >> $GITHUB_ENV
+
+          for project in "${PROJECT_ARRAY[@]}"; do
+            PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -type d -path "*/publish" | head -1)
+            if [ -z "$PUBLISH_DIR" ]; then
+              echo "::error::Publish directory not found for $project in artifact preparation"
+              exit 1
+            fi
+
+            PROJECT_ARTIFACT_DIR="combined-artifacts/$project"
+            mkdir -p "$PROJECT_ARTIFACT_DIR"
+            cp -r "$PUBLISH_DIR"/* "$PROJECT_ARTIFACT_DIR/"
+          done
+
+          cat > combined-artifacts/version.json <<EOF
+          {
+            "mod": "${{ env.MOD_NAME }}",
+            "version": "${{ env.VERSION }}",
+            "gameLib": "${{ env.LIB_VERSION }}",
+            "buildDate": "$BUILD_DATE_ISO"
+          }
+          EOF
+
+          ZIP_NAME="${{ env.MOD_NAME }}.zip"
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+          (cd combined-artifacts && zip -r "../${ZIP_NAME}" .)
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.full_tag }}
+          name: ${{ env.MOD_NAME }} v${{ env.VERSION }}
+          body: |
+            ### Build Summary
+            ${{ env.BUILD_SUMMARY }}
+            **Game Lib Version**: ${{ env.LIB_VERSION }}
+            **Build Date**: ${{ env.BUILD_DATE_READABLE }}
+          files: ${{ env.ZIP_NAME }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

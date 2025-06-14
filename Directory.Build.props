@@ -1,0 +1,5 @@
+<Project>
+    <PropertyGroup>
+        <LF2GameLib>$(MSBuildThisFileDirectory)game-lib</LF2GameLib>
+    </PropertyGroup>
+</Project>

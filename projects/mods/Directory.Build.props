@@ -1,0 +1,15 @@
+<Project>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+    <PropertyGroup>
+        <IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</IsBackend>
+        <IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</IsFrontend>
+
+        <TargetFramework Condition="'$(IsBackend)' == 'true'">net6.0</TargetFramework>
+        <TargetFramework Condition="'$(IsFrontend)' == 'true'">netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>CA1707</NoWarn>
+    </PropertyGroup>
+</Project>

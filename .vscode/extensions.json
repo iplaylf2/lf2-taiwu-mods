@@ -1,9 +1,10 @@
 {
     "recommendations": [
-        "ms-dotnettools.vscode-dotnet-runtime",
-        "ms-dotnettools.csharp",
         "ms-dotnettools.csdevkit",
-        "streetsidesoftware.code-spell-checker",
-        "redhat.vscode-xml"
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.vscode-dotnet-runtime",
+        "redhat.vscode-xml",
+        "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker"
     ]
 }
