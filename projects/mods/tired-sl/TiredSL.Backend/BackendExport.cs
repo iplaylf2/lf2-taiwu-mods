@@ -1,5 +1,4 @@
 ﻿using GameData.Domains;
-using HarmonyLib;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace TiredSL.Backend;
@@ -7,27 +6,18 @@ namespace TiredSL.Backend;
 [PluginConfig("tired-sl", "lf2", "1.0.0")]
 public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
 {
-    private Harmony? harmony;
-
-    public override void Dispose()
-    {
-        harmony?.UnpatchSelf();
-    }
-
     public override void Initialize()
     {
-        harmony = new Harmony(ModIdStr);
+        HarmonyInstance.PatchAll(typeof(Random.RandomPatch));
 
-        harmony.PatchAll(typeof(Random.RandomPatch));
-
-        harmony.PatchAll(typeof(Combat.CollapseCatchOdds));
-        harmony.PatchAll(typeof(Combat.MissMe));
-        harmony.PatchAll(typeof(Combat.FullCombatAI));
-        harmony.PatchAll(typeof(InitialSetup.AllGoodFeature));
-        harmony.PatchAll(typeof(InitialSetup.CanMoveResource));
-        harmony.PatchAll(typeof(InitialSetup.MyHobbyValue));
-        harmony.PatchAll(typeof(SkillBreakout.BrightenUp));
-        harmony.PatchAll(typeof(SkillBreakout.EndlessStep));
+        HarmonyInstance.PatchAll(typeof(Combat.CollapseCatchOdds));
+        HarmonyInstance.PatchAll(typeof(Combat.MissMe));
+        HarmonyInstance.PatchAll(typeof(Combat.FullCombatAI));
+        HarmonyInstance.PatchAll(typeof(InitialSetup.AllGoodFeature));
+        HarmonyInstance.PatchAll(typeof(InitialSetup.CanMoveResource));
+        HarmonyInstance.PatchAll(typeof(InitialSetup.MyHobbyValue));
+        HarmonyInstance.PatchAll(typeof(SkillBreakout.BrightenUp));
+        HarmonyInstance.PatchAll(typeof(SkillBreakout.EndlessStep));
     }
 
     public override void OnModSettingUpdate()
