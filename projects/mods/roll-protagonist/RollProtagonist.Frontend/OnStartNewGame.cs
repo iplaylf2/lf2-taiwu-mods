@@ -1,33 +1,23 @@
-using System.Collections;
-using GameData.Utilities;
 using HarmonyLib;
 using UnityEngine;
+using GameData.Utilities;
+using System.Collections;
 
 namespace RollProtagonist.Frontend;
 
-[HarmonyPatch(typeof(UI_NewGame), "DoStartNewGame")]
-internal static class OnStartNewGame
+[HarmonyPatch(typeof(UI_NewGame))]
+internal static class OnStartNewGamePatcher
 {
-    public static void HandleAssetBundleLoaded(Harmony harmony, Type baseType, string assetName, UnityEngine.Object asset)
+    [HarmonyPatch("DoStartNewGame"), HarmonyPrefix]
+    private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        if (TargetClassName != assetName
-            || asset is not GameObject gameObject
-            || gameObject.GetComponent<MonoBehaviour>() is not { } uiNewGame
-            || uiNewGame.GetType() is not { } UINewGame
-        )
-        {
-            return;
-        }
-    }
+        InDoStartGame = true;
 
-    private static readonly string TargetClassName = "UI_NewGame";
-
-    private static bool Prefix(UI_NewGame __instance)
-    {
         __instance.StartCoroutine(DoStartNewGame(__instance));
 
         return false;
     }
+
 
     private static IEnumerator DoStartNewGame(UI_NewGame newGameInstance)
     {
@@ -39,5 +29,15 @@ internal static class OnStartNewGame
         AdaptableLog.Info("after DoStartNewGame");
 
         yield return new WaitForSeconds(3);
+
+        InDoStartGame = false;
     }
+
+    [HarmonyPatch("OnStartNewGame"), HarmonyPrefix]
+    private static bool OnStartNewGame()
+    {
+        return !InDoStartGame;
+    }
+
+    private static bool InDoStartGame = false;
 }
