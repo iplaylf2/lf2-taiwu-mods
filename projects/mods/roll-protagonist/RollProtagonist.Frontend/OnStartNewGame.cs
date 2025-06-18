@@ -2,21 +2,23 @@ using HarmonyLib;
 using UnityEngine;
 using GameData.Utilities;
 using System.Collections;
-using System.Runtime.CompilerServices;
+using MonoMod.Cil;
+using System.Reflection;
+using MonoMod.Utils;
 
 namespace RollProtagonist.Frontend;
 
-[HarmonyPatch(typeof(UI_NewGame))]
+[HarmonyPatch(typeof(UI_NewGame), "DoStartNewGame")]
 internal static class OnStartNewGamePatcher
 {
-    [HarmonyPatch("DoStartNewGame"), HarmonyReversePatch]
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void DoStartNewGameOrigin(UI_NewGame uiNewGame)
+    [HarmonyILManipulator]
+    private static void SplitMethodIntoStages(MethodBase origin)
     {
-        throw null!;
+        var ilContext = new ILContext(new DynamicMethodDefinition(origin).Definition);
+        var ilCursor = new ILCursor(ilContext);
     }
 
-    [HarmonyPatch("DoStartNewGame"), HarmonyPrefix]
+    [HarmonyPrefix]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
         __instance.StartCoroutine(DoStartNewGame(__instance));
@@ -29,7 +31,7 @@ internal static class OnStartNewGamePatcher
 
         AdaptableLog.Info("before DoStartNewGame");
 
-        DoStartNewGameOrigin(uiNewGame);
+        // DoStartNewGameOrigin(uiNewGame);
 
         AdaptableLog.Info("after DoStartNewGame");
 
