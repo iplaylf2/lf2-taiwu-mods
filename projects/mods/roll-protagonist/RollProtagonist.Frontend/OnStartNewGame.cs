@@ -33,17 +33,18 @@ internal static class OnStartNewGamePatcher
             var packResult = CreatePackResult(stackValueTypes);
 
 
-            static void EmitPackLocals(ILCursor iLCursor, IEnumerable<VariableDefinition> variables)
+            static void EmitPackLocals(ILCursor iLCursor, ICollection<VariableDefinition> variables)
             {
-                iLCursor.Emit(OpCodes.Ldc_I4, variables.Count());
+
+                iLCursor.Emit(OpCodes.Ldc_I4, variables.Count);
                 iLCursor.Emit(OpCodes.Newarr, typeof(object));
 
-                foreach (var (variable, index) in variables.Select((x, i) => (x, i)))
+                foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
                 {
                     iLCursor.Emit(OpCodes.Dup);
-                    iLCursor.Emit(OpCodes.Ldc_I4, index);
-
+                    iLCursor.Emit(OpCodes.Ldc_I4, i);
                     iLCursor.Emit(OpCodes.Ldloc, variable);
+
                     if (variable.VariableType.IsValueType)
                     {
                         iLCursor.Emit(OpCodes.Box, variable.VariableType);
@@ -119,7 +120,8 @@ internal static class OnStartNewGamePatcher
                     ),
                     isSplitParam,
                     variablesParam
-                )
+                ),
+                parameters
             )
             .Compile();
     }
