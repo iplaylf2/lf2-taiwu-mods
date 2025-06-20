@@ -2,9 +2,13 @@
     "cSpell.words": [
         "callvirt",
         "ldfld",
+        "ldloc",
+        "ldnull",
         "netstandard",
+        "newarr",
         "newobj",
         "redzen",
+        "stelem",
         "stfld",
         "taiwu",
         "transil",

@@ -7,6 +7,8 @@ using System.Reflection;
 using MonoMod.Utils;
 using GameData.Domains.Character;
 using System.Linq.Expressions;
+using Mono.Cecil.Cil;
+using GameData.Domains.Character.Creation;
 
 namespace RollProtagonist.Frontend;
 
@@ -16,39 +18,76 @@ internal static class OnStartNewGamePatcher
     [HarmonyILManipulator]
     private static void SplitMethodIntoStages(MethodBase origin)
     {
-        var stageA = new DynamicMethodDefinition(origin);  // origin 是 void DoStartNewGame()
+        var stageA = new DynamicMethodDefinition(origin);
 
         {
             var ilContext = new ILContext(stageA.Definition);
             var ilCursor = new ILCursor(ilContext);
+            var variables = ilContext.Body.Variables;
+
+            ilContext.Method.ReturnType = ilContext.Module.ImportReference(typeof(Tuple<object[], bool, object[]>));
+
             var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
             var createProtagonistMethod = createProtagonist.GetMethodInfo();
+            Type[] stackValueTypes = [typeof(int), typeof(ProtagonistCreationInfo)];
+            var packResult = CreatePackResult(stackValueTypes);
 
+
+            static void EmitPackLocals(ILCursor iLCursor, IEnumerable<VariableDefinition> variables)
             {
+                iLCursor.Emit(OpCodes.Ldc_I4, variables.Count());
+                iLCursor.Emit(OpCodes.Newarr, typeof(object));
 
-
-                ilCursor.FindNext(out var targets, (x) => x.MatchCallOrCallvirt(createProtagonistMethod));
-
-                foreach (var target in targets)
+                foreach (var (variable, index) in variables.Select((x, i) => (x, i)))
                 {
-                    target.Remove();
-                    // 插入指令： targetMethod 的两个参数在计算栈里，加上局部变量表，和true值表达是分割位置返回，整合后 return
+                    iLCursor.Emit(OpCodes.Dup);
+                    iLCursor.Emit(OpCodes.Ldc_I4, index);
+
+                    iLCursor.Emit(OpCodes.Ldloc, variable);
+                    if (variable.VariableType.IsValueType)
+                    {
+                        iLCursor.Emit(OpCodes.Box, variable.VariableType);
+                    }
+
+                    iLCursor.Emit(OpCodes.Stelem_Ref);
                 }
             }
 
             {
-                ilCursor.FindNext(out var targets, (x) => x.MatchRet());
+                ilCursor.FindNext(out var targetCursors, (x) => x.MatchCallOrCallvirt(createProtagonistMethod));
 
-                foreach (var target in targets)
+                foreach (var targetCursor in targetCursors)
                 {
-                    target.Index--;
-                    // 插入指令：计算栈是空的，填充一些与前面对的空白齐内容，和false值表达非分割位置返回
+                    targetCursor.Remove();
+                    targetCursor.Emit(OpCodes.Ldc_I4_1);
+
+                    EmitPackLocals(targetCursor, variables);
+
+                    targetCursor.EmitDelegate(packResult);
+                    targetCursor.Emit(OpCodes.Ret);
                 }
             }
 
+            {
+                ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
+
+                foreach (var retCursor in retCursors)
+                {
+                    retCursor.Index--;
+
+                    retCursor.Emit(OpCodes.Ldc_I4_0);
+                    retCursor.Emit(OpCodes.Ldnull);
+
+                    retCursor.Emit(OpCodes.Ldc_I4_0);
+
+                    EmitPackLocals(retCursor, variables);
+
+                    retCursor.EmitDelegate(packResult);
+                }
+            }
         }
 
-        // BeforeRoll = stageA.Generate().CreateDelegate<>();
+        BeforeRoll = stageA.Generate().CreateDelegate<Func<Tuple<object[], bool, object[]>>>();
     }
 
     [HarmonyPrefix]
@@ -59,12 +98,12 @@ internal static class OnStartNewGamePatcher
         return false;
     }
 
-    private static Delegate CreatePackFunc(IEnumerable<Type> stackValues, IEnumerable<Type> variables)
+    private static Delegate CreatePackResult(IEnumerable<Type> stackValues)
     {
         var stackValueParams = stackValues.Select((x, i) => Expression.Parameter(x, $"stackValue{i}")).ToArray();
         var isSplitParam = Expression.Parameter(typeof(bool), "isSplit");
-        var variableParams = variables.Select((x, i) => Expression.Parameter(x, $"variable{i}")).ToArray();
-        ParameterExpression[] parameters = [.. stackValueParams, isSplitParam, .. variableParams];
+        var variablesParam = Expression.Parameter(typeof(object[]), "variables");
+        ParameterExpression[] parameters = [.. stackValueParams, isSplitParam, variablesParam];
 
         var objectType = typeof(object);
 
@@ -79,14 +118,10 @@ internal static class OnStartNewGamePatcher
                         )
                     ),
                     isSplitParam,
-                    Expression.NewArrayInit(
-                        typeof(object),
-                        variableParams.Select(
-                            x => x.Type.IsValueType ? Expression.Convert(x, objectType) : (Expression)x
-                        )
-                    )
+                    variablesParam
                 )
-            ).Compile();
+            )
+            .Compile();
     }
 
     private static IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
@@ -103,5 +138,5 @@ internal static class OnStartNewGamePatcher
         AdaptableLog.Info("after WaitForSeconds");
     }
 
-    private static Func<object[]>? BeforeRoll;
+    private static Func<Tuple<object[], bool, object[]>>? BeforeRoll;
 }
