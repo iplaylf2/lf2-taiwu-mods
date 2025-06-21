@@ -95,7 +95,7 @@ internal static class OnStartNewGamePatcher
 
                     EmitPackLocals(retCursor, variables);
 
-                    retCursor.EmitDelegate(packResult);
+                    retCursor.Emit(OpCodes.Call, packResult);
                 }
             }
 
@@ -110,7 +110,8 @@ internal static class OnStartNewGamePatcher
 
                 EmitPackLocals(targetCursor, variables);
 
-                targetCursor.EmitDelegate(packResult);
+                targetCursor.Emit(OpCodes.Call, packResult);
+
                 targetCursor.Emit(OpCodes.Ret);
             }
 
@@ -172,7 +173,7 @@ internal static class OnStartNewGamePatcher
         return false;
     }
 
-    private static Delegate CreatePackResult(IEnumerable<Type> stackValues)
+    private static MethodInfo CreatePackResult(IEnumerable<Type> stackValues)
     {
         var stackValueParams = stackValues.Select((x, i) => Expression.Parameter(x, $"stackValue{i}")).ToArray();
         var isSplitParam = Expression.Parameter(typeof(bool), "isSplit");
@@ -181,10 +182,13 @@ internal static class OnStartNewGamePatcher
 
         var objectType = typeof(object);
 
-        return Expression
+        var lambda = Expression
             .Lambda(
                 Expression.New(
-                    typeof(Tuple<object[], bool, object[]>).GetConstructors().First(),
+                    AccessTools.FirstConstructor(
+                        typeof(Tuple<object[], bool, object[]>),
+                         x => x.GetParameters().Length == 3
+                    ),
                     Expression.NewArrayInit(
                         typeof(object),
                         stackValueParams.Select(
@@ -195,10 +199,77 @@ internal static class OnStartNewGamePatcher
                     variablesParam
                 ),
                 parameters
-            )
-            .Compile();
+            );
+
+        return ILHelper.CreateDynamicMethod(lambda);
     }
 
     private static Func<UI_NewGame, Tuple<object[], bool, object[]>>? BeforeRoll;
     private static Action<UI_NewGame, object[]>? AfterRoll;
+}
+
+class ILHelper
+{
+    public static MethodInfo CreateDynamicMethod(LambdaExpression lambda)
+    {
+        var targetDelegate = lambda.Compile();
+        var delegateType = targetDelegate.GetType();
+        var paramTypes = targetDelegate.Method.GetParameters().Select(p => p.ParameterType).ToArray();
+
+        var dynamicMethod = new DynamicMethodDefinition(
+            name: targetDelegate.Method.Name,
+            returnType: targetDelegate.Method.ReturnType,
+            parameterTypes: paramTypes
+        );
+
+        var il = dynamicMethod.GetILProcessor();
+        var targetType = targetDelegate.Target.GetType();
+
+        bool preserveContext = targetDelegate.Target != null &&
+                              targetType.GetFields().Any(f => !f.IsStatic);
+
+        if (preserveContext)
+        {
+            var currentDelegateCounter = DelegateCounter++;
+
+            DelegateCache[currentDelegateCounter] = targetDelegate;
+
+            var cacheField = AccessTools.Field(typeof(ILHelper), nameof(DelegateCache));
+            var getMethod = AccessTools.Method(typeof(Dictionary<int, Delegate>), "get_Item");
+
+            il.Emit(OpCodes.Ldsfld, cacheField);
+            il.Emit(OpCodes.Ldc_I4, currentDelegateCounter);
+            il.Emit(OpCodes.Callvirt, getMethod);
+        }
+        else
+        {
+            if (targetDelegate.Target == null)
+            {
+                il.Emit(OpCodes.Ldnull);
+            }
+            else
+            {
+                il.Emit(
+                    OpCodes.Newobj,
+                    AccessTools.FirstConstructor(targetType, x => x.GetParameters().Length == 0 && !x.IsStatic)
+                );
+            }
+
+            il.Emit(OpCodes.Ldftn, targetDelegate.Method);
+            il.Emit(OpCodes.Newobj, AccessTools.Constructor(delegateType, [typeof(object), typeof(IntPtr)]));
+        }
+
+        for (int i = 0; i < paramTypes.Length; i++)
+        {
+            il.Emit(OpCodes.Ldarg, i);
+        }
+
+        il.Emit(OpCodes.Callvirt, AccessTools.Method(delegateType, "Invoke"));
+        il.Emit(OpCodes.Ret);
+
+        return dynamicMethod.Generate();
+    }
+
+    private static readonly Dictionary<int, Delegate> DelegateCache = [];
+    private static int DelegateCounter;
 }
