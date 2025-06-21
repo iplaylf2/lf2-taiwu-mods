@@ -98,8 +98,6 @@ internal static class OnStartNewGamePatcher
 
                 foreach (var retCursor in retCursors)
                 {
-                    retCursor.Index--;
-
                     retCursor.Emit(OpCodes.Ldc_I4_0);
                     retCursor.Emit(OpCodes.Ldnull);
 
@@ -157,29 +155,29 @@ internal static class OnStartNewGamePatcher
                 var skipBefore = ilCursor.DefineLabel();
 
                 ilCursor.Index = 0;
-
-                ilCursor.Emit(OpCodes.Jmp, skipBefore);
+                ilCursor.Emit(OpCodes.Br, skipBefore);
 
                 var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
 
-                ilCursor.MarkLabel(skipBefore);
+                targetCursor.Index++;
+                targetCursor.MarkLabel(skipBefore);
 
                 foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
                 {
-                    ilCursor.Emit(OpCodes.Ldarg_1);
-                    ilCursor.Emit(OpCodes.Ldc_I4, i);
-                    ilCursor.Emit(OpCodes.Ldelem_Ref);
+                    targetCursor.Emit(OpCodes.Ldarg_1);
+                    targetCursor.Emit(OpCodes.Ldc_I4, i);
+                    targetCursor.Emit(OpCodes.Ldelem_Ref);
 
                     if (variable.VariableType.IsValueType)
                     {
-                        ilCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
+                        targetCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
                     }
                     else
                     {
-                        ilCursor.Emit(OpCodes.Castclass, variable.VariableType);
+                        targetCursor.Emit(OpCodes.Castclass, variable.VariableType);
                     }
 
-                    ilCursor.Emit(OpCodes.Stloc, variable);
+                    targetCursor.Emit(OpCodes.Stloc, variable);
                 }
             }
 
