@@ -89,9 +89,16 @@ internal static class OnStartNewGamePatcher
                 targetCursor.Emit(OpCodes.Ret);
             }
 
-            BeforeRoll = stage.Generate().CreateDelegate<Func<Tuple<object[], bool, object[]>>>();
+            BeforeRoll = stage.Generate().CreateDelegate<Func<UI_NewGame, Tuple<object[], bool, object[]>>>();
         }
 
+        {
+            var stage = new DynamicMethodDefinition(origin);
+
+            var ilContext = new ILContext(stage.Definition);
+            var ilCursor = new ILCursor(ilContext);
+            var variables = ilContext.Body.Variables;
+        }
     }
 
     [HarmonyPrefix]
@@ -131,17 +138,29 @@ internal static class OnStartNewGamePatcher
 
     private static IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
     {
+        var (stackValues, isRoll, variables) = BeforeRoll!(uiNewGame);
 
-        AdaptableLog.Info("before DoStartNewGame");
+        if (!isRoll)
+        {
+            throw new InvalidOperationException("New game initialization failed.");
+        }
 
-        // DoStartNewGameOrigin(uiNewGame);
+        AdaptableLog.Info("Before roll");
 
-        AdaptableLog.Info("after DoStartNewGame");
+        yield return null;
 
-        yield return new WaitForSeconds(3);
+        CharacterDomainHelper.MethodCall.CreateProtagonist(
+            (int)stackValues[0],
+            (ProtagonistCreationInfo)stackValues[1]
+        );
 
-        AdaptableLog.Info("after WaitForSeconds");
+        yield return null;
+
+        AdaptableLog.Info("After roll completed successfully");
+
+        AfterRoll!(variables);
     }
 
-    private static Func<Tuple<object[], bool, object[]>>? BeforeRoll;
+    private static Func<UI_NewGame, Tuple<object[], bool, object[]>>? BeforeRoll;
+    private static Action<object[]> AfterRoll;
 }
