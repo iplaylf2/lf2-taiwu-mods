@@ -18,20 +18,20 @@ internal static class OnStartNewGamePatcher
     [HarmonyILManipulator]
     private static void SplitMethodIntoStages(MethodBase origin)
     {
-        var stageA = new DynamicMethodDefinition(origin);
+        var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
+        var createProtagonistMethod = createProtagonist.GetMethodInfo();
 
         {
-            var ilContext = new ILContext(stageA.Definition);
+            var stage = new DynamicMethodDefinition(origin);
+
+            var ilContext = new ILContext(stage.Definition);
             var ilCursor = new ILCursor(ilContext);
             var variables = ilContext.Body.Variables;
 
             ilContext.Method.ReturnType = ilContext.Module.ImportReference(typeof(Tuple<object[], bool, object[]>));
 
-            var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
-            var createProtagonistMethod = createProtagonist.GetMethodInfo();
             Type[] stackValueTypes = [typeof(int), typeof(ProtagonistCreationInfo)];
             var packResult = CreatePackResult(stackValueTypes);
-
 
             static void EmitPackLocals(ILCursor iLCursor, ICollection<VariableDefinition> variables)
             {
@@ -55,21 +55,8 @@ internal static class OnStartNewGamePatcher
             }
 
             {
-                ilCursor.FindNext(out var targetCursors, (x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+                ilCursor.Index = 0;
 
-                foreach (var targetCursor in targetCursors)
-                {
-                    targetCursor.Remove();
-                    targetCursor.Emit(OpCodes.Ldc_I4_1);
-
-                    EmitPackLocals(targetCursor, variables);
-
-                    targetCursor.EmitDelegate(packResult);
-                    targetCursor.Emit(OpCodes.Ret);
-                }
-            }
-
-            {
                 ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
                 foreach (var retCursor in retCursors)
@@ -79,16 +66,32 @@ internal static class OnStartNewGamePatcher
                     retCursor.Emit(OpCodes.Ldc_I4_0);
                     retCursor.Emit(OpCodes.Ldnull);
 
-                    retCursor.Emit(OpCodes.Ldc_I4_0);
+                    retCursor.Emit(OpCodes.Ldc_I4_0);  // false
 
                     EmitPackLocals(retCursor, variables);
 
                     retCursor.EmitDelegate(packResult);
                 }
             }
+
+            {
+                ilCursor.Index = 0;
+
+                var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+
+                targetCursor.Remove();
+
+                targetCursor.Emit(OpCodes.Ldc_I4_1); // true
+
+                EmitPackLocals(targetCursor, variables);
+
+                targetCursor.EmitDelegate(packResult);
+                targetCursor.Emit(OpCodes.Ret);
+            }
+
+            BeforeRoll = stage.Generate().CreateDelegate<Func<Tuple<object[], bool, object[]>>>();
         }
 
-        BeforeRoll = stageA.Generate().CreateDelegate<Func<Tuple<object[], bool, object[]>>>();
     }
 
     [HarmonyPrefix]
