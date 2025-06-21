@@ -43,16 +43,26 @@ internal static class OnStartNewGamePatcher
     [HarmonyILManipulator]
     private static void SplitMethodIntoStages(MethodBase origin)
     {
+        var originDefinition = new DynamicMethodDefinition(origin);
+
         var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
         var createProtagonistMethod = createProtagonist.GetMethodInfo();
 
         {
-            var stage = new DynamicMethodDefinition(origin);
+            var stage = new DynamicMethodDefinition(
+                "BeforeRoll",
+                typeof(Tuple<object[], bool, object[]>),
+                [.. origin.GetParameters().Select(x => x.ParameterType)]
+            )
+            {
+                Definition = {
+                    Body = originDefinition.Definition.Body,
+                },
+                OwnerType = originDefinition.OwnerType
+            };
 
             var ilContext = new ILContext(stage.Definition);
             var ilCursor = new ILCursor(ilContext);
-
-            ilContext.Method.ReturnType = ilContext.Module.ImportReference(typeof(Tuple<object[], bool, object[]>));
 
             var variables = ilContext.Body.Variables;
             Type[] stackValueTypes = [typeof(int), typeof(ProtagonistCreationInfo)];
@@ -115,19 +125,30 @@ internal static class OnStartNewGamePatcher
                 targetCursor.Emit(OpCodes.Ret);
             }
 
-            BeforeRoll = stage.Generate().CreateDelegate<Func<UI_NewGame, Tuple<object[], bool, object[]>>>();
+            var method = stage.Generate();
+
+            AdaptableLog.Info("method ReturnType:" + method.ReturnType.ToString());
+
+            BeforeRoll = (BeforeRollDelegate)Delegate.CreateDelegate(typeof(BeforeRollDelegate), null, method);
         }
 
         // custom CreateProtagonist
 
         {
-            var stage = new DynamicMethodDefinition(origin);
+            var stage = new DynamicMethodDefinition(
+                "AfterRoll",
+                typeof(void),
+                [.. origin.GetParameters().Select(x => x.ParameterType), typeof(object[])]
+            )
+            {
+                Definition = {
+                    Body = originDefinition.Definition.Body,
+                },
+                OwnerType = originDefinition.OwnerType
+            };
 
             var ilContext = new ILContext(stage.Definition);
             var ilCursor = new ILCursor(ilContext);
-
-            var objectArrayType = ilContext.Module.ImportReference(typeof(object[]));
-            ilContext.Method.Parameters.Add(new ParameterDefinition(objectArrayType));
 
             var variables = ilContext.Body.Variables;
 
@@ -161,7 +182,11 @@ internal static class OnStartNewGamePatcher
                 }
             }
 
-            AfterRoll = stage.Generate().CreateDelegate<Action<UI_NewGame, object[]>>();
+            var method = stage.Generate();
+
+            AdaptableLog.Info("method ReturnType:" + method.ReturnType.ToString());
+
+            AfterRoll = (AfterRollDelegate)Delegate.CreateDelegate(typeof(AfterRollDelegate), null, stage.Generate());
         }
     }
 
@@ -203,9 +228,10 @@ internal static class OnStartNewGamePatcher
 
         return ILHelper.CreateDynamicMethod(lambda);
     }
-
-    private static Func<UI_NewGame, Tuple<object[], bool, object[]>>? BeforeRoll;
-    private static Action<UI_NewGame, object[]>? AfterRoll;
+    private delegate Tuple<object[], bool, object[]> BeforeRollDelegate(UI_NewGame instance);
+    private delegate void AfterRollDelegate(UI_NewGame instance, object[] variables);
+    private static BeforeRollDelegate? BeforeRoll;
+    private static AfterRollDelegate? AfterRoll;
 }
 
 class ILHelper
