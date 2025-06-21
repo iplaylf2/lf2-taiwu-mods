@@ -8,6 +8,7 @@ using GameData.Domains.Character;
 using System.Linq.Expressions;
 using Mono.Cecil.Cil;
 using GameData.Domains.Character.Creation;
+using Mono.Cecil;
 
 namespace RollProtagonist.Frontend;
 
