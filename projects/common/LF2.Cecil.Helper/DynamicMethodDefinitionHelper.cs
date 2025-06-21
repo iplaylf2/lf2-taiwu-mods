@@ -16,7 +16,6 @@ public static class DynamicMethodDefinitionHelper
 
     public static DynamicMethodDefinition CreateFrom(
         MethodBase prototype,
-        string name,
         Type returnType,
         Type[] parameterTypes
     )
@@ -25,7 +24,7 @@ public static class DynamicMethodDefinitionHelper
         var prototypeContext = new ILContext(prototypeDMD.Definition);
 
         var result = new DynamicMethodDefinition(
-            name,
+            prototypeDMD.Name,
             returnType,
             parameterTypes
         );
