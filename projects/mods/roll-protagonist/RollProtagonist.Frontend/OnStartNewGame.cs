@@ -9,6 +9,7 @@ using GameData.Domains.Character;
 using System.Linq.Expressions;
 using Mono.Cecil.Cil;
 using GameData.Domains.Character.Creation;
+using Mono.Cecil;
 
 namespace RollProtagonist.Frontend;
 
@@ -26,10 +27,10 @@ internal static class OnStartNewGamePatcher
 
             var ilContext = new ILContext(stage.Definition);
             var ilCursor = new ILCursor(ilContext);
-            var variables = ilContext.Body.Variables;
 
             ilContext.Method.ReturnType = ilContext.Module.ImportReference(typeof(Tuple<object[], bool, object[]>));
 
+            var variables = ilContext.Body.Variables;
             Type[] stackValueTypes = [typeof(int), typeof(ProtagonistCreationInfo)];
             var packResult = CreatePackResult(stackValueTypes);
 
@@ -92,12 +93,50 @@ internal static class OnStartNewGamePatcher
             BeforeRoll = stage.Generate().CreateDelegate<Func<UI_NewGame, Tuple<object[], bool, object[]>>>();
         }
 
+        // custom CreateProtagonist
+
         {
             var stage = new DynamicMethodDefinition(origin);
 
             var ilContext = new ILContext(stage.Definition);
             var ilCursor = new ILCursor(ilContext);
+
+            var objectArrayType = ilContext.Module.ImportReference(typeof(object[]));
+            ilContext.Method.Parameters.Add(new ParameterDefinition(objectArrayType));
+
             var variables = ilContext.Body.Variables;
+
+            {
+                var skipBefore = ilCursor.DefineLabel();
+
+                ilCursor.Index = 0;
+
+                ilCursor.Emit(OpCodes.Jmp, skipBefore);
+
+                var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+
+                ilCursor.MarkLabel(skipBefore);
+
+                foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
+                {
+                    ilCursor.Emit(OpCodes.Ldarg_1);
+                    ilCursor.Emit(OpCodes.Ldc_I4, i);
+                    ilCursor.Emit(OpCodes.Ldelem_Ref);
+
+                    if (variable.VariableType.IsValueType)
+                    {
+                        ilCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
+                    }
+                    else
+                    {
+                        ilCursor.Emit(OpCodes.Castclass, variable.VariableType);
+                    }
+
+                    ilCursor.Emit(OpCodes.Stloc, variable);
+                }
+            }
+
+            AfterRoll = stage.Generate().CreateDelegate<Action<UI_NewGame, object[]>>();
         }
     }
 
@@ -158,9 +197,9 @@ internal static class OnStartNewGamePatcher
 
         AdaptableLog.Info("After roll completed successfully");
 
-        AfterRoll!(variables);
+        AfterRoll!(uiNewGame, variables);
     }
 
     private static Func<UI_NewGame, Tuple<object[], bool, object[]>>? BeforeRoll;
-    private static Action<object[]> AfterRoll;
+    private static Action<UI_NewGame, object[]>? AfterRoll;
 }
