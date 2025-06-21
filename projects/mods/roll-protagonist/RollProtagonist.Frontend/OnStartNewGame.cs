@@ -43,16 +43,18 @@ internal static class OnStartNewGamePatcher
     [HarmonyILManipulator]
     private static void SplitMethodIntoStages(MethodBase origin)
     {
-        var originDefinition = new DynamicMethodDefinition(origin);
+        AdaptableLog.Info("SplitMethodIntoStages started");
 
         var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
         var createProtagonistMethod = createProtagonist.GetMethodInfo();
 
         {
+            var originDefinition = new DynamicMethodDefinition(origin);
+
             var stage = new DynamicMethodDefinition(
                 "BeforeRoll",
                 typeof(Tuple<object[], bool, object[]>),
-                [.. origin.GetParameters().Select(x => x.ParameterType)]
+                [origin.GetThisParamType(), .. origin.GetParameters().Select(x => x.ParameterType)]
             )
             {
                 Definition = {
@@ -125,20 +127,19 @@ internal static class OnStartNewGamePatcher
                 targetCursor.Emit(OpCodes.Ret);
             }
 
-            var method = stage.Generate();
-
-            AdaptableLog.Info("method ReturnType:" + method.ReturnType.ToString());
-
-            BeforeRoll = (BeforeRollDelegate)Delegate.CreateDelegate(typeof(BeforeRollDelegate), null, method);
+            BeforeRoll = stage.Generate().CreateDelegate<BeforeRollDelegate>(null);
         }
 
+        AdaptableLog.Info("BeforeRoll generated");
         // custom CreateProtagonist
 
         {
+            var originDefinition = new DynamicMethodDefinition(origin);
+
             var stage = new DynamicMethodDefinition(
                 "AfterRoll",
                 typeof(void),
-                [.. origin.GetParameters().Select(x => x.ParameterType), typeof(object[])]
+                [origin.GetThisParamType(), .. origin.GetParameters().Select(x => x.ParameterType), typeof(object[])]
             )
             {
                 Definition = {
@@ -182,12 +183,12 @@ internal static class OnStartNewGamePatcher
                 }
             }
 
-            var method = stage.Generate();
+            AdaptableLog.Info("AfterRoll il\n" + ilContext.Body.Instructions.Join(x => x.ToString(), "\n"));
 
-            AdaptableLog.Info("method ReturnType:" + method.ReturnType.ToString());
-
-            AfterRoll = (AfterRollDelegate)Delegate.CreateDelegate(typeof(AfterRollDelegate), null, stage.Generate());
+            AfterRoll = stage.Generate().CreateDelegate<AfterRollDelegate>(null);
         }
+
+        AdaptableLog.Info("AfterRoll generated");
     }
 
     [HarmonyPrefix]
@@ -240,7 +241,11 @@ class ILHelper
     {
         var targetDelegate = lambda.Compile();
         var delegateType = targetDelegate.GetType();
-        var paramTypes = targetDelegate.Method.GetParameters().Select(p => p.ParameterType).ToArray();
+        var paramTypes = targetDelegate.Method
+            .GetParameters()
+            .Skip(1)
+            .Select(p => p.ParameterType)
+            .ToArray();
 
         var dynamicMethod = new DynamicMethodDefinition(
             name: targetDelegate.Method.Name,
