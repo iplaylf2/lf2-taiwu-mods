@@ -1,5 +1,4 @@
 using HarmonyLib;
-using UnityEngine;
 using GameData.Utilities;
 using System.Collections;
 using MonoMod.Cil;
@@ -16,6 +15,31 @@ namespace RollProtagonist.Frontend;
 [HarmonyPatch(typeof(UI_NewGame), "DoStartNewGame")]
 internal static class OnStartNewGamePatcher
 {
+    private static IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
+    {
+        var (stackValues, isRoll, variables) = BeforeRoll!(uiNewGame);
+
+        if (!isRoll)
+        {
+            throw new InvalidOperationException("New game initialization failed.");
+        }
+
+        AdaptableLog.Info("Before roll");
+
+        yield return null;
+
+        CharacterDomainHelper.MethodCall.CreateProtagonist(
+            (int)stackValues[0],
+            (ProtagonistCreationInfo)stackValues[1]
+        );
+
+        yield return null;
+
+        AdaptableLog.Info("After roll completed successfully");
+
+        AfterRoll!(uiNewGame, variables);
+    }
+
     [HarmonyILManipulator]
     private static void SplitMethodIntoStages(MethodBase origin)
     {
@@ -173,31 +197,6 @@ internal static class OnStartNewGamePatcher
                 parameters
             )
             .Compile();
-    }
-
-    private static IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
-    {
-        var (stackValues, isRoll, variables) = BeforeRoll!(uiNewGame);
-
-        if (!isRoll)
-        {
-            throw new InvalidOperationException("New game initialization failed.");
-        }
-
-        AdaptableLog.Info("Before roll");
-
-        yield return null;
-
-        CharacterDomainHelper.MethodCall.CreateProtagonist(
-            (int)stackValues[0],
-            (ProtagonistCreationInfo)stackValues[1]
-        );
-
-        yield return null;
-
-        AdaptableLog.Info("After roll completed successfully");
-
-        AfterRoll!(uiNewGame, variables);
     }
 
     private static Func<UI_NewGame, Tuple<object[], bool, object[]>>? BeforeRoll;
