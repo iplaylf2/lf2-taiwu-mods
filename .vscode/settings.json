@@ -2,6 +2,7 @@
     "cSpell.words": [
         "callvirt",
         "castclass",
+        "instrs",
         "ldarg",
         "ldelem",
         "ldfld",

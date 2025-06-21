@@ -63,67 +63,69 @@ internal static class OnStartNewGamePatcher
                 OwnerType = originDefinition.OwnerType
             };
 
-            var ilContext = new ILContext(stage.Definition);
-            var ilCursor = new ILCursor(ilContext);
-
-            var variables = ilContext.Body.Variables;
-            Type[] stackValueTypes = [typeof(int), typeof(ProtagonistCreationInfo)];
-            var packResult = CreatePackResult(stackValueTypes);
-
-            static void EmitPackLocals(ILCursor iLCursor, ICollection<VariableDefinition> variables)
+            new ILContext(stage.Definition).Invoke(ilContext =>
             {
+                var ilCursor = new ILCursor(ilContext);
 
-                iLCursor.Emit(OpCodes.Ldc_I4, variables.Count);
-                iLCursor.Emit(OpCodes.Newarr, typeof(object));
+                var variables = ilContext.Body.Variables;
+                Type[] stackValueTypes = [typeof(int), typeof(ProtagonistCreationInfo)];
+                var packResult = CreatePackResult(stackValueTypes);
 
-                foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
+                static void EmitPackLocals(ILCursor iLCursor, ICollection<VariableDefinition> variables)
                 {
-                    iLCursor.Emit(OpCodes.Dup);
-                    iLCursor.Emit(OpCodes.Ldc_I4, i);
-                    iLCursor.Emit(OpCodes.Ldloc, variable);
 
-                    if (variable.VariableType.IsValueType)
+                    iLCursor.Emit(OpCodes.Ldc_I4, variables.Count);
+                    iLCursor.Emit(OpCodes.Newarr, typeof(object));
+
+                    foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
                     {
-                        iLCursor.Emit(OpCodes.Box, variable.VariableType);
+                        iLCursor.Emit(OpCodes.Dup);
+                        iLCursor.Emit(OpCodes.Ldc_I4, i);
+                        iLCursor.Emit(OpCodes.Ldloc, variable);
+
+                        if (variable.VariableType.IsValueType)
+                        {
+                            iLCursor.Emit(OpCodes.Box, variable.VariableType);
+                        }
+
+                        iLCursor.Emit(OpCodes.Stelem_Ref);
                     }
-
-                    iLCursor.Emit(OpCodes.Stelem_Ref);
                 }
-            }
 
-            {
-                ilCursor.Index = 0;
-
-                ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
-
-                foreach (var retCursor in retCursors)
                 {
-                    retCursor.Emit(OpCodes.Ldc_I4_0);
-                    retCursor.Emit(OpCodes.Ldnull);
+                    ilCursor.Index = 0;
 
-                    retCursor.Emit(OpCodes.Ldc_I4_0);  // false
+                    ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
-                    EmitPackLocals(retCursor, variables);
+                    foreach (var retCursor in retCursors)
+                    {
+                        retCursor.Emit(OpCodes.Ldc_I4_0);
+                        retCursor.Emit(OpCodes.Ldnull);
 
-                    retCursor.Emit(OpCodes.Call, packResult);
+                        retCursor.Emit(OpCodes.Ldc_I4_0);  // false
+
+                        EmitPackLocals(retCursor, variables);
+
+                        retCursor.Emit(OpCodes.Call, packResult);
+                    }
                 }
-            }
 
-            {
-                ilCursor.Index = 0;
+                {
+                    ilCursor.Index = 0;
 
-                var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+                    var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
 
-                targetCursor.Remove();
+                    targetCursor.Remove();
 
-                targetCursor.Emit(OpCodes.Ldc_I4_1); // true
+                    targetCursor.Emit(OpCodes.Ldc_I4_1); // true
 
-                EmitPackLocals(targetCursor, variables);
+                    EmitPackLocals(targetCursor, variables);
 
-                targetCursor.Emit(OpCodes.Call, packResult);
+                    targetCursor.Emit(OpCodes.Call, packResult);
 
-                targetCursor.Emit(OpCodes.Ret);
-            }
+                    targetCursor.Emit(OpCodes.Ret);
+                }
+            });
 
             BeforeRoll = stage.Generate().CreateDelegate<BeforeRollDelegate>(null);
         }
@@ -146,42 +148,42 @@ internal static class OnStartNewGamePatcher
                 OwnerType = originDefinition.OwnerType
             };
 
-            var ilContext = new ILContext(stage.Definition);
-            var ilCursor = new ILCursor(ilContext);
-
-            var variables = ilContext.Body.Variables;
-
+            new ILContext(stage.Definition).Invoke(ilContext =>
             {
-                var skipBefore = ilCursor.DefineLabel();
+                var ilCursor = new ILCursor(ilContext);
 
-                ilCursor.Index = 0;
-                ilCursor.Emit(OpCodes.Br, skipBefore);
+                var variables = ilContext.Body.Variables;
 
-                var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
-
-                targetCursor.Index++;
-                targetCursor.MarkLabel(skipBefore);
-
-                foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
                 {
-                    targetCursor.Emit(OpCodes.Ldarg_1);
-                    targetCursor.Emit(OpCodes.Ldc_I4, i);
-                    targetCursor.Emit(OpCodes.Ldelem_Ref);
+                    var skipBefore = ilContext.DefineLabel();
 
-                    if (variable.VariableType.IsValueType)
-                    {
-                        targetCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
-                    }
-                    else
-                    {
-                        targetCursor.Emit(OpCodes.Castclass, variable.VariableType);
-                    }
+                    ilCursor.Index = 0;
+                    ilCursor.Emit(OpCodes.Br, skipBefore);
 
-                    targetCursor.Emit(OpCodes.Stloc, variable);
+                    var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+
+                    targetCursor.Index++;
+                    targetCursor.MarkLabel(skipBefore);
+
+                    foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
+                    {
+                        targetCursor.Emit(OpCodes.Ldarg_1);
+                        targetCursor.Emit(OpCodes.Ldc_I4, i);
+                        targetCursor.Emit(OpCodes.Ldelem_Ref);
+
+                        if (variable.VariableType.IsValueType)
+                        {
+                            targetCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
+                        }
+                        else
+                        {
+                            targetCursor.Emit(OpCodes.Castclass, variable.VariableType);
+                        }
+
+                        targetCursor.Emit(OpCodes.Stloc, variable);
+                    }
                 }
-            }
-
-            AdaptableLog.Info("AfterRoll il\n" + ilContext.Body.Instructions.Join(x => x.ToString(), "\n"));
+            });
 
             AfterRoll = stage.Generate().CreateDelegate<AfterRollDelegate>(null);
         }
