@@ -9,14 +9,14 @@ namespace LF2.Cecil.Helper;
 
 public sealed class MethodSplitter<T> :
     MethodSplitter<T>.ISplitContext,
-    MethodSplitter<T>.ILeftCapture,
+    MethodSplitter<T>.ILeftProtectOrigin,
     MethodSplitter<T>.ILeftLeave,
     MethodSplitter<T>.IRightEnter,
     MethodSplitter<T>.IRightRestore,
     MethodSplitter<T>.ICreateDelegate
     where T : Delegate
 {
-    public static ILeftCapture CreateLeftSegment(MethodBase prototype)
+    public static ILeftProtectOrigin CreateLeftSegment(MethodBase prototype)
     {
         return new MethodSplitter<T>(prototype);
     }
@@ -26,9 +26,9 @@ public sealed class MethodSplitter<T> :
         return new MethodSplitter<T>(prototype);
     }
 
-    public ILeftLeave CaptureLeftState(IEnumerable<Type> stackValues, Action<ISplitContext, ILCursor> alignStack)
+    public ILeftLeave ProtectLeftOrigin()
     {
-        statePack = CreateStatePack(stackValues);
+        var shouldBox = prototype.ReturnType.IsValueType;
 
         splitContext.Invoke(ilContext =>
         {
@@ -36,28 +36,40 @@ public sealed class MethodSplitter<T> :
 
             ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
-            foreach (var retCursor in retCursors)
+            if (prototype.ReturnType == typeof(void))
             {
-                retCursor.Remove();
-
-                alignStack(this, retCursor);
-
-                EmitPackReturn(retCursor, false, statePack);
+                PatchVoidReturns(retCursors);
+            }
+            else if (prototype.ReturnType.IsValueType)
+            {
+                PatchValueReturns(retCursors, prototype.ReturnType);
+            }
+            else
+            {
+                PatchObjectReturns(retCursors);
             }
         });
 
         return this;
     }
 
-    public ICreateDelegate LeaveLeft(Action<ISplitContext, ILCursor> handleLeavePoint)
+    public ICreateDelegate LeaveLeft(IEnumerable<Type> stackValueTypes, Action<ISplitContext, ILCursor> handleLeavePoint)
     {
+        var statePack = CreateStatePack(stackValueTypes);
+
         splitContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
             handleLeavePoint(this, ilCursor);
 
-            EmitPackReturn(ilCursor, true, statePack!);
+            ilCursor.Emit(OpCodes.Ldc_I4_1);
+
+            EmitLocalsPack(ilCursor);
+
+            ilCursor.Emit(OpCodes.Call, statePack);
+
+            ilCursor.Emit(OpCodes.Ret);
         });
 
         return this;
@@ -123,14 +135,14 @@ public sealed class MethodSplitter<T> :
         public MethodInfo DelegateType { get; }
     }
 
-    public interface ILeftCapture
+    public interface ILeftProtectOrigin
     {
-        ILeftLeave CaptureLeftState(IEnumerable<Type> stackValueTypes, Action<ISplitContext, ILCursor> alignStack);
+        ILeftLeave ProtectLeftOrigin();
     }
 
     public interface ILeftLeave
     {
-        ICreateDelegate LeaveLeft(Action<ISplitContext, ILCursor> handleLeftPoint);
+        ICreateDelegate LeaveLeft(IEnumerable<Type> stackValueTypes, Action<ISplitContext, ILCursor> handleLeftPoint);
     }
 
     public interface IRightEnter
@@ -152,6 +164,8 @@ public sealed class MethodSplitter<T> :
 
     private MethodSplitter(MethodBase prototype)
     {
+        this.prototype = (MethodInfo)prototype;
+
         DelegateType = typeof(T).GetMethod("Invoke");
         dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom(
             prototype,
@@ -192,15 +206,35 @@ public sealed class MethodSplitter<T> :
         return ExpressionHelper.CreateStaticMethod(lambda);
     }
 
-    private static void EmitPackReturn(ILCursor ilCursor, bool isSplitReturn, MethodInfo statePack)
+    private static void PatchVoidReturns(ILCursor[] ilCursors)
     {
-        ilCursor.Emit(isSplitReturn ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+        foreach (var ilCursor in ilCursors)
+        {
+            ilCursor.Emit(OpCodes.Ldnull);
+            ilCursor.EmitDelegate(PackOriginReturn);
+        }
+    }
 
-        EmitLocalsPack(ilCursor);
+    private static void PatchValueReturns(ILCursor[] ilCursors, Type type)
+    {
+        foreach (var ilCursor in ilCursors)
+        {
+            ilCursor.Emit(OpCodes.Box, type);
+            ilCursor.EmitDelegate(PackOriginReturn);
+        }
+    }
 
-        ilCursor.Emit(OpCodes.Call, statePack);
+    private static void PatchObjectReturns(ILCursor[] ilCursors)
+    {
+        foreach (var ilCursor in ilCursors)
+        {
+            ilCursor.EmitDelegate(PackOriginReturn);
+        }
+    }
 
-        ilCursor.Emit(OpCodes.Ret);
+    private static Tuple<object[], bool, object[]> PackOriginReturn(object returnValue)
+    {
+        return new([returnValue], false, []);
     }
 
     private static void EmitLocalsPack(ILCursor ilCursor)
@@ -224,9 +258,8 @@ public sealed class MethodSplitter<T> :
             ilCursor.Emit(OpCodes.Stelem_Ref);
         }
     }
-
+    private readonly MethodInfo prototype;
     private readonly DynamicMethodDefinition dynamicMethod;
     private readonly ILContext splitContext;
-    private MethodInfo? statePack;
     private ILLabel? rightEntry;
 }
