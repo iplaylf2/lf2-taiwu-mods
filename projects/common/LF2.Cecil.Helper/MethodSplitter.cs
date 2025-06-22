@@ -28,13 +28,22 @@ public sealed class MethodSplitter<T> :
 
     public ILeftLeave CaptureLeftState(IEnumerable<Type> stackValues, Action<ISplitContext, ILCursor> alignStack)
     {
-        statePackM = CreateStatePack(stackValues);
+        statePack = CreateStatePack(stackValues);
 
         splitContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
-            PatchOriginalReturns(ilCursor, ilCursor => alignStack(this, ilCursor), statePackM);
+            ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
+
+            foreach (var retCursor in retCursors)
+            {
+                retCursor.Remove();
+
+                alignStack(this, retCursor);
+
+                EmitPackReturn(retCursor, false, statePack);
+            }
         });
 
         return this;
@@ -48,7 +57,7 @@ public sealed class MethodSplitter<T> :
 
             handleLeavePoint(this, ilCursor);
 
-            EmitPackReturn(ilCursor, true, statePackM!);
+            EmitPackReturn(ilCursor, true, statePack!);
         });
 
         return this;
@@ -59,7 +68,7 @@ public sealed class MethodSplitter<T> :
         splitContext.Invoke(ilContext =>
         {
             rightEntry = ilContext.DefineLabel();
-            
+
             var ilCursor = new ILCursor(ilContext);
 
             ilCursor.Emit(OpCodes.Br, rightEntry);
@@ -183,20 +192,6 @@ public sealed class MethodSplitter<T> :
         return ExpressionHelper.CreateStaticMethod(lambda);
     }
 
-    private static void PatchOriginalReturns(ILCursor ilCursor, Action<ILCursor> aliasStack, MethodInfo statePack)
-    {
-        ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
-
-        foreach (var retCursor in retCursors)
-        {
-            retCursor.Remove();
-
-            aliasStack(retCursor);
-
-            EmitPackReturn(ilCursor, false, statePack);
-        }
-    }
-
     private static void EmitPackReturn(ILCursor ilCursor, bool isSplitReturn, MethodInfo statePack)
     {
         ilCursor.Emit(isSplitReturn ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
@@ -232,6 +227,6 @@ public sealed class MethodSplitter<T> :
 
     private readonly DynamicMethodDefinition dynamicMethod;
     private readonly ILContext splitContext;
-    private MethodInfo? statePackM;
+    private MethodInfo? statePack;
     private ILLabel? rightEntry;
 }

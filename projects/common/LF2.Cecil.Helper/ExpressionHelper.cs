@@ -34,7 +34,7 @@ public class ExpressionHelper
 
             DelegateCache[currentDelegateCounter] = freshDelegate;
 
-            var cacheField = AccessTools.Field(typeof(MethodInfo), nameof(DelegateCache));
+            var cacheField = AccessTools.Field(typeof(ExpressionHelper), nameof(DelegateCache));
             var getMethod = AccessTools.Method(typeof(Dictionary<int, Delegate>), "get_Item");
 
             il.Emit(OpCodes.Ldsfld, cacheField);
