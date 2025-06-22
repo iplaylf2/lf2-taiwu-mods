@@ -9,83 +9,149 @@ namespace LF2.Cecil.Helper;
 
 public sealed class MethodSplitter<T> :
     MethodSplitter<T>.ISplitContext,
-    MethodSplitter<T>.ILeftProcessState,
-    MethodSplitter<T>.ILeftProcessCursor,
-    MethodSplitter<T>.IGenerateDelegate
+    MethodSplitter<T>.IStateStorer,
+    MethodSplitter<T>.IReturnPointHandler,
+    MethodSplitter<T>.IBranchPointHandler,
+    MethodSplitter<T>.IStateRestorer,
+    MethodSplitter<T>.IDelegateFinalizer
     where T : Delegate
 {
-    public static MethodSplitter<T>.ILeftProcessState SplitLeft(MethodBase prototype)
+    public static MethodSplitter<T>.IStateStorer CreateLeftSplit(MethodBase prototype)
     {
         return new MethodSplitter<T>(prototype);
     }
 
-    public ILeftProcessCursor ProcessMethodState(IEnumerable<Type> stackValues, Action<ISplitContext, ILCursor> aliasStack)
+    public static MethodSplitter<T>.IBranchPointHandler CreateRightSplit(MethodBase prototype)
     {
-        LeftStatePack = CreateStatePack(stackValues);
+        return new MethodSplitter<T>(prototype);
+    }
 
-        SplitContext.Invoke(ilContext =>
+    public IReturnPointHandler StoreState(IEnumerable<Type> stackValues, Action<ISplitContext, ILCursor> aliasStack)
+    {
+        stateBundleMethod = CreateStateBundle(stackValues);
+
+        splitContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
-            AdaptReturn(ilCursor, ilCursor => aliasStack(this, ilCursor), LeftStatePack);
+            PatchReturnPoints(ilCursor, ilCursor => aliasStack(this, ilCursor), stateBundleMethod);
         });
 
         return this;
     }
 
-    public IGenerateDelegate ProcessSplitCursor(Action<ISplitContext, ILCursor> handleSplit)
+    public IDelegateFinalizer HandleReturn(Action<ISplitContext, ILCursor> handler)
     {
-        SplitContext.Invoke(ilContext =>
+        splitContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
-            handleSplit(this, ilCursor);
+            handler(this, ilCursor);
 
-            EmitLeftReturn(ilCursor, true, LeftStatePack!);
+            EmitStateBundleReturn(ilCursor, true, stateBundleMethod!);
         });
 
         return this;
     }
 
-    public T Generate()
+    public IStateRestorer HandleBranch(Action<ISplitContext, ILCursor> handler)
     {
-        return DMD.Generate().CreateDelegate<T>(null);
+        splitContext.Invoke(ilContext =>
+        {
+            branchPoint = ilContext.DefineLabel();
+            var ilCursor = new ILCursor(ilContext);
+
+            ilCursor.Emit(OpCodes.Br, branchPoint);
+
+            handler(this, ilCursor);
+
+            ilCursor.MarkLabel(branchPoint);
+        });
+
+        return this;
+    }
+
+    public IDelegateFinalizer RestoreState()
+    {
+        splitContext.Invoke(ilContext =>
+        {
+            var ilCursor = new ILCursor(ilContext);
+
+            ilCursor.GotoLabel(branchPoint!);
+
+            var stateIndex = ilContext.Method.Parameters.Count - 1;
+
+            foreach (var (variable, i) in ilContext.Body.Variables.Select((x, i) => (x, i)))
+            {
+                ilCursor.Emit(OpCodes.Ldarg, stateIndex);
+                ilCursor.Emit(OpCodes.Ldc_I4, i);
+                ilCursor.Emit(OpCodes.Ldelem_Ref);
+
+                if (variable.VariableType.IsValueType)
+                {
+                    ilCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
+                }
+                else
+                {
+                    ilCursor.Emit(OpCodes.Castclass, variable.VariableType);
+                }
+
+                ilCursor.Emit(OpCodes.Stloc, variable);
+            }
+        });
+
+        return this;
+    }
+
+    public T CreateDelegate()
+    {
+        return dynamicMethod.Generate().CreateDelegate<T>(null);
     }
 
     public interface ISplitContext
     {
-        public MethodInfo TargetType { get; }
+        public MethodInfo DelegateType { get; }
     }
 
-    public interface ILeftProcessState
+    public interface IStateStorer
     {
-        ILeftProcessCursor ProcessMethodState(IEnumerable<Type> stackValues, Action<ISplitContext, ILCursor> aliasStack);
+        IReturnPointHandler StoreState(IEnumerable<Type> stackValues, Action<ISplitContext, ILCursor> aliasStack);
     }
 
-    public interface ILeftProcessCursor
+    public interface IReturnPointHandler
     {
-        IGenerateDelegate ProcessSplitCursor(Action<ISplitContext, ILCursor> handleSplit);
+        IDelegateFinalizer HandleReturn(Action<ISplitContext, ILCursor> handler);
     }
 
-    public interface IGenerateDelegate
+    public interface IBranchPointHandler
     {
-        T Generate();
+        IStateRestorer HandleBranch(Action<ISplitContext, ILCursor> handler);
     }
 
-    public MethodInfo TargetType { get; }
+    public interface IStateRestorer
+    {
+        IDelegateFinalizer RestoreState();
+    }
+
+    public interface IDelegateFinalizer
+    {
+        T CreateDelegate();
+    }
+
+    public MethodInfo DelegateType { get; }
 
     private MethodSplitter(MethodBase prototype)
     {
-        TargetType = typeof(T).GetMethod("Invoke");
-        DMD = DynamicMethodDefinitionHelper.CreateFrom(
+        DelegateType = typeof(T).GetMethod("Invoke");
+        dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom(
             prototype,
-            TargetType.ReturnType,
-            [.. TargetType.GetParameters().Select(x => x.ParameterType)]
+            DelegateType.ReturnType,
+            [.. DelegateType.GetParameters().Select(x => x.ParameterType)]
         );
-        SplitContext = new ILContext(DMD.Definition);
+        splitContext = new ILContext(dynamicMethod.Definition);
     }
 
-    private static MethodInfo CreateStatePack(IEnumerable<Type> stackValues)
+    private static MethodInfo CreateStateBundle(IEnumerable<Type> stackValues)
     {
         var stackValueParams = stackValues.Select((x) => Expression.Parameter(x)).ToArray();
         var isSplitParam = Expression.Parameter(typeof(bool));
@@ -116,7 +182,7 @@ public sealed class MethodSplitter<T> :
         return ExpressionHelper.CreateStaticMethod(lambda);
     }
 
-    private static void AdaptReturn(ILCursor ilCursor, Action<ILCursor> aliasStack, MethodInfo statePack)
+    private static void PatchReturnPoints(ILCursor ilCursor, Action<ILCursor> aliasStack, MethodInfo statePack)
     {
         ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
@@ -126,22 +192,22 @@ public sealed class MethodSplitter<T> :
 
             aliasStack(retCursor);
 
-            EmitLeftReturn(ilCursor, false, statePack);
+            EmitStateBundleReturn(ilCursor, false, statePack);
         }
     }
 
-    private static void EmitLeftReturn(ILCursor ilCursor, bool isSplitPosition, MethodInfo statePack)
+    private static void EmitStateBundleReturn(ILCursor ilCursor, bool isSplitPosition, MethodInfo statePack)
     {
         ilCursor.Emit(isSplitPosition ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
 
-        EmitPackLocals(ilCursor);
+        EmitLocalVariablesBundle(ilCursor);
 
         ilCursor.Emit(OpCodes.Call, statePack);
 
         ilCursor.Emit(OpCodes.Ret);
     }
 
-    private static void EmitPackLocals(ILCursor ilCursor)
+    private static void EmitLocalVariablesBundle(ILCursor ilCursor)
     {
         var variables = ilCursor.Body.Variables;
 
@@ -163,9 +229,10 @@ public sealed class MethodSplitter<T> :
         }
     }
 
-    private readonly DynamicMethodDefinition DMD;
-    private readonly ILContext SplitContext;
-    private MethodInfo? LeftStatePack;
+    private readonly DynamicMethodDefinition dynamicMethod;
+    private readonly ILContext splitContext;
+    private MethodInfo? stateBundleMethod;
+    private ILLabel? branchPoint;
 }
 
 

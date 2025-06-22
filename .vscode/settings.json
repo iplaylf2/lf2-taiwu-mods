@@ -2,6 +2,7 @@
     "cSpell.words": [
         "callvirt",
         "castclass",
+        "finalizer",
         "instrs",
         "ldarg",
         "ldelem",
@@ -17,6 +18,7 @@
         "stelem",
         "stfld",
         "stloc",
+        "storer",
         "taiwu",
         "transil",
         "unpatch"
