@@ -8,27 +8,7 @@ namespace LF2.Cecil.Helper;
 
 public static class SpiltMethodHelper
 {
-    public static void EmitPackLocals(ILCursor iLCursor, ICollection<VariableDefinition> variables)
-    {
-        iLCursor.Emit(OpCodes.Ldc_I4, variables.Count);
-        iLCursor.Emit(OpCodes.Newarr, typeof(object));
-
-        foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
-        {
-            iLCursor.Emit(OpCodes.Dup);
-            iLCursor.Emit(OpCodes.Ldc_I4, i);
-            iLCursor.Emit(OpCodes.Ldloc, variable);
-
-            if (variable.VariableType.IsValueType)
-            {
-                iLCursor.Emit(OpCodes.Box, variable.VariableType);
-            }
-
-            iLCursor.Emit(OpCodes.Stelem_Ref);
-        }
-    }
-
-    public static MethodInfo CreateStatePack(IEnumerable<Type> stackValues)
+    private static MethodInfo CreateStatePack(IEnumerable<Type> stackValues)
     {
         var stackValueParams = stackValues.Select((x, i) => Expression.Parameter(x, $"stackValue{i}")).ToArray();
         var isSplitParam = Expression.Parameter(typeof(bool), "isSplit");
@@ -59,8 +39,50 @@ public static class SpiltMethodHelper
         return ExpressionHelper.CreateStaticMethod(lambda);
     }
 
-    public static void AdaptReturn()
+    private static void AdaptReturn(ILCursor ilCursor, Action<ILCursor> aliasStack, MethodInfo statePack)
     {
+        ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
+        foreach (var retCursor in retCursors)
+        {
+            retCursor.Remove();
+
+            aliasStack(retCursor);
+
+            EmitNewReturn(ilCursor, false, statePack);
+        }
+    }
+
+    private static void EmitNewReturn(ILCursor ilCursor, bool isTargetBranch, MethodInfo statePack)
+    {
+        ilCursor.Emit(isTargetBranch ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
+
+        EmitPackLocals(ilCursor);
+
+        ilCursor.Emit(OpCodes.Call, statePack);
+
+        ilCursor.Emit(OpCodes.Ret);
+    }
+
+    private static void EmitPackLocals(ILCursor ilCursor)
+    {
+        var variables = ilCursor.Body.Variables;
+
+        ilCursor.Emit(OpCodes.Ldc_I4, variables.Count);
+        ilCursor.Emit(OpCodes.Newarr, typeof(object));
+
+        foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
+        {
+            ilCursor.Emit(OpCodes.Dup);
+            ilCursor.Emit(OpCodes.Ldc_I4, i);
+            ilCursor.Emit(OpCodes.Ldloc, variable);
+
+            if (variable.VariableType.IsValueType)
+            {
+                ilCursor.Emit(OpCodes.Box, variable.VariableType);
+            }
+
+            ilCursor.Emit(OpCodes.Stelem_Ref);
+        }
     }
 }
