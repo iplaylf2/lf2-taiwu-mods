@@ -8,7 +8,7 @@ using GameData.Domains.Character;
 using System.Linq.Expressions;
 using Mono.Cecil.Cil;
 using GameData.Domains.Character.Creation;
-using Mono.Cecil;
+using LF2.Cecil.Helper;
 
 namespace RollProtagonist.Frontend;
 
@@ -48,145 +48,34 @@ internal static class OnStartNewGamePatcher
         var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
         var createProtagonistMethod = createProtagonist.GetMethodInfo();
 
-        {
-            var originDefinition = new DynamicMethodDefinition(origin);
-
-            var stage = new DynamicMethodDefinition(
-                "BeforeRoll",
-                typeof(Tuple<object[], bool, object[]>),
-                [origin.GetThisParamType(), .. origin.GetParameters().Select(x => x.ParameterType)]
+        BeforeRoll = MethodSplitter<BeforeRollDelegate>
+            .CreateLeftSegment(origin)
+            .CaptureLeftState(
+                [typeof(int), typeof(ProtagonistCreationInfo)],
+                (_, ilCursor) =>
+                {
+                    ilCursor.Emit(OpCodes.Ldc_I4_0);
+                    ilCursor.Emit(OpCodes.Ldnull);
+                }
             )
+            .LeaveLeft((_, ilCursor) =>
             {
-                Definition = {
-                    Body = originDefinition.Definition.Body,
-                },
-                OwnerType = originDefinition.OwnerType
-            };
-
-            new ILContext(stage.Definition).Invoke(ilContext =>
-            {
-                var ilCursor = new ILCursor(ilContext);
-
-                var variables = ilContext.Body.Variables;
-                Type[] stackValueTypes = [typeof(int), typeof(ProtagonistCreationInfo)];
-                var packResult = CreatePackResult(stackValueTypes);
-
-                static void EmitPackLocals(ILCursor iLCursor, ICollection<VariableDefinition> variables)
-                {
-
-                    iLCursor.Emit(OpCodes.Ldc_I4, variables.Count);
-                    iLCursor.Emit(OpCodes.Newarr, typeof(object));
-
-                    foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
-                    {
-                        iLCursor.Emit(OpCodes.Dup);
-                        iLCursor.Emit(OpCodes.Ldc_I4, i);
-                        iLCursor.Emit(OpCodes.Ldloc, variable);
-
-                        if (variable.VariableType.IsValueType)
-                        {
-                            iLCursor.Emit(OpCodes.Box, variable.VariableType);
-                        }
-
-                        iLCursor.Emit(OpCodes.Stelem_Ref);
-                    }
-                }
-
-                {
-                    ilCursor.Index = 0;
-
-                    ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
-
-                    foreach (var retCursor in retCursors)
-                    {
-                        retCursor.Emit(OpCodes.Ldc_I4_0);
-                        retCursor.Emit(OpCodes.Ldnull);
-
-                        retCursor.Emit(OpCodes.Ldc_I4_0);  // false
-
-                        EmitPackLocals(retCursor, variables);
-
-                        retCursor.Emit(OpCodes.Call, packResult);
-                    }
-                }
-
-                {
-                    ilCursor.Index = 0;
-
-                    var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
-
-                    targetCursor.Remove();
-
-                    targetCursor.Emit(OpCodes.Ldc_I4_1); // true
-
-                    EmitPackLocals(targetCursor, variables);
-
-                    targetCursor.Emit(OpCodes.Call, packResult);
-
-                    targetCursor.Emit(OpCodes.Ret);
-                }
-            });
-
-            BeforeRoll = stage.Generate().CreateDelegate<BeforeRollDelegate>(null);
-        }
+                ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+                ilCursor.Remove();
+            })
+            .CreateDelegate();
 
         AdaptableLog.Info("BeforeRoll generated");
-        // custom CreateProtagonist
 
-        {
-            var originDefinition = new DynamicMethodDefinition(origin);
-
-            var stage = new DynamicMethodDefinition(
-                "AfterRoll",
-                typeof(void),
-                [origin.GetThisParamType(), .. origin.GetParameters().Select(x => x.ParameterType), typeof(object[])]
-            )
+        AfterRoll = MethodSplitter<AfterRollDelegate>
+            .CreateRightSegment(origin)
+            .EnterRight((_, ilCursor) =>
             {
-                Definition = {
-                    Body = originDefinition.Definition.Body,
-                },
-                OwnerType = originDefinition.OwnerType
-            };
-
-            new ILContext(stage.Definition).Invoke(ilContext =>
-            {
-                var ilCursor = new ILCursor(ilContext);
-
-                var variables = ilContext.Body.Variables;
-
-                {
-                    var skipBefore = ilContext.DefineLabel();
-
-                    ilCursor.Index = 0;
-                    ilCursor.Emit(OpCodes.Br, skipBefore);
-
-                    var targetCursor = ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
-
-                    targetCursor.Index++;
-                    targetCursor.MarkLabel(skipBefore);
-
-                    foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
-                    {
-                        targetCursor.Emit(OpCodes.Ldarg_1);
-                        targetCursor.Emit(OpCodes.Ldc_I4, i);
-                        targetCursor.Emit(OpCodes.Ldelem_Ref);
-
-                        if (variable.VariableType.IsValueType)
-                        {
-                            targetCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
-                        }
-                        else
-                        {
-                            targetCursor.Emit(OpCodes.Castclass, variable.VariableType);
-                        }
-
-                        targetCursor.Emit(OpCodes.Stloc, variable);
-                    }
-                }
-            });
-
-            AfterRoll = stage.Generate().CreateDelegate<AfterRollDelegate>(null);
-        }
+                ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+                ilCursor.Index++;
+            })
+            .RestoreRightState()
+            .CreateDelegate();
 
         AdaptableLog.Info("AfterRoll generated");
     }
