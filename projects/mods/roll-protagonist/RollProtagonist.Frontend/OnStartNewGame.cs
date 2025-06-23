@@ -48,30 +48,11 @@ internal static class OnStartNewGamePatcher
         var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
         var createProtagonistMethod = createProtagonist.GetMethodInfo();
 
-        BeforeRoll = MethodSegmenter<BeforeRollDelegate>
-            .CreateLeftSegment(origin)
-            .GuardOriginalReturns()
-            .InjectSplitPoint(
-                [typeof(int), typeof(ProtagonistCreationInfo)],
-                (_, ilCursor) =>
-                {
-                    ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
-                    ilCursor.Remove();
-                }
-            )
-            .CreateDelegate();
+        BeforeRoll = MethodSegmenter.CreateLeftSegment(new LeftConfig(origin));
 
         AdaptableLog.Info("BeforeRoll generated");
 
-        AfterRoll = MethodSegmenter<AfterRollDelegate>
-            .CreateRightSegment(origin)
-            .InjectContinuationPoint((_, ilCursor) =>
-            {
-                ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
-                ilCursor.Index++;
-            })
-            .RestoreExecutionContext()
-            .CreateDelegate();
+        AfterRoll = MethodSegmenter.CreateRightSegment(new RightConfig(origin));
 
         AdaptableLog.Info("AfterRoll generated");
     }
@@ -84,108 +65,33 @@ internal static class OnStartNewGamePatcher
         return false;
     }
 
-    private static MethodInfo CreatePackResult(IEnumerable<Type> stackValues)
+    private class LeftConfig(MethodBase origin) :
+        MethodSegmenter.LeftConfig<BeforeRollDelegate>((MethodInfo)origin, [typeof(int), typeof(ProtagonistCreationInfo)])
     {
-        var stackValueParams = stackValues.Select((x, i) => Expression.Parameter(x, $"stackValue{i}")).ToArray();
-        var isSplitParam = Expression.Parameter(typeof(bool), "isSplit");
-        var variablesParam = Expression.Parameter(typeof(object[]), "variables");
-        ParameterExpression[] parameters = [.. stackValueParams, isSplitParam, variablesParam];
+        private readonly MethodInfo createProtagonistMethod = ((Delegate)CharacterDomainHelper.MethodCall.CreateProtagonist).GetMethodInfo();
 
-        var objectType = typeof(object);
-
-        var lambda = Expression
-            .Lambda(
-                Expression.New(
-                    AccessTools.FirstConstructor(
-                        typeof(Tuple<object[], bool, object[]>),
-                         x => x.GetParameters().Length == 3
-                    ),
-                    Expression.NewArrayInit(
-                        typeof(object),
-                        stackValueParams.Select(
-                            x => x.Type.IsValueType ? Expression.Convert(x, objectType) : (Expression)x
-                        )
-                    ),
-                    isSplitParam,
-                    variablesParam
-                ),
-                parameters
-            );
-
-        return ILHelper.CreateDynamicMethod(lambda);
+        protected override void InjectSplitPoint(ILCursor ilCursor)
+        {
+            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+            ilCursor.Remove();
+        }
     }
+
+    private class RightConfig(MethodBase origin) :
+    MethodSegmenter.RightConfig<AfterRollDelegate>((MethodInfo)origin)
+    {
+        private readonly MethodInfo createProtagonistMethod = ((Delegate)CharacterDomainHelper.MethodCall.CreateProtagonist).GetMethodInfo();
+
+        protected override void InjectContinuationPoint(ILCursor ilCursor)
+        {
+            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+            ilCursor.Index++;
+        }
+    }
+
     private delegate Tuple<object[], bool, object[]> BeforeRollDelegate(UI_NewGame instance);
     private delegate void AfterRollDelegate(UI_NewGame instance, object[] variables);
     private static BeforeRollDelegate? BeforeRoll;
     private static AfterRollDelegate? AfterRoll;
 }
 
-class ILHelper
-{
-    public static MethodInfo CreateDynamicMethod(LambdaExpression lambda)
-    {
-        var targetDelegate = lambda.Compile();
-        var delegateType = targetDelegate.GetType();
-        var paramTypes = targetDelegate.Method
-            .GetParameters()
-            .Skip(1)
-            .Select(p => p.ParameterType)
-            .ToArray();
-
-        var dynamicMethod = new DynamicMethodDefinition(
-            name: targetDelegate.Method.Name,
-            returnType: targetDelegate.Method.ReturnType,
-            parameterTypes: paramTypes
-        );
-
-        var il = dynamicMethod.GetILProcessor();
-        var targetType = targetDelegate.Target.GetType();
-
-        bool preserveContext = targetDelegate.Target != null &&
-                              targetType.GetFields().Any(f => !f.IsStatic);
-
-        if (preserveContext)
-        {
-            var currentDelegateCounter = DelegateCounter++;
-
-            DelegateCache[currentDelegateCounter] = targetDelegate;
-
-            var cacheField = AccessTools.Field(typeof(ILHelper), nameof(DelegateCache));
-            var getMethod = AccessTools.Method(typeof(Dictionary<int, Delegate>), "get_Item");
-
-            il.Emit(OpCodes.Ldsfld, cacheField);
-            il.Emit(OpCodes.Ldc_I4, currentDelegateCounter);
-            il.Emit(OpCodes.Callvirt, getMethod);
-        }
-        else
-        {
-            if (targetDelegate.Target == null)
-            {
-                il.Emit(OpCodes.Ldnull);
-            }
-            else
-            {
-                il.Emit(
-                    OpCodes.Newobj,
-                    AccessTools.FirstConstructor(targetType, x => x.GetParameters().Length == 0 && !x.IsStatic)
-                );
-            }
-
-            il.Emit(OpCodes.Ldftn, targetDelegate.Method);
-            il.Emit(OpCodes.Newobj, AccessTools.Constructor(delegateType, [typeof(object), typeof(IntPtr)]));
-        }
-
-        for (int i = 0; i < paramTypes.Length; i++)
-        {
-            il.Emit(OpCodes.Ldarg, i);
-        }
-
-        il.Emit(OpCodes.Callvirt, AccessTools.Method(delegateType, "Invoke"));
-        il.Emit(OpCodes.Ret);
-
-        return dynamicMethod.Generate();
-    }
-
-    private static readonly Dictionary<int, Delegate> DelegateCache = [];
-    private static int DelegateCounter;
-}

@@ -7,172 +7,140 @@ using MonoMod.Utils;
 
 namespace LF2.Cecil.Helper;
 
-public sealed class MethodSegmenter<T> :
-    MethodSegmenter<T>.ISegmentMeta,
-    MethodSegmenter<T>.IReturnGuard,
-    MethodSegmenter<T>.ISplitPointInjector,
-    MethodSegmenter<T>.IContinuationInjector,
-    MethodSegmenter<T>.IContextRestorer,
-    MethodSegmenter<T>.IDelegateBinder
-    where T : Delegate
+public static class MethodSegmenter
 {
-    public static IReturnGuard CreateLeftSegment(MethodBase prototype)
+    public abstract class LeftConfig<T>(
+        MethodInfo prototype,
+        IEnumerable<Type> preservedStackTypes
+    ) where T : Delegate
     {
-        return new MethodSegmenter<T>(prototype);
+        internal protected readonly MethodInfo prototype = prototype;
+        internal protected readonly IEnumerable<Type> preservedStackTypes = preservedStackTypes;
+        internal protected abstract void InjectSplitPoint(ILCursor ilCursor);
     }
 
-    public static IContinuationInjector CreateRightSegment(MethodBase prototype)
+    public abstract class RightConfig<T>(
+        MethodInfo prototype
+    ) where T : Delegate
     {
-        return new MethodSegmenter<T>(prototype);
+        internal protected readonly MethodInfo prototype = prototype;
+        internal protected abstract void InjectContinuationPoint(ILCursor ilCursor);
     }
 
-    public ISplitPointInjector GuardOriginalReturns()
+    public static T CreateLeftSegment<T>(LeftConfig<T> config) where T : Delegate
     {
-        var shouldBox = prototype.ReturnType.IsValueType;
+        InitILContext<T>(config.prototype, out var dynamicMethod, out var ilContext);
 
-        segmenterIlContext.Invoke(ilContext =>
+        ilContext.Invoke(ilContext =>
         {
-            var ilCursor = new ILCursor(ilContext);
+            GuardOriginalReturns(ilContext, config.prototype);
+            InjectSplitPoint(ilContext, config.preservedStackTypes, config.InjectSplitPoint);
+        });
 
-            ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
-            if (prototype.ReturnType == typeof(void))
+        return dynamicMethod.Generate().CreateDelegate<T>();
+    }
+
+    public static T CreateRightSegment<T>(RightConfig<T> config) where T : Delegate
+    {
+        InitILContext<T>(config.prototype, out var dynamicMethod, out var ilContext);
+
+        ilContext.Invoke(ilContext =>
+        {
+            var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
+            RestoreExecutionContext(ilContext, label);
+        });
+
+        return dynamicMethod.Generate().CreateDelegate<T>();
+    }
+
+    private static void InitILContext<T>(MethodBase prototype, out DynamicMethodDefinition dynamicMethod, out ILContext ilContext) where T : Delegate
+    {
+        var delegateType = typeof(T).GetMethod("Invoke");
+        dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom(
+             prototype,
+             delegateType.ReturnType,
+             [.. delegateType.GetParameters().Select(x => x.ParameterType)]
+         );
+        ilContext = new ILContext(dynamicMethod.Definition);
+    }
+
+
+    public static void GuardOriginalReturns(ILContext ilContext, MethodInfo prototype)
+    {
+        var ilCursor = new ILCursor(ilContext);
+
+        ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
+
+        if (prototype.ReturnType == typeof(void))
+        {
+            PatchVoidReturns(retCursors);
+        }
+        else if (prototype.ReturnType.IsValueType)
+        {
+            PatchValueReturns(retCursors, prototype.ReturnType);
+        }
+        else
+        {
+            PatchObjectReturns(retCursors);
+        }
+    }
+
+    public static void InjectSplitPoint(ILContext ilContext, IEnumerable<Type> stackValueTypes, Action<ILCursor> injectSplitPoint)
+    {
+        var statePacking = CreateStatePacking(stackValueTypes);
+        var ilCursor = new ILCursor(ilContext);
+
+        injectSplitPoint(ilCursor);
+
+        ilCursor.Emit(OpCodes.Ldc_I4_1);
+
+        CaptureLocals(ilCursor);
+
+        ilCursor.Emit(OpCodes.Call, statePacking);
+
+        ilCursor.Emit(OpCodes.Ret);
+    }
+
+    public static ILLabel InjectContinuationPoint(ILContext ilContext, Action<ILCursor> injectContinuationPoint)
+    {
+        var continuationLabel = ilContext.DefineLabel();
+        var ilCursor = new ILCursor(ilContext);
+
+        ilCursor.Emit(OpCodes.Br, continuationLabel);
+
+        injectContinuationPoint(ilCursor);
+
+        ilCursor.MarkLabel(continuationLabel);
+
+        return continuationLabel;
+    }
+
+    public static void RestoreExecutionContext(ILContext ilContext, ILLabel continuationLabel)
+    {
+        var ilCursor = new ILCursor(ilContext);
+
+        ilCursor.GotoLabel(continuationLabel);
+
+        var stateIndex = ilContext.Method.Parameters.Count - 1;
+
+        foreach (var (variable, i) in ilContext.Body.Variables.Select((x, i) => (x, i)))
+        {
+            ilCursor.Emit(OpCodes.Ldarg, stateIndex);
+            ilCursor.Emit(OpCodes.Ldc_I4, i);
+            ilCursor.Emit(OpCodes.Ldelem_Ref);
+
+            if (variable.VariableType.IsValueType)
             {
-                PatchVoidReturns(retCursors);
-            }
-            else if (prototype.ReturnType.IsValueType)
-            {
-                PatchValueReturns(retCursors, prototype.ReturnType);
+                ilCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
             }
             else
             {
-                PatchObjectReturns(retCursors);
+                ilCursor.Emit(OpCodes.Castclass, variable.VariableType);
             }
-        });
 
-        return this;
-    }
-
-    public IDelegateBinder InjectSplitPoint(IEnumerable<Type> stackValueTypes, Action<ISegmentMeta, ILCursor> injectSplitPoint)
-    {
-        var statePacking = CreateStatePacking(stackValueTypes);
-
-        segmenterIlContext.Invoke(ilContext =>
-        {
-            var ilCursor = new ILCursor(ilContext);
-
-            injectSplitPoint(this, ilCursor);
-
-            ilCursor.Emit(OpCodes.Ldc_I4_1);
-
-            CaptureLocals(ilCursor);
-
-            ilCursor.Emit(OpCodes.Call, statePacking);
-
-            ilCursor.Emit(OpCodes.Ret);
-        });
-
-        return this;
-    }
-
-    public IContextRestorer InjectContinuationPoint(Action<ISegmentMeta, ILCursor> injectContinuationPoint)
-    {
-        segmenterIlContext.Invoke(ilContext =>
-        {
-            continuationLabel = ilContext.DefineLabel();
-
-            var ilCursor = new ILCursor(ilContext);
-
-            ilCursor.Emit(OpCodes.Br, continuationLabel);
-
-            injectContinuationPoint(this, ilCursor);
-
-            ilCursor.MarkLabel(continuationLabel);
-        });
-
-        return this;
-    }
-
-    public IDelegateBinder RestoreExecutionContext()
-    {
-        segmenterIlContext.Invoke(ilContext =>
-        {
-            var ilCursor = new ILCursor(ilContext);
-
-            ilCursor.GotoLabel(continuationLabel!);
-
-            var stateIndex = ilContext.Method.Parameters.Count - 1;
-
-            foreach (var (variable, i) in ilContext.Body.Variables.Select((x, i) => (x, i)))
-            {
-                ilCursor.Emit(OpCodes.Ldarg, stateIndex);
-                ilCursor.Emit(OpCodes.Ldc_I4, i);
-                ilCursor.Emit(OpCodes.Ldelem_Ref);
-
-                if (variable.VariableType.IsValueType)
-                {
-                    ilCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
-                }
-                else
-                {
-                    ilCursor.Emit(OpCodes.Castclass, variable.VariableType);
-                }
-
-                ilCursor.Emit(OpCodes.Stloc, variable);
-            }
-        });
-
-        return this;
-    }
-
-    public T CreateDelegate()
-    {
-        return dynamicMethod.Generate().CreateDelegate<T>(null);
-    }
-
-    public interface ISegmentMeta
-    {
-        public MethodInfo DelegateType { get; }
-    }
-
-    public interface IReturnGuard
-    {
-        ISplitPointInjector GuardOriginalReturns();
-    }
-
-    public interface ISplitPointInjector
-    {
-        IDelegateBinder InjectSplitPoint(IEnumerable<Type> preservedStackTypes, Action<ISegmentMeta, ILCursor> injectSplitPoint);
-    }
-
-    public interface IContinuationInjector
-    {
-        IContextRestorer InjectContinuationPoint(Action<ISegmentMeta, ILCursor> injectContinuationPoint);
-    }
-
-    public interface IContextRestorer
-    {
-        IDelegateBinder RestoreExecutionContext();
-    }
-
-    public interface IDelegateBinder
-    {
-        T CreateDelegate();
-    }
-
-    public MethodInfo DelegateType { get; }
-
-    private MethodSegmenter(MethodBase prototype)
-    {
-        this.prototype = (MethodInfo)prototype;
-
-        DelegateType = typeof(T).GetMethod("Invoke");
-        dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom(
-            prototype,
-            DelegateType.ReturnType,
-            [.. DelegateType.GetParameters().Select(x => x.ParameterType)]
-        );
-        segmenterIlContext = new ILContext(dynamicMethod.Definition);
+            ilCursor.Emit(OpCodes.Stloc, variable);
+        }
     }
 
     private static MethodInfo CreateStatePacking(IEnumerable<Type> preservedStackTypes)
@@ -258,8 +226,4 @@ public sealed class MethodSegmenter<T> :
             ilCursor.Emit(OpCodes.Stelem_Ref);
         }
     }
-    private readonly MethodInfo prototype;
-    private readonly DynamicMethodDefinition dynamicMethod;
-    private readonly ILContext segmenterIlContext;
-    private ILLabel? continuationLabel;
 }
