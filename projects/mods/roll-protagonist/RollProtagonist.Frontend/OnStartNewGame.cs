@@ -48,33 +48,29 @@ internal static class OnStartNewGamePatcher
         var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
         var createProtagonistMethod = createProtagonist.GetMethodInfo();
 
-        BeforeRoll = MethodSplitter<BeforeRollDelegate>
+        BeforeRoll = MethodSegmenter<BeforeRollDelegate>
             .CreateLeftSegment(origin)
-            .CaptureLeftState(
+            .GuardOriginalReturns()
+            .InjectSplitPoint(
                 [typeof(int), typeof(ProtagonistCreationInfo)],
                 (_, ilCursor) =>
                 {
-                    ilCursor.Emit(OpCodes.Ldc_I4_0);
-                    ilCursor.Emit(OpCodes.Ldnull);
+                    ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+                    ilCursor.Remove();
                 }
             )
-            .LeaveLeft((_, ilCursor) =>
-            {
-                ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
-                ilCursor.Remove();
-            })
             .CreateDelegate();
 
         AdaptableLog.Info("BeforeRoll generated");
 
-        AfterRoll = MethodSplitter<AfterRollDelegate>
+        AfterRoll = MethodSegmenter<AfterRollDelegate>
             .CreateRightSegment(origin)
-            .EnterRight((_, ilCursor) =>
+            .InjectContinuationPoint((_, ilCursor) =>
             {
                 ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
                 ilCursor.Index++;
             })
-            .RestoreRightState()
+            .RestoreExecutionContext()
             .CreateDelegate();
 
         AdaptableLog.Info("AfterRoll generated");

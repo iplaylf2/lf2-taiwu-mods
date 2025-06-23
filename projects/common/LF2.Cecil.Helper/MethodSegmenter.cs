@@ -7,26 +7,26 @@ using MonoMod.Utils;
 
 namespace LF2.Cecil.Helper;
 
-public sealed class MethodSplitter<T> :
-    MethodSplitter<T>.ISplitContext,
-    MethodSplitter<T>.ILeftProtectOrigin,
-    MethodSplitter<T>.ILeftLeave,
-    MethodSplitter<T>.IRightEnter,
-    MethodSplitter<T>.IRightRestore,
-    MethodSplitter<T>.ICreateDelegate
+public sealed class MethodSegmenter<T> :
+    MethodSegmenter<T>.ISegmentMeta,
+    MethodSegmenter<T>.IReturnGuard,
+    MethodSegmenter<T>.ISplitPointInjector,
+    MethodSegmenter<T>.IContinuationInjector,
+    MethodSegmenter<T>.IContextRestorer,
+    MethodSegmenter<T>.IDelegateBinder
     where T : Delegate
 {
-    public static ILeftProtectOrigin CreateLeftSegment(MethodBase prototype)
+    public static IReturnGuard CreateLeftSegment(MethodBase prototype)
     {
-        return new MethodSplitter<T>(prototype);
+        return new MethodSegmenter<T>(prototype);
     }
 
-    public static IRightEnter CreateRightSegment(MethodBase prototype)
+    public static IContinuationInjector CreateRightSegment(MethodBase prototype)
     {
-        return new MethodSplitter<T>(prototype);
+        return new MethodSegmenter<T>(prototype);
     }
 
-    public ILeftLeave ProtectLeftOrigin()
+    public ISplitPointInjector GuardOriginalReturns()
     {
         var shouldBox = prototype.ReturnType.IsValueType;
 
@@ -53,21 +53,21 @@ public sealed class MethodSplitter<T> :
         return this;
     }
 
-    public ICreateDelegate LeaveLeft(IEnumerable<Type> stackValueTypes, Action<ISplitContext, ILCursor> handleLeavePoint)
+    public IDelegateBinder InjectSplitPoint(IEnumerable<Type> stackValueTypes, Action<ISegmentMeta, ILCursor> injectSplitPoint)
     {
-        var statePack = CreateStatePack(stackValueTypes);
+        var statePacking = CreateStatePacking(stackValueTypes);
 
         splitContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
-            handleLeavePoint(this, ilCursor);
+            injectSplitPoint(this, ilCursor);
 
             ilCursor.Emit(OpCodes.Ldc_I4_1);
 
-            EmitLocalsPack(ilCursor);
+            CaptureLocals(ilCursor);
 
-            ilCursor.Emit(OpCodes.Call, statePack);
+            ilCursor.Emit(OpCodes.Call, statePacking);
 
             ilCursor.Emit(OpCodes.Ret);
         });
@@ -75,31 +75,31 @@ public sealed class MethodSplitter<T> :
         return this;
     }
 
-    public IRightRestore EnterRight(Action<ISplitContext, ILCursor> handleEnterPoint)
+    public IContextRestorer InjectContinuationPoint(Action<ISegmentMeta, ILCursor> injectContinuationPoint)
     {
         splitContext.Invoke(ilContext =>
         {
-            rightEntry = ilContext.DefineLabel();
+            continuationLabel = ilContext.DefineLabel();
 
             var ilCursor = new ILCursor(ilContext);
 
-            ilCursor.Emit(OpCodes.Br, rightEntry);
+            ilCursor.Emit(OpCodes.Br, continuationLabel);
 
-            handleEnterPoint(this, ilCursor);
+            injectContinuationPoint(this, ilCursor);
 
-            ilCursor.MarkLabel(rightEntry);
+            ilCursor.MarkLabel(continuationLabel);
         });
 
         return this;
     }
 
-    public ICreateDelegate RestoreRightState()
+    public IDelegateBinder RestoreExecutionContext()
     {
         splitContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
-            ilCursor.GotoLabel(rightEntry!);
+            ilCursor.GotoLabel(continuationLabel!);
 
             var stateIndex = ilContext.Method.Parameters.Count - 1;
 
@@ -130,39 +130,39 @@ public sealed class MethodSplitter<T> :
         return dynamicMethod.Generate().CreateDelegate<T>(null);
     }
 
-    public interface ISplitContext
+    public interface ISegmentMeta
     {
         public MethodInfo DelegateType { get; }
     }
 
-    public interface ILeftProtectOrigin
+    public interface IReturnGuard
     {
-        ILeftLeave ProtectLeftOrigin();
+        ISplitPointInjector GuardOriginalReturns();
     }
 
-    public interface ILeftLeave
+    public interface ISplitPointInjector
     {
-        ICreateDelegate LeaveLeft(IEnumerable<Type> stackValueTypes, Action<ISplitContext, ILCursor> handleLeftPoint);
+        IDelegateBinder InjectSplitPoint(IEnumerable<Type> preservedStackTypes, Action<ISegmentMeta, ILCursor> injectSplitPoint);
     }
 
-    public interface IRightEnter
+    public interface IContinuationInjector
     {
-        IRightRestore EnterRight(Action<ISplitContext, ILCursor> handleEnterPoint);
+        IContextRestorer InjectContinuationPoint(Action<ISegmentMeta, ILCursor> injectContinuationPoint);
     }
 
-    public interface IRightRestore
+    public interface IContextRestorer
     {
-        ICreateDelegate RestoreRightState();
+        IDelegateBinder RestoreExecutionContext();
     }
 
-    public interface ICreateDelegate
+    public interface IDelegateBinder
     {
         T CreateDelegate();
     }
 
     public MethodInfo DelegateType { get; }
 
-    private MethodSplitter(MethodBase prototype)
+    private MethodSegmenter(MethodBase prototype)
     {
         this.prototype = (MethodInfo)prototype;
 
@@ -175,9 +175,9 @@ public sealed class MethodSplitter<T> :
         splitContext = new ILContext(dynamicMethod.Definition);
     }
 
-    private static MethodInfo CreateStatePack(IEnumerable<Type> stackValueTypes)
+    private static MethodInfo CreateStatePacking(IEnumerable<Type> preservedStackTypes)
     {
-        var stackValueParams = stackValueTypes.Select((x) => Expression.Parameter(x)).ToArray();
+        var stackValueParams = preservedStackTypes.Select((x) => Expression.Parameter(x)).ToArray();
         var isSplitReturnParam = Expression.Parameter(typeof(bool));
         var variablesParam = Expression.Parameter(typeof(object[]));
         ParameterExpression[] parameters = [.. stackValueParams, isSplitReturnParam, variablesParam];
@@ -211,7 +211,7 @@ public sealed class MethodSplitter<T> :
         foreach (var ilCursor in ilCursors)
         {
             ilCursor.Emit(OpCodes.Ldnull);
-            ilCursor.EmitDelegate(PackOriginReturn);
+            ilCursor.EmitDelegate(WrapReturnValue);
         }
     }
 
@@ -220,7 +220,7 @@ public sealed class MethodSplitter<T> :
         foreach (var ilCursor in ilCursors)
         {
             ilCursor.Emit(OpCodes.Box, type);
-            ilCursor.EmitDelegate(PackOriginReturn);
+            ilCursor.EmitDelegate(WrapReturnValue);
         }
     }
 
@@ -228,16 +228,16 @@ public sealed class MethodSplitter<T> :
     {
         foreach (var ilCursor in ilCursors)
         {
-            ilCursor.EmitDelegate(PackOriginReturn);
+            ilCursor.EmitDelegate(WrapReturnValue);
         }
     }
 
-    private static Tuple<object[], bool, object[]> PackOriginReturn(object returnValue)
+    private static Tuple<object[], bool, object[]> WrapReturnValue(object returnValue)
     {
         return new([returnValue], false, []);
     }
 
-    private static void EmitLocalsPack(ILCursor ilCursor)
+    private static void CaptureLocals(ILCursor ilCursor)
     {
         var variables = ilCursor.Body.Variables;
 
@@ -261,5 +261,5 @@ public sealed class MethodSplitter<T> :
     private readonly MethodInfo prototype;
     private readonly DynamicMethodDefinition dynamicMethod;
     private readonly ILContext splitContext;
-    private ILLabel? rightEntry;
+    private ILLabel? continuationLabel;
 }
