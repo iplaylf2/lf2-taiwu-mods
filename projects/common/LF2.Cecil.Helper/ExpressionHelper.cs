@@ -6,7 +6,7 @@ using MonoMod.Utils;
 
 namespace LF2.Cecil.Helper;
 
-public class ExpressionHelper
+public static class ExpressionHelper
 {
     public static MethodInfo CreateStaticMethod(LambdaExpression lambda)
     {
