@@ -30,7 +30,7 @@ public sealed class MethodSegmenter<T> :
     {
         var shouldBox = prototype.ReturnType.IsValueType;
 
-        splitContext.Invoke(ilContext =>
+        segmenterIlContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
@@ -57,7 +57,7 @@ public sealed class MethodSegmenter<T> :
     {
         var statePacking = CreateStatePacking(stackValueTypes);
 
-        splitContext.Invoke(ilContext =>
+        segmenterIlContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
@@ -77,7 +77,7 @@ public sealed class MethodSegmenter<T> :
 
     public IContextRestorer InjectContinuationPoint(Action<ISegmentMeta, ILCursor> injectContinuationPoint)
     {
-        splitContext.Invoke(ilContext =>
+        segmenterIlContext.Invoke(ilContext =>
         {
             continuationLabel = ilContext.DefineLabel();
 
@@ -95,7 +95,7 @@ public sealed class MethodSegmenter<T> :
 
     public IDelegateBinder RestoreExecutionContext()
     {
-        splitContext.Invoke(ilContext =>
+        segmenterIlContext.Invoke(ilContext =>
         {
             var ilCursor = new ILCursor(ilContext);
 
@@ -172,7 +172,7 @@ public sealed class MethodSegmenter<T> :
             DelegateType.ReturnType,
             [.. DelegateType.GetParameters().Select(x => x.ParameterType)]
         );
-        splitContext = new ILContext(dynamicMethod.Definition);
+        segmenterIlContext = new ILContext(dynamicMethod.Definition);
     }
 
     private static MethodInfo CreateStatePacking(IEnumerable<Type> preservedStackTypes)
@@ -189,7 +189,7 @@ public sealed class MethodSegmenter<T> :
                 Expression.New(
                     AccessTools.FirstConstructor(
                         typeof(Tuple<object[], bool, object[]>),
-                         x => x.GetParameters().Length == 3
+                        x => x.GetParameters().Length == 3
                     ),
                     Expression.NewArrayInit(
                         typeof(object),
@@ -260,6 +260,6 @@ public sealed class MethodSegmenter<T> :
     }
     private readonly MethodInfo prototype;
     private readonly DynamicMethodDefinition dynamicMethod;
-    private readonly ILContext splitContext;
+    private readonly ILContext segmenterIlContext;
     private ILLabel? continuationLabel;
 }
