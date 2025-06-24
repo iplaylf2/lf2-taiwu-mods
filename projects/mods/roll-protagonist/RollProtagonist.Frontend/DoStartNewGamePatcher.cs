@@ -38,12 +38,9 @@ internal static class DoStartNewGamePatcher
     }
 
     [HarmonyILManipulator]
-    private static void SplitMethodIntoStages(MethodBase origin)
+    private static void SplitMethod(MethodBase origin)
     {
-        AdaptableLog.Info("SplitMethodIntoStages started");
-
-        var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
-        var createProtagonistMethod = createProtagonist.GetMethodInfo();
+        AdaptableLog.Info("SplitMethod started");
 
         BeforeRoll = MethodSegmenter.CreateLeftSegment(new LeftConfig(origin));
 
@@ -63,25 +60,28 @@ internal static class DoStartNewGamePatcher
     }
 
     private class LeftConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig<BeforeRollDelegate>((MethodInfo)origin, [typeof(int), typeof(ProtagonistCreationInfo)])
+        MethodSegmenter.LeftConfig<BeforeRollDelegate>(
+            (MethodInfo)origin,
+            [typeof(int), typeof(ProtagonistCreationInfo)]
+        )
     {
-        private readonly MethodInfo createProtagonistMethod = ((Delegate)CharacterDomainHelper.MethodCall.CreateProtagonist).GetMethodInfo();
-
         protected override void InjectSplitPoint(ILCursor ilCursor)
         {
-            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+            var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
+
+            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
             ilCursor.Remove();
         }
     }
 
     private class RightConfig(MethodBase origin) :
-    MethodSegmenter.RightConfig<AfterRollDelegate>((MethodInfo)origin)
+        MethodSegmenter.RightConfig<AfterRollDelegate>((MethodInfo)origin)
     {
-        private readonly MethodInfo createProtagonistMethod = ((Delegate)CharacterDomainHelper.MethodCall.CreateProtagonist).GetMethodInfo();
-
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
-            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonistMethod));
+            var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
+
+            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
             ilCursor.Index++;
         }
     }

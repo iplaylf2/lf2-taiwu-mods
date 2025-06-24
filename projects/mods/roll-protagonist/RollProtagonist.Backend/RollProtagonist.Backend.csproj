@@ -1,2 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="$(LF2Common)/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
+    </ItemGroup>
 </Project>
