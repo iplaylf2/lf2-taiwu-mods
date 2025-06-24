@@ -3,10 +3,7 @@ using GameData.Utilities;
 using System.Collections;
 using MonoMod.Cil;
 using System.Reflection;
-using MonoMod.Utils;
 using GameData.Domains.Character;
-using System.Linq.Expressions;
-using Mono.Cecil.Cil;
 using GameData.Domains.Character.Creation;
 using LF2.Cecil.Helper;
 

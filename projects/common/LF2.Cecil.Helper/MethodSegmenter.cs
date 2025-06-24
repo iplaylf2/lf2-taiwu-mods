@@ -65,7 +65,6 @@ public static class MethodSegmenter
         ilContext = new ILContext(dynamicMethod.Definition);
     }
 
-
     public static void GuardOriginalReturns(ILContext ilContext, MethodInfo prototype)
     {
         var ilCursor = new ILCursor(ilContext);
