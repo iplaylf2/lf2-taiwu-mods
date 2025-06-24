@@ -10,7 +10,7 @@ using LF2.Cecil.Helper;
 namespace RollProtagonist.Frontend;
 
 [HarmonyPatch(typeof(UI_NewGame), "DoStartNewGame")]
-internal static class OnStartNewGamePatcher
+internal static class DoStartNewGamePatcher
 {
     private static IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
     {

@@ -7,6 +7,6 @@ public class FrontendExport : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
-        HarmonyInstance.PatchAll(typeof(OnStartNewGamePatcher));
+        HarmonyInstance.PatchAll(typeof(DoStartNewGamePatcher));
     }
 }
