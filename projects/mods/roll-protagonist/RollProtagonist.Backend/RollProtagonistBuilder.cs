@@ -27,9 +27,9 @@ internal static class RollProtagonistBuilder
     }
 
     private class LeftConfig(MethodBase origin) :
-       MethodSegmenter.LeftConfig<RollDelegate>((MethodInfo)origin, [])
+       MethodSegmenter.LeftConfig<RollDelegate>((MethodInfo)origin)
     {
-        protected override void InjectSplitPoint(ILCursor ilCursor)
+        protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
             var offlineCreateProtagonist =
              AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
@@ -39,6 +39,8 @@ internal static class RollProtagonistBuilder
                 x => x.MatchStloc(out var _)
             );
             ilCursor.Index++;
+
+            return [];
         }
     }
 

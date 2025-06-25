@@ -9,14 +9,10 @@ namespace LF2.Cecil.Helper;
 
 public static class MethodSegmenter
 {
-    public abstract class LeftConfig<T>(
-        MethodInfo prototype,
-        IEnumerable<Type> preservedStackTypes
-    ) where T : Delegate
+    public abstract class LeftConfig<T>(MethodInfo prototype) where T : Delegate
     {
         internal protected readonly MethodInfo prototype = prototype;
-        internal protected readonly IEnumerable<Type> preservedStackTypes = preservedStackTypes;
-        internal protected abstract void InjectSplitPoint(ILCursor ilCursor);
+        internal protected abstract IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor);
     }
 
     public abstract class RightConfig<T>(
@@ -34,7 +30,7 @@ public static class MethodSegmenter
         ilContext.Invoke(ilContext =>
         {
             GuardOriginalReturns(ilContext, config.prototype);
-            InjectSplitPoint(ilContext, config.preservedStackTypes, config.InjectSplitPoint);
+            InjectSplitPoint(ilContext, config.InjectSplitPoint);
         });
 
 
@@ -85,12 +81,11 @@ public static class MethodSegmenter
         }
     }
 
-    public static void InjectSplitPoint(ILContext ilContext, IEnumerable<Type> stackValueTypes, Action<ILCursor> injectSplitPoint)
+    public static void InjectSplitPoint(ILContext ilContext, Func<ILCursor, IEnumerable<Type>> injectSplitPoint)
     {
-        var statePacking = CreateStatePacking(stackValueTypes);
         var ilCursor = new ILCursor(ilContext);
-
-        injectSplitPoint(ilCursor);
+        var stackValueTypes = injectSplitPoint(ilCursor);
+        var statePacking = CreateStatePacking(stackValueTypes);
 
         ilCursor.Emit(OpCodes.Ldc_I4_1);
 

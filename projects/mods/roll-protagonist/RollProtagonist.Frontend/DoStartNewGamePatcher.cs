@@ -60,17 +60,16 @@ internal static class DoStartNewGamePatcher
     }
 
     private class LeftConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig<BeforeRollDelegate>(
-            (MethodInfo)origin,
-            [typeof(int), typeof(ProtagonistCreationInfo)]
-        )
+        MethodSegmenter.LeftConfig<BeforeRollDelegate>((MethodInfo)origin)
     {
-        protected override void InjectSplitPoint(ILCursor ilCursor)
+        protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
             var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
 
             ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
             ilCursor.Remove();
+
+            return [typeof(int), typeof(ProtagonistCreationInfo)];
         }
     }
 
