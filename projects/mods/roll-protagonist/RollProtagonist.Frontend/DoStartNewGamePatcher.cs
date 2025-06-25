@@ -12,55 +12,61 @@ namespace RollProtagonist.Frontend;
 [HarmonyPatch(typeof(UI_NewGame), "DoStartNewGame")]
 internal static class DoStartNewGamePatcher
 {
-    private static IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
-    {
-        var (stackValues, isRoll, variables) = BeforeRoll!(uiNewGame);
-
-        if (!isRoll)
-        {
-            throw new InvalidOperationException("New game initialization failed.");
-        }
-
-        AdaptableLog.Info("Before roll");
-
-        yield return null;
-
-        CharacterDomainHelper.MethodCall.CreateProtagonist(
-            (int)stackValues[0],
-            (ProtagonistCreationInfo)stackValues[1]
-        );
-
-        yield return null;
-
-        AdaptableLog.Info("After roll completed successfully");
-
-        AfterRoll!(uiNewGame, variables);
-    }
-
     [HarmonyILManipulator]
-    private static void SplitMethod(MethodBase origin)
+    private static void RefactorDoStartNewGame(MethodBase origin)
     {
         AdaptableLog.Info("SplitMethod started");
 
-        BeforeRoll = MethodSegmenter.CreateLeftSegment(new LeftConfig(origin));
+        var beforeRoll = MethodSegmenter.CreateLeftSegment(new BeforeRollConfig(origin));
 
         AdaptableLog.Info("BeforeRoll generated");
 
-        AfterRoll = MethodSegmenter.CreateRightSegment(new RightConfig(origin));
+        var afterRoll = MethodSegmenter.CreateRightSegment(new AfterRollConfig(origin));
 
         AdaptableLog.Info("AfterRoll generated");
+
+        IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
+        {
+            AdaptableLog.Info("DoStartNewGame");
+
+            var (stackValues, isRoll, variables) = beforeRoll(uiNewGame);
+
+            if (!isRoll)
+            {
+                throw new InvalidOperationException("New game initialization failed.");
+            }
+
+            AdaptableLog.Info("Before roll completed successfully");
+
+            yield return null;
+
+            CharacterDomainHelper.MethodCall.CreateProtagonist(
+                (int)stackValues[0],
+                (ProtagonistCreationInfo)stackValues[1]
+            );
+
+            yield return null;
+
+            afterRoll(uiNewGame, variables);
+
+            AdaptableLog.Info("After roll completed successfully");
+        }
+
+        doStartNewGame = DoStartNewGame;
     }
 
     [HarmonyPrefix]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        __instance.StartCoroutine(DoStartNewGame(__instance));
+        __instance.StartCoroutine(doStartNewGame!(__instance));
 
         return false;
     }
 
-    private class LeftConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig<BeforeRollDelegate>((MethodInfo)origin)
+    private class BeforeRollConfig(MethodBase origin) :
+        MethodSegmenter.LeftConfig<
+            Func<UI_NewGame, Tuple<object[], bool, object[]>>
+        >((MethodInfo)origin)
     {
         protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
@@ -73,8 +79,10 @@ internal static class DoStartNewGamePatcher
         }
     }
 
-    private class RightConfig(MethodBase origin) :
-        MethodSegmenter.RightConfig<AfterRollDelegate>((MethodInfo)origin)
+    private class AfterRollConfig(MethodBase origin) :
+        MethodSegmenter.RightConfig<
+            Action<UI_NewGame, object[]>
+        >((MethodInfo)origin)
     {
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
@@ -85,9 +93,6 @@ internal static class DoStartNewGamePatcher
         }
     }
 
-    private delegate Tuple<object[], bool, object[]> BeforeRollDelegate(UI_NewGame instance);
-    private delegate void AfterRollDelegate(UI_NewGame instance, object[] variables);
-    private static BeforeRollDelegate? BeforeRoll;
-    private static AfterRollDelegate? AfterRoll;
+    private static Func<UI_NewGame, IEnumerator>? doStartNewGame;
 }
 

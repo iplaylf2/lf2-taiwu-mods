@@ -17,16 +17,16 @@ internal static class RollProtagonistBuilder
     {
         AdaptableLog.Info("SplitMethod started");
 
-        var roll = MethodSegmenter.CreateLeftSegment(new LeftConfig(origin));
+        var roll = MethodSegmenter.CreateLeftSegment(new RollConfig(origin));
 
         AdaptableLog.Info("roll generated");
 
-        var confirm = MethodSegmenter.CreateRightSegment(new RightConfig(origin));
+        var afterRoll = MethodSegmenter.CreateRightSegment(new AfterRollConfig(origin));
 
-        AdaptableLog.Info("confirm generated");
+        AdaptableLog.Info("afterRoll generated");
     }
 
-    private class LeftConfig(MethodBase origin) :
+    private class RollConfig(MethodBase origin) :
        MethodSegmenter.LeftConfig<RollDelegate>((MethodInfo)origin)
     {
         protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
@@ -44,8 +44,8 @@ internal static class RollProtagonistBuilder
         }
     }
 
-    private class RightConfig(MethodBase origin) :
-        MethodSegmenter.RightConfig<ConfirmDelegate>((MethodInfo)origin)
+    private class AfterRollConfig(MethodBase origin) :
+        MethodSegmenter.RightConfig<AfterRollDelegate>((MethodInfo)origin)
     {
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
@@ -65,7 +65,7 @@ internal static class RollProtagonistBuilder
         DataContext context,
         ProtagonistCreationInfo info
     );
-    private delegate int ConfirmDelegate(
+    private delegate int AfterRollDelegate(
         CharacterDomain instance,
         DataContext context,
         ProtagonistCreationInfo info,

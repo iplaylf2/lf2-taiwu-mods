@@ -50,7 +50,11 @@ public static class MethodSegmenter
         return dynamicMethod.Generate().CreateDelegate<T>();
     }
 
-    private static void InitILContext<T>(MethodBase prototype, out DynamicMethodDefinition dynamicMethod, out ILContext ilContext) where T : Delegate
+    private static void InitILContext<T>(
+        MethodBase prototype,
+        out DynamicMethodDefinition dynamicMethod,
+        out ILContext ilContext
+    ) where T : Delegate
     {
         var delegateType = typeof(T).GetMethod("Invoke");
         dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom(
