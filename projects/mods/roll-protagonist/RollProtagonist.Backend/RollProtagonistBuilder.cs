@@ -1,7 +1,5 @@
 using System.Reflection;
-using GameData.Common;
 using GameData.Domains.Character;
-using GameData.Domains.Character.Creation;
 using GameData.Utilities;
 using HarmonyLib;
 using LF2.Cecil.Helper;
@@ -27,7 +25,9 @@ internal static class RollProtagonistBuilder
     }
 
     private class RollConfig(MethodBase origin) :
-       MethodSegmenter.LeftConfig<RollDelegate>((MethodInfo)origin)
+        MethodSegmenter.LeftConfig<CreateProtagonistStages.RollDelegate>(
+            (MethodInfo)origin
+        )
     {
         protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
@@ -45,7 +45,9 @@ internal static class RollProtagonistBuilder
     }
 
     private class AfterRollConfig(MethodBase origin) :
-        MethodSegmenter.RightConfig<AfterRollDelegate>((MethodInfo)origin)
+        MethodSegmenter.RightConfig<CreateProtagonistStages.AfterRollDelegate>(
+            (MethodInfo)origin
+        )
     {
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
@@ -59,16 +61,4 @@ internal static class RollProtagonistBuilder
             ilCursor.Index++;
         }
     }
-
-    private delegate Tuple<object[], bool, object[]> RollDelegate(
-        CharacterDomain instance,
-        DataContext context,
-        ProtagonistCreationInfo info
-    );
-    private delegate int AfterRollDelegate(
-        CharacterDomain instance,
-        DataContext context,
-        ProtagonistCreationInfo info,
-        object[] variables
-    );
 }
