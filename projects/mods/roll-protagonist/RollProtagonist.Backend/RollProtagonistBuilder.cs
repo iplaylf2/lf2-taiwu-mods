@@ -6,7 +6,6 @@ using GameData.Utilities;
 using HarmonyLib;
 using LF2.Cecil.Helper;
 using MonoMod.Cil;
-using static GameData.Domains.Character.Character;
 
 namespace RollProtagonist.Backend;
 
@@ -28,14 +27,18 @@ internal static class RollProtagonistBuilder
     }
 
     private class LeftConfig(MethodBase origin) :
-       MethodSegmenter.LeftConfig<RollDelegate>(
-            (MethodInfo)origin,
-            [typeof(ProtagonistFeatureRelatedStatus)]
-        )
+       MethodSegmenter.LeftConfig<RollDelegate>((MethodInfo)origin, [])
     {
         protected override void InjectSplitPoint(ILCursor ilCursor)
         {
-            throw new NotImplementedException();
+            var offlineCreateProtagonist =
+             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+
+            ilCursor.GotoNext(
+                x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
+                x => x.MatchStloc(out var _)
+            );
+            ilCursor.Index++;
         }
     }
 
@@ -44,7 +47,14 @@ internal static class RollProtagonistBuilder
     {
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
-            throw new NotImplementedException();
+            var offlineCreateProtagonist =
+             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+
+            ilCursor.GotoNext(
+                x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
+                x => x.MatchStloc(out var _)
+            );
+            ilCursor.Index++;
         }
     }
 
@@ -53,5 +63,10 @@ internal static class RollProtagonistBuilder
         DataContext context,
         ProtagonistCreationInfo info
     );
-    private delegate void ConfirmDelegate(CharacterDomain instance, object[] variables);
+    private delegate int ConfirmDelegate(
+        CharacterDomain instance,
+        DataContext context,
+        ProtagonistCreationInfo info,
+        object[] variables
+    );
 }
