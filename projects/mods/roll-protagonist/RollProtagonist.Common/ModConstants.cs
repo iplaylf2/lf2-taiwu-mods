@@ -2,7 +2,21 @@ namespace RollProtagonist.Common;
 
 public static class ModConstants
 {
-    public const string ExecuteInitial = "ExecuteInitial";
-    public const string ExecuteRoll = "ExecuteRoll";
-    public const string ExecuteCommit = "ExecuteCommit";
+    public static class Method
+    {
+        public static class ExecuteInitial
+        {
+            public const string creationInfo = "creationInfo";
+        }
+
+        public static class ExecuteRoll
+        {
+
+        }
+
+        public static class ExecuteCommit
+        {
+
+        }
+    }
 }

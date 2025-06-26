@@ -31,7 +31,7 @@ internal static class RollProtagonistBuilder
 
         DomainManager.Mod.AddModMethod(
             ModIdStr,
-            ModConstants.ExecuteInitial,
+            nameof(ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
             }
@@ -39,7 +39,7 @@ internal static class RollProtagonistBuilder
 
         DomainManager.Mod.AddModMethod(
             ModIdStr,
-            ModConstants.ExecuteRoll,
+            nameof(ModConstants.Method.ExecuteRoll),
             (context, data) =>
             {
             }
@@ -47,7 +47,7 @@ internal static class RollProtagonistBuilder
 
         DomainManager.Mod.AddModMethod(
             ModIdStr,
-            ModConstants.ExecuteCommit,
+            nameof(ModConstants.Method.ExecuteCommit),
             (context, data) =>
             {
             }
@@ -91,4 +91,24 @@ internal static class RollProtagonistBuilder
             ilCursor.Index++;
         }
     }
+
+    // // 通用序列化方法（支持类和结构体）
+    // public static string SerializeToBase64<T>(T obj)
+    // {
+    //     if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+    //     using var stream = new MemoryStream();
+
+    //     new BinaryFormatter().Serialize(stream, obj);
+    //     return Convert.ToBase64String(stream.ToArray());
+    // }
+
+    // // 通用反序列化方法
+    // public static T DeserializeFromBase64<T>(string base64String)
+    // {
+    //     byte[] bytes = Convert.FromBase64String(base64String);
+    //     using var stream = new MemoryStream(bytes);
+
+    //     return (T)new BinaryFormatter().Deserialize(stream);
+    // }
 }
