@@ -13,6 +13,7 @@
   </Folder>
   <Folder Name="/projects/mods/roll-protagonist/">
     <Project Path="projects/mods/roll-protagonist/RollProtagonist.Backend/RollProtagonist.Backend.csproj" />
+    <Project Path="projects/mods/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj" />
     <Project Path="projects/mods/roll-protagonist/RollProtagonist.Frontend/RollProtagonist.Frontend.csproj" />
   </Folder>
   <Folder Name="/projects/mods/tired-sl/">

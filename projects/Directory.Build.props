@@ -3,6 +3,7 @@
 
     <PropertyGroup>
         <LF2Common>$(MSBuildThisFileDirectory)/common</LF2Common>
+        <LF2Mods>$(MSBuildThisFileDirectory)/mods</LF2Mods>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -54,7 +54,7 @@ internal class CreateProtagonistFlow
         return rollResult.Character;
     }
 
-    public void CommitCreation()
+    public void ExecuteCommit()
     {
         currentPhase = CreationPhase.Commit;
         creationFlow.MoveNext();

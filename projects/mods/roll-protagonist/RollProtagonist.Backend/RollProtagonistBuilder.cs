@@ -1,15 +1,19 @@
 using System.Reflection;
+using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Utilities;
 using HarmonyLib;
 using LF2.Cecil.Helper;
 using MonoMod.Cil;
+using RollProtagonist.Common;
 
 namespace RollProtagonist.Backend;
 
 [HarmonyPatch(typeof(CharacterDomain), nameof(CharacterDomain.CreateProtagonist))]
 internal static class RollProtagonistBuilder
 {
+    public static string? ModIdStr { get; set; }
+
     [HarmonyILManipulator]
     private static void SplitMethod(MethodBase origin)
     {
@@ -22,6 +26,32 @@ internal static class RollProtagonistBuilder
         var commit = MethodSegmenter.CreateRightSegment(new CommitOperationConfig(origin));
 
         AdaptableLog.Info($"{nameof(commit)} generated");
+
+        var flow = new CreateProtagonistFlow(roll, commit);
+
+        DomainManager.Mod.AddModMethod(
+            ModIdStr,
+            ModConstants.ExecuteInitial,
+            (context, data) =>
+            {
+            }
+        );
+
+        DomainManager.Mod.AddModMethod(
+            ModIdStr,
+            ModConstants.ExecuteRoll,
+            (context, data) =>
+            {
+            }
+        );
+
+        DomainManager.Mod.AddModMethod(
+            ModIdStr,
+            ModConstants.ExecuteCommit,
+            (context, data) =>
+            {
+            }
+        );
     }
 
     private class RollOperationConfig(MethodBase origin) :
