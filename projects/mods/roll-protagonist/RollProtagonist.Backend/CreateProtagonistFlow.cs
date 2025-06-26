@@ -27,32 +27,25 @@ internal class CreateProtagonistFlow
         object[] variables
     );
 
-    public Character ExecuteInitialRoll(
+    public void ExecuteInitial(
         CharacterDomain domain,
         DataContext context,
         ProtagonistCreationInfo info
     )
     {
-        currentPhase = CreationPhase.InitialRoll;
         characterDomain = domain;
         dataContext = context;
         creationInfo = info;
-
-        creationFlow.MoveNext();
-
-        var rollResult = (RollResult)creationFlow.Current;
-
-        return rollResult.Character;
     }
 
-    public Character ExecuteReroll()
+    public Character ExecuteRoll()
     {
         if (characterDomain is null)
         {
-            throw new InvalidOperationException("Character domain not initialized");
+            throw new InvalidOperationException("CreateProtagonist not initialized");
         }
 
-        currentPhase = CreationPhase.Reroll;
+        currentPhase = CreationPhase.Roll;
 
         creationFlow.MoveNext();
 
@@ -93,15 +86,7 @@ internal class CreateProtagonistFlow
                         }
                     }
                     break;
-                case CreationPhase.InitialRoll:
-                    {
-                        var (_, _, newVariables) = roll(characterDomain!, dataContext!, creationInfo!);
-                        stateVariables = newVariables;
-
-                        yield return new RollResult(ExtractCharacter(stateVariables));
-                    }
-                    break;
-                case CreationPhase.Reroll:
+                case CreationPhase.Roll:
                     {
                         var (_, _, newVariables) = roll(characterDomain!, dataContext!, creationInfo!);
                         stateVariables = newVariables;
@@ -120,11 +105,11 @@ internal class CreateProtagonistFlow
 
     private enum CreationPhase
     {
-        Commit, InitialRoll, Reroll,
+        Commit, Roll,
     }
 
     private readonly IEnumerator<StageResult> creationFlow;
-    private CreationPhase currentPhase = CreationPhase.InitialRoll;
+    private CreationPhase currentPhase = CreationPhase.Roll;
     private CharacterDomain? characterDomain;
     private DataContext? dataContext;
     private ProtagonistCreationInfo? creationInfo;
