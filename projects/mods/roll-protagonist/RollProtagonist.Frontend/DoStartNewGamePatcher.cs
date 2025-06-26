@@ -15,15 +15,15 @@ internal static class DoStartNewGamePatcher
     [HarmonyILManipulator]
     private static void RefactorDoStartNewGame(MethodBase origin)
     {
-        AdaptableLog.Info("SplitMethod started");
+        AdaptableLog.Info("RefactorDoStartNewGame started");
 
         var beforeRoll = MethodSegmenter.CreateLeftSegment(new BeforeRollConfig(origin));
 
-        AdaptableLog.Info("BeforeRoll generated");
+        AdaptableLog.Info($"{nameof(beforeRoll)} generated");
 
         var afterRoll = MethodSegmenter.CreateRightSegment(new AfterRollConfig(origin));
 
-        AdaptableLog.Info("AfterRoll generated");
+        AdaptableLog.Info($"{nameof(afterRoll)}  generated");
 
         IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
         {
