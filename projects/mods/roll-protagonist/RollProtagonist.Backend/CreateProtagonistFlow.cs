@@ -9,10 +9,10 @@ internal class CreateProtagonistFlow
 {
     public CreateProtagonistFlow(
         RollOperation roll,
-        CommitOperation complete
+        CommitOperation commit
     )
     {
-        creationFlow = BuildCreationFlow(roll, complete);
+        creationFlow = BuildCreationFlow(roll, commit);
     }
 
     public delegate Tuple<object[], bool, object[]> RollOperation(
@@ -60,11 +60,11 @@ internal class CreateProtagonistFlow
         creationFlow.MoveNext();
     }
 
-    protected abstract record StageResult { }
-    protected record RollResult(Character Character) : StageResult { }
-    protected record CompleteRollResult : StageResult { }
+    protected abstract record PhaseResult { }
+    protected record RollResult(Character Character) : PhaseResult { }
+    protected record CommitResult : PhaseResult { }
 
-    private IEnumerator<StageResult> BuildCreationFlow(RollOperation roll, CommitOperation completeRoll)
+    private IEnumerator<PhaseResult> BuildCreationFlow(RollOperation roll, CommitOperation commit)
     {
         object[] stateVariables = [];
 
@@ -74,9 +74,9 @@ internal class CreateProtagonistFlow
             {
                 case CreationPhase.Commit:
                     {
-                        completeRoll(characterDomain!, dataContext!, creationInfo!, stateVariables);
+                        commit(characterDomain!, dataContext!, creationInfo!, stateVariables);
 
-                        yield return new CompleteRollResult();
+                        yield return new CommitResult();
 
                         if (CreationPhase.Commit == currentPhase)
                         {
@@ -108,7 +108,7 @@ internal class CreateProtagonistFlow
         Commit, Roll,
     }
 
-    private readonly IEnumerator<StageResult> creationFlow;
+    private readonly IEnumerator<PhaseResult> creationFlow;
     private CreationPhase currentPhase = CreationPhase.Roll;
     private CharacterDomain? characterDomain;
     private DataContext? dataContext;
