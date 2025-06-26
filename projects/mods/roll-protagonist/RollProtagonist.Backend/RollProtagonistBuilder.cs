@@ -15,17 +15,17 @@ internal static class RollProtagonistBuilder
     {
         AdaptableLog.Info("SplitMethod started");
 
-        var roll = MethodSegmenter.CreateLeftSegment(new RollConfig(origin));
+        var rollOperation = MethodSegmenter.CreateLeftSegment(new RollOperationConfig(origin));
 
-        AdaptableLog.Info("roll generated");
+        AdaptableLog.Info("rollOperation generated");
 
-        var afterRoll = MethodSegmenter.CreateRightSegment(new AfterRollConfig(origin));
+        var commitOperation = MethodSegmenter.CreateRightSegment(new CommitOperationConfig(origin));
 
-        AdaptableLog.Info("afterRoll generated");
+        AdaptableLog.Info("commitOperation generated");
     }
 
-    private class RollConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig<CreateProtagonistStages.RollDelegate>(
+    private class RollOperationConfig(MethodBase origin) :
+        MethodSegmenter.LeftConfig<CreateProtagonistFlow.RollOperation>(
             (MethodInfo)origin
         )
     {
@@ -44,8 +44,8 @@ internal static class RollProtagonistBuilder
         }
     }
 
-    private class AfterRollConfig(MethodBase origin) :
-        MethodSegmenter.RightConfig<CreateProtagonistStages.AfterRollDelegate>(
+    private class CommitOperationConfig(MethodBase origin) :
+        MethodSegmenter.RightConfig<CreateProtagonistFlow.CommitOperation>(
             (MethodInfo)origin
         )
     {

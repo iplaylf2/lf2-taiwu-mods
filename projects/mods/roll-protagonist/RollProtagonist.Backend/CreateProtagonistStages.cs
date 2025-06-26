@@ -1,111 +1,131 @@
-using System.Collections;
 using GameData.Common;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
+using GameData.Utilities;
 
 namespace RollProtagonist.Backend;
 
-internal class CreateProtagonistStages
+internal class CreateProtagonistFlow
 {
-    public CreateProtagonistStages(
-        RollDelegate roll,
-        AfterRollDelegate afterRoll
+    public CreateProtagonistFlow(
+        RollOperation roll,
+        CommitOperation complete
     )
     {
-        this.roll = roll;
-        this.afterRoll = afterRoll;
-        stageLoop = StageLoop();
+        creationFlow = BuildCreationFlow(roll, complete);
     }
 
-    public delegate Tuple<object[], bool, object[]> RollDelegate(
-        CharacterDomain instance,
+    public delegate Tuple<object[], bool, object[]> RollOperation(
+        CharacterDomain domain,
         DataContext context,
         ProtagonistCreationInfo info
     );
-    public delegate int AfterRollDelegate(
-        CharacterDomain instance,
+    public delegate int CommitOperation(
+        CharacterDomain domain,
         DataContext context,
         ProtagonistCreationInfo info,
         object[] variables
     );
 
-    public Character New(ProtagonistCreationInfo info)
+    public Character ExecuteInitialRoll(
+        CharacterDomain domain,
+        DataContext context,
+        ProtagonistCreationInfo info
+    )
     {
-        nextStage = NextStage.New;
+        currentPhase = CreationPhase.InitialRoll;
+        characterDomain = domain;
+        dataContext = context;
         creationInfo = info;
 
-        stageLoop.MoveNext();
+        creationFlow.MoveNext();
 
-        throw new NotImplementedException();
+        var rollResult = (RollResult)creationFlow.Current;
+
+        return rollResult.Character;
     }
 
-    public Character Roll()
+    public Character ExecuteReroll()
     {
-        nextStage = NextStage.Roll;
-        stageLoop.MoveNext();
+        if (characterDomain is null)
+        {
+            throw new InvalidOperationException("Character domain not initialized");
+        }
 
-        throw new NotImplementedException();
+        currentPhase = CreationPhase.Reroll;
+
+        creationFlow.MoveNext();
+
+        var rollResult = (RollResult)creationFlow.Current;
+
+        return rollResult.Character;
     }
 
-    public void Confirm()
+    public void CommitCreation()
     {
-        nextStage = NextStage.AfterRoll;
-        stageLoop.MoveNext();
+        currentPhase = CreationPhase.Commit;
+        creationFlow.MoveNext();
     }
 
-    private IEnumerator StageLoop()
+    protected abstract record StageResult { }
+    protected record RollResult(Character Character) : StageResult { }
+    protected record CompleteRollResult : StageResult { }
+
+    private IEnumerator<StageResult> BuildCreationFlow(RollOperation roll, CommitOperation completeRoll)
     {
-        object[] variables = [];
+        object[] stateVariables = [];
 
         while (true)
         {
-            switch (nextStage)
+            switch (currentPhase)
             {
-                case NextStage.AfterRoll:
+                case CreationPhase.Commit:
                     {
-                        afterRoll(null, null, creationInfo!, variables);
+                        completeRoll(characterDomain!, dataContext!, creationInfo!, stateVariables);
 
-                        yield return null;
+                        yield return new CompleteRollResult();
 
-                        if (NextStage.AfterRoll == nextStage)
+                        if (CreationPhase.Commit == currentPhase)
                         {
-                            throw new Exception();
+                            throw new InvalidOperationException(
+                                "Must perform at least one roll operation before committing"
+                            );
                         }
                     }
                     break;
-                case NextStage.New:
+                case CreationPhase.InitialRoll:
                     {
-                        var (_, _, newVariables) = roll(null, null, creationInfo!);
-                        variables = newVariables;
+                        var (_, _, newVariables) = roll(characterDomain!, dataContext!, creationInfo!);
+                        stateVariables = newVariables;
 
-                        yield return ExtractCharacter(newVariables);
+                        yield return new RollResult(ExtractCharacter(stateVariables));
                     }
                     break;
-                case NextStage.Roll:
+                case CreationPhase.Reroll:
                     {
-                        var (_, _, newVariables) = roll(null, null, creationInfo!);
-                        variables = newVariables;
+                        var (_, _, newVariables) = roll(characterDomain!, dataContext!, creationInfo!);
+                        stateVariables = newVariables;
 
-                        yield return ExtractCharacter(newVariables);
+                        yield return new RollResult(ExtractCharacter(stateVariables));
                     }
                     break;
             }
         }
     }
 
-    private Character ExtractCharacter(object[] variables)
+    private static Character ExtractCharacter(object[] variables)
     {
-        throw new NotImplementedException();
+        return (Character)variables.Find(x => x is Character);
     }
 
-    private enum NextStage
+    private enum CreationPhase
     {
-        AfterRoll, New, Roll,
+        Commit, InitialRoll, Reroll,
     }
 
-    private readonly RollDelegate roll;
-    private readonly AfterRollDelegate afterRoll;
-    private readonly IEnumerator stageLoop;
-    private NextStage nextStage = NextStage.New;
+    private readonly IEnumerator<StageResult> creationFlow;
+    private CreationPhase currentPhase = CreationPhase.InitialRoll;
+    private CharacterDomain? characterDomain;
+    private DataContext? dataContext;
     private ProtagonistCreationInfo? creationInfo;
 }
