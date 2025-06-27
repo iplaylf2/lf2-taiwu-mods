@@ -1,9 +1,12 @@
 using System.Reflection;
 using GameData.Domains;
 using GameData.Domains.Character;
+using GameData.Domains.Character.Creation;
+using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
 using LF2.Cecil.Helper;
+using LF2.Kit;
 using MonoMod.Cil;
 using RollProtagonist.Common;
 
@@ -15,9 +18,9 @@ internal static class RollProtagonistBuilder
     public static string? ModIdStr { get; set; }
 
     [HarmonyILManipulator]
-    private static void SplitMethod(MethodBase origin)
+    private static void BuildCreationFlow(MethodBase origin)
     {
-        AdaptableLog.Info("SplitMethod started");
+        AdaptableLog.Info("CreateFlow started");
 
         var roll = MethodSegmenter.CreateLeftSegment(new RollOperationConfig(origin));
 
@@ -27,13 +30,20 @@ internal static class RollProtagonistBuilder
 
         AdaptableLog.Info($"{nameof(commit)} generated");
 
-        var flow = new CreateProtagonistFlow(roll, commit);
+        creationFlow = new CreateProtagonistFlow(roll, commit);
 
         DomainManager.Mod.AddModMethod(
             ModIdStr,
             nameof(ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
+                data.Get(
+                    ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
+                    out string infoString
+                );
+                var info = StringSerializer.DeserializeFromString<ProtagonistCreationInfo>(infoString);
+
+                creationFlow.ExecuteInitial(DomainManager.Character, context, info);
             }
         );
 
@@ -42,16 +52,25 @@ internal static class RollProtagonistBuilder
             nameof(ModConstants.Method.ExecuteRoll),
             (context, data) =>
             {
-            }
-        );
+                var character = creationFlow.ExecuteRoll();
 
-        DomainManager.Mod.AddModMethod(
-            ModIdStr,
-            nameof(ModConstants.Method.ExecuteCommit),
-            (context, data) =>
-            {
+                var serializableModData = new SerializableModData();
+
+                serializableModData.Set<Character>(
+                    ModConstants.Method.ExecuteRoll.Return.character,
+                    character
+                );
+
+                return serializableModData;
             }
         );
+    }
+
+    [HarmonyPrefix]
+    private static bool CreateProtagonist(ref int __result)
+    {
+        __result = creationFlow!.ExecuteCommit();
+        return false;
     }
 
     private class RollOperationConfig(MethodBase origin) :
@@ -92,23 +111,5 @@ internal static class RollProtagonistBuilder
         }
     }
 
-    // // 通用序列化方法（支持类和结构体）
-    // public static string SerializeToBase64<T>(T obj)
-    // {
-    //     if (obj == null) throw new ArgumentNullException(nameof(obj));
-
-    //     using var stream = new MemoryStream();
-
-    //     new BinaryFormatter().Serialize(stream, obj);
-    //     return Convert.ToBase64String(stream.ToArray());
-    // }
-
-    // // 通用反序列化方法
-    // public static T DeserializeFromBase64<T>(string base64String)
-    // {
-    //     byte[] bytes = Convert.FromBase64String(base64String);
-    //     using var stream = new MemoryStream(bytes);
-
-    //     return (T)new BinaryFormatter().Deserialize(stream);
-    // }
+    private static CreateProtagonistFlow? creationFlow;
 }

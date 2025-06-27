@@ -54,15 +54,20 @@ internal class CreateProtagonistFlow
         return rollResult.Character;
     }
 
-    public void ExecuteCommit()
+    public int ExecuteCommit()
     {
         currentPhase = CreationPhase.Commit;
+
         creationFlow.MoveNext();
+
+        var commitResult = (CommitResult)creationFlow.Current;
+
+        return commitResult.Data;
     }
 
     protected abstract record PhaseResult { }
     protected record RollResult(Character Character) : PhaseResult { }
-    protected record CommitResult : PhaseResult { }
+    protected record CommitResult(int Data) : PhaseResult { }
 
     private IEnumerator<PhaseResult> BuildCreationFlow(RollOperation roll, CommitOperation commit)
     {
@@ -74,9 +79,9 @@ internal class CreateProtagonistFlow
             {
                 case CreationPhase.Commit:
                     {
-                        commit(characterDomain!, dataContext!, creationInfo!, stateVariables);
+                        var data = commit(characterDomain!, dataContext!, creationInfo!, stateVariables);
 
-                        yield return new CommitResult();
+                        yield return new CommitResult(data);
 
                         if (CreationPhase.Commit == currentPhase)
                         {

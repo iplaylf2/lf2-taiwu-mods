@@ -3,8 +3,10 @@
     <File Path="projects/Directory.Build.props" />
   </Folder>
   <Folder Name="/projects/common/">
+    <File Path="projects/common/AssemblyDebugger.cs" />
     <File Path="projects/common/Directory.Build.props" />
     <Project Path="projects/common/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
+    <Project Path="projects/common/LF2.Kit/LF2.Kit.csproj" />
   </Folder>
   <Folder Name="/projects/mods/">
     <File Path="projects/mods/Directory.Build.props" />
