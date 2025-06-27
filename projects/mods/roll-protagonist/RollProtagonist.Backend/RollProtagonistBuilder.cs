@@ -43,7 +43,7 @@ internal static class RollProtagonistBuilder
                 );
                 var info = StringSerializer.DeserializeFromString<ProtagonistCreationInfo>(infoString);
 
-                creationFlow.ExecuteInitial(DomainManager.Character, context, info);
+                creationFlow.ExecuteInitial(context, info);
             }
         );
 
@@ -70,6 +70,7 @@ internal static class RollProtagonistBuilder
     private static bool CreateProtagonist(ref int __result)
     {
         __result = creationFlow!.ExecuteCommit();
+
         return false;
     }
 

@@ -12,6 +12,8 @@ namespace RollProtagonist.Frontend;
 [HarmonyPatch(typeof(UI_NewGame), "DoStartNewGame")]
 internal static class DoStartNewGamePatcher
 {
+    public static string? ModIdStr { get; set; }
+
     [HarmonyILManipulator]
     private static void RefactorDoStartNewGame(MethodBase origin)
     {
@@ -91,6 +93,16 @@ internal static class DoStartNewGamePatcher
             ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
             ilCursor.Index++;
         }
+    }
+
+    private void ExecuteInitial(ProtagonistCreationInfo creationInfo)
+    {
+
+    }
+
+    private Character ExecuteRoll()
+    {
+
     }
 
     private static Func<UI_NewGame, IEnumerator>? doStartNewGame;

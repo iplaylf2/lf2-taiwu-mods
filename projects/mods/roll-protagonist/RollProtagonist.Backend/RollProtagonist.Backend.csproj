@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <ProjectReference Include="$(LF2Mods)/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj"></ProjectReference>
+        <ProjectReference Include="$(LF2Mods)/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj" />
         <ProjectReference Include="$(LF2Common)/LF2.Kit/LF2.Kit.csproj" />
         <ProjectReference Include="$(LF2Common)/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
     </ItemGroup>

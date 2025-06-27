@@ -1,4 +1,5 @@
 using GameData.Common;
+using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Utilities;
@@ -28,19 +29,17 @@ internal class CreateProtagonistFlow
     );
 
     public void ExecuteInitial(
-        CharacterDomain domain,
         DataContext context,
         ProtagonistCreationInfo info
     )
     {
-        characterDomain = domain;
         dataContext = context;
         creationInfo = info;
     }
 
     public Character ExecuteRoll()
     {
-        if (characterDomain is null)
+        if (creationInfo is null)
         {
             throw new InvalidOperationException("CreateProtagonist not initialized");
         }
@@ -79,7 +78,14 @@ internal class CreateProtagonistFlow
             {
                 case CreationPhase.Commit:
                     {
-                        var data = commit(characterDomain!, dataContext!, creationInfo!, stateVariables);
+                        var data = commit(
+                            DomainManager.Character,
+                            dataContext!,
+                            creationInfo!,
+                            stateVariables
+                        );
+
+                        stateVariables = [];
 
                         yield return new CommitResult(data);
 
@@ -93,7 +99,12 @@ internal class CreateProtagonistFlow
                     break;
                 case CreationPhase.Roll:
                     {
-                        var (_, _, newVariables) = roll(characterDomain!, dataContext!, creationInfo!);
+                        var (_, _, newVariables) = roll(
+                            DomainManager.Character,
+                            dataContext!,
+                            creationInfo!
+                        );
+
                         stateVariables = newVariables;
 
                         yield return new RollResult(ExtractCharacter(stateVariables));
@@ -115,7 +126,6 @@ internal class CreateProtagonistFlow
 
     private readonly IEnumerator<PhaseResult> creationFlow;
     private CreationPhase currentPhase = CreationPhase.Roll;
-    private CharacterDomain? characterDomain;
     private DataContext? dataContext;
     private ProtagonistCreationInfo? creationInfo;
 }
