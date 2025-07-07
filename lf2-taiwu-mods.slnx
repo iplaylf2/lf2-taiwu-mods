@@ -6,6 +6,7 @@
     <File Path="projects/common/AssemblyDebugger.cs" />
     <File Path="projects/common/Directory.Build.props" />
     <Project Path="projects/common/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
+    <Project Path="projects/common/LF2.Frontend.Helper/LF2.Frontend.Helper.csproj" />
     <Project Path="projects/common/LF2.Kit/LF2.Kit.csproj" />
   </Folder>
   <Folder Name="/projects/mods/">

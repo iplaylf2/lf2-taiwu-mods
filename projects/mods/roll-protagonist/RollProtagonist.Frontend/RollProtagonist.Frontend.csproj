@@ -2,6 +2,6 @@
   <ItemGroup>
     <ProjectReference Include="$(LF2Mods)/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj" />
     <ProjectReference Include="$(LF2Common)/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
-    <Compile Include="$(LF2Common)/AssemblyDebugger.cs" />
+    <ProjectReference Include="$(LF2Common)/LF2.Frontend.Helper/LF2.Frontend.Helper.csproj" />
   </ItemGroup>
 </Project>
