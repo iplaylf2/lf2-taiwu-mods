@@ -9,6 +9,9 @@ using LF2.Cecil.Helper;
 using GameData.Domains.Character.Display;
 using LF2.Frontend.Helper;
 using UnityEngine;
+using GameData.Domains.Mod;
+using RollProtagonist.Common;
+using LF2.Kit;
 
 namespace RollProtagonist.Frontend;
 
@@ -53,6 +56,14 @@ internal static class DoStartNewGamePatcher
 
             yield return null;
 
+            var creationInfo = (ProtagonistCreationInfo)stackValues[1];
+
+            ExecuteInitial(creationInfo);
+
+            new AsyncOperation();
+
+            yield return null;
+
             CharacterDomainHelper.MethodCall.CreateProtagonist(
                 (int)stackValues[0],
                 (ProtagonistCreationInfo)stackValues[1]
@@ -72,7 +83,7 @@ internal static class DoStartNewGamePatcher
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
         __instance.StartCoroutine(doStartNewGame!(__instance));
-
+        
         return false;
     }
 
@@ -106,14 +117,24 @@ internal static class DoStartNewGamePatcher
         }
     }
 
-    private void ExecuteInitial(ProtagonistCreationInfo creationInfo)
+    private static void ExecuteInitial(ProtagonistCreationInfo creationInfo)
     {
+        var data = new SerializableModData();
+        data.Set(
+            ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
+            StringSerializer.SerializeToString(creationInfo)
+        );
 
+        ModDomainHelper.MethodCall.CallModMethodWithParam(
+            ModIdStr!,
+            nameof(ModConstants.Method.ExecuteInitial),
+            data
+        );
     }
 
-    private CharacterDisplayDataForTooltip ExecuteRoll()
+    private static CharacterDisplayDataForTooltip ExecuteRoll()
     {
-
+        ModDomainHelper.MethodCall.CallModMethodWithRet()
     }
 
     private static GameObject? displayObject;
