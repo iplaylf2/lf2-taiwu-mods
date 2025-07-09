@@ -1,49 +1,71 @@
+using HarmonyLib;
 using UnityEngine;
 
 namespace LF2.Frontend.Helper;
 
-public static class GameResourceHelper
+public static class ModResourceFactory
 {
-    private const string GameUiRootPath = "RemakeResources/Prefab/Views/";
+    public class ModdedUIBehavior : MonoBehaviour { }
 
-    public static void LoadAndInstantiateGameUI(string uiPath, Action<GameObject?> onInstantiated)
+    /// <summary>
+    /// Creates a mod-specific copy of a UI element by loading its original prefab.
+    /// </summary>
+    /// <param name="originalElement">The live UI element instance to use as a reference.</param>
+    /// <param name="onInstantiated">Callback with the new instance, or null on failure.</param>
+    public static void CreateModCopy(UIElement originalElement, Action<GameObject?> onInstantiated)
     {
+        string uiPath = GetPathFromOriginal(originalElement);
+
         if (string.IsNullOrEmpty(uiPath))
         {
-            Debug.LogError("[GameResourceHelper] Error: uiPath cannot be null or empty.");
+            Debug.LogError(
+                $"[ModResourceFactory] Error: Could not retrieve uiPath from originalElement: {originalElement.Name}"
+            );
 
-            onInstantiated?.Invoke(null);
+            onInstantiated(null);
 
             return;
         }
 
-        string fullPath = Path.Combine(GameUiRootPath, uiPath);
+        string fullPath = Path.Combine(rootPrefabPath, uiPath);
 
         ResLoader.Load<GameObject>(fullPath, (prefab) =>
         {
             if (prefab == null)
             {
-                Debug.LogError($"[GameResourceHelper] Failed to load game UI prefab at path: {fullPath}");
+                Debug.LogError($"[ModResourceFactory] Failed to load game UI prefab at path: {fullPath}");
 
-                onInstantiated?.Invoke(null);
+                onInstantiated(null);
 
                 return;
             }
 
-            GameObject uiInstance = UnityEngine.Object.Instantiate(prefab);
+            GameObject modInstance = UnityEngine.Object.Instantiate(prefab);
 
-            uiInstance.name = prefab.name + "_ModInstance";
+            modInstance.name = $"{prefab.name}_ModCopy";
 
-            if (UIManager.Instance != null && UIManager.Instance.transform != null)
+            if (UIManager.Instance?.transform != null)
             {
-                uiInstance.transform.SetParent(UIManager.Instance.transform, false);
+                modInstance.transform.SetParent(UIManager.Instance.transform, false);
             }
             else
             {
-                Debug.LogError("[GameResourceHelper] UIManager.Instance is not available. Cannot place the UI correctly.");
+                Debug.LogWarning(
+                    "[ModResourceFactory] UIManager.Instance is not available. UI may not be parented correctly."
+                );
             }
 
-            onInstantiated?.Invoke(uiInstance);
+            modInstance.AddComponent<ModdedUIBehavior>();
+
+            onInstantiated(modInstance);
         });
     }
+
+    private static string GetPathFromOriginal(UIElement originalElement)
+    {
+        return Traverse.Create(originalElement).Field("_path").GetValue<string>();
+    }
+
+    private static readonly string rootPrefabPath =
+        Traverse.Create(typeof(UIElement)).Field("rootPrefabPath").GetValue<string>();
 }

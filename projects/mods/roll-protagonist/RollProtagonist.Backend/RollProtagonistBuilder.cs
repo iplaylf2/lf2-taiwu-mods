@@ -2,6 +2,7 @@ using System.Reflection;
 using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
+using GameData.Domains.Character.Display;
 using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
@@ -56,9 +57,9 @@ internal static class RollProtagonistBuilder
 
                 var serializableModData = new SerializableModData();
 
-                serializableModData.Set<Character>(
+                serializableModData.Set(
                     ModConstants.Method.ExecuteRoll.Return.character,
-                    character
+                    new CharacterDisplayDataForTooltip(character)
                 );
 
                 return serializableModData;

@@ -6,6 +6,9 @@ using System.Reflection;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using LF2.Cecil.Helper;
+using GameData.Domains.Character.Display;
+using LF2.Frontend.Helper;
+using UnityEngine;
 
 namespace RollProtagonist.Frontend;
 
@@ -17,6 +20,14 @@ internal static class DoStartNewGamePatcher
     [HarmonyILManipulator]
     private static void RefactorDoStartNewGame(MethodBase origin)
     {
+        ModResourceFactory.CreateModCopy(
+            UIElement.MouseTipCharacterComplete,
+            (modInstance) =>
+            {
+                displayObject = modInstance;
+            }
+        );
+
         AdaptableLog.Info("RefactorDoStartNewGame started");
 
         var beforeRoll = MethodSegmenter.CreateLeftSegment(new BeforeRollConfig(origin));
@@ -100,11 +111,12 @@ internal static class DoStartNewGamePatcher
 
     }
 
-    private Character ExecuteRoll()
+    private CharacterDisplayDataForTooltip ExecuteRoll()
     {
 
     }
 
+    private static GameObject? displayObject;
     private static Func<UI_NewGame, IEnumerator>? doStartNewGame;
 }
 
