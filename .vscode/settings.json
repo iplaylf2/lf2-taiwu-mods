@@ -3,6 +3,7 @@
         "behaviour",
         "callvirt",
         "castclass",
+        "cysharp",
         "finalizer",
         "instrs",
         "ldarg",

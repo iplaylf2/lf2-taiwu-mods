@@ -1,6 +1,5 @@
 using HarmonyLib;
 using GameData.Utilities;
-using System.Collections;
 using MonoMod.Cil;
 using System.Reflection;
 using GameData.Domains.Character;
@@ -12,6 +11,9 @@ using UnityEngine;
 using GameData.Domains.Mod;
 using RollProtagonist.Common;
 using LF2.Kit;
+using Cysharp.Threading.Tasks;
+using GameData.Serializer;
+using FrameWork;
 
 namespace RollProtagonist.Frontend;
 
@@ -41,7 +43,7 @@ internal static class DoStartNewGamePatcher
 
         AdaptableLog.Info($"{nameof(afterRoll)}  generated");
 
-        IEnumerator DoStartNewGame(UI_NewGame uiNewGame)
+        async UniTask DoStartNewGame(UI_NewGame uiNewGame)
         {
             AdaptableLog.Info("DoStartNewGame");
 
@@ -54,22 +56,25 @@ internal static class DoStartNewGamePatcher
 
             AdaptableLog.Info("Before roll completed successfully");
 
-            yield return null;
-
             var creationInfo = (ProtagonistCreationInfo)stackValues[1];
 
             ExecuteInitial(creationInfo);
 
-            new AsyncOperation();
+            var character = await ExecuteRoll();
 
-            yield return null;
+            var viewArg = new ArgumentBox();
+
+            viewArg.Set("Data", character);
+
+            var view= displayObject!.GetComponent<MouseTipCharacterComplete>();
+            view.OnInit(viewArg);
+
+            await Task.Delay(TimeSpan.FromSeconds(10));
 
             CharacterDomainHelper.MethodCall.CreateProtagonist(
                 (int)stackValues[0],
                 (ProtagonistCreationInfo)stackValues[1]
             );
-
-            yield return null;
 
             afterRoll(uiNewGame, variables);
 
@@ -82,8 +87,8 @@ internal static class DoStartNewGamePatcher
     [HarmonyPrefix]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        __instance.StartCoroutine(doStartNewGame!(__instance));
-        
+        doStartNewGame!(__instance).Forget();
+
         return false;
     }
 
@@ -132,12 +137,40 @@ internal static class DoStartNewGamePatcher
         );
     }
 
-    private static CharacterDisplayDataForTooltip ExecuteRoll()
+    private static UniTask<CharacterDisplayDataForTooltip> ExecuteRoll()
     {
-        ModDomainHelper.MethodCall.CallModMethodWithRet()
+        var source = new UniTaskCompletionSource<CharacterDisplayDataForTooltip>();
+
+        ModDomainHelper.AsyncMethodCall.CallModMethodWithRet(
+            EmptyIRequestHandler.Default,
+            ModIdStr!,
+            nameof(ModConstants.Method.ExecuteRoll),
+            (offset, pool) =>
+            {
+                try
+                {
+                    var data = new SerializableModData();
+
+                    SerializerHolder<SerializableModData>.Deserialize(pool, offset, ref data);
+
+                    data.Get(
+                        ModConstants.Method.ExecuteRoll.Return.character,
+                        out CharacterDisplayDataForTooltip character
+                    );
+
+                    source.TrySetResult(character);
+                }
+                catch (Exception e)
+                {
+                    source.TrySetException(e);
+                }
+            }
+        );
+
+        return source.Task;
     }
 
     private static GameObject? displayObject;
-    private static Func<UI_NewGame, IEnumerator>? doStartNewGame;
+    private static Func<UI_NewGame, UniTask>? doStartNewGame;
 }
 
