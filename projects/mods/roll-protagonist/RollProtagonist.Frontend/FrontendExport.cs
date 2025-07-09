@@ -7,6 +7,9 @@ public class FrontendExport : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
+        HarmonyInstance.PatchAll(typeof(MouseTipCharacterCompletePatcher));
+
+        DoStartNewGamePatcher.ModIdStr = ModIdStr;
         HarmonyInstance.PatchAll(typeof(DoStartNewGamePatcher));
     }
 }

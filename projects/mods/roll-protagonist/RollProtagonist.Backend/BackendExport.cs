@@ -7,5 +7,7 @@ public class FrontendExport : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
+        RollProtagonistBuilder.ModIdStr = ModIdStr;
+        HarmonyInstance.PatchAll(typeof(RollProtagonistBuilder));
     }
 }
