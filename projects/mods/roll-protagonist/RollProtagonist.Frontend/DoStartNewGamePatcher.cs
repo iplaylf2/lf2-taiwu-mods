@@ -60,16 +60,37 @@ internal static class DoStartNewGamePatcher
 
             ExecuteInitial(creationInfo);
 
-            var character = await ExecuteRoll();
+            var isRolling = true;
 
-            var viewArg = new ArgumentBox();
+            while (isRolling)
+            {
+                var character = await ExecuteRoll();
 
-            viewArg.Set("Data", character);
+                var viewArg = new ArgumentBox();
+                viewArg.Set("Data", character);
 
-            var view= displayObject!.GetComponent<MouseTipCharacterComplete>();
-            view.OnInit(viewArg);
+                var view = displayObject!.GetComponent<MouseTipCharacterComplete>();
+                view.OnInit(viewArg);
 
-            await Task.Delay(TimeSpan.FromSeconds(10));
+                while (true)
+                {
+                    if (CommonCommandKit.Enter.Check(view.Element))
+                    {
+                        isRolling = false;
+                        
+                        break;
+                    }
+
+                    if (CommonCommandKit.Shift.Check(view.Element))
+                    {
+                        AdaptableLog.Info("roll");
+
+                        break; 
+                    }
+
+                    await UniTask.Yield();
+                }
+            }
 
             CharacterDomainHelper.MethodCall.CreateProtagonist(
                 (int)stackValues[0],
