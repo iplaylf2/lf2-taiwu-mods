@@ -16,8 +16,12 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <PackageReference Include="Fody" Version="6.9.2" />
-        <PackageReference Include="Costura.Fody" Version="6.0.0" />
+        <PackageReference Include="Fody" Version="6.9.2">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Costura.Fody" Version="6.0.0">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsBackend)' == 'true'">

@@ -33,19 +33,19 @@ internal static class DoStartNewGamePatcher
             }
         );
 
-        AdaptableLog.Info("RefactorDoStartNewGame started");
+        Game.ClockAndLogInfo("RefactorDoStartNewGame started", false);
 
         var beforeRoll = MethodSegmenter.CreateLeftSegment(new BeforeRollConfig(origin));
 
-        AdaptableLog.Info($"{nameof(beforeRoll)} generated");
+        Game.ClockAndLogInfo($"{nameof(beforeRoll)} generated", false);
 
         var afterRoll = MethodSegmenter.CreateRightSegment(new AfterRollConfig(origin));
 
-        AdaptableLog.Info($"{nameof(afterRoll)}  generated");
+        Game.ClockAndLogInfo($"{nameof(afterRoll)}  generated", false);
 
         async UniTask DoStartNewGame(UI_NewGame uiNewGame)
         {
-            AdaptableLog.Info("DoStartNewGame");
+            Game.ClockAndLogInfo("DoStartNewGame", false);
 
             var (stackValues, isRoll, variables) = beforeRoll(uiNewGame);
 
@@ -54,7 +54,7 @@ internal static class DoStartNewGamePatcher
                 throw new InvalidOperationException("New game initialization failed.");
             }
 
-            AdaptableLog.Info("Before roll completed successfully");
+            Game.ClockAndLogInfo("Before roll completed successfully", false);
 
             var creationInfo = (ProtagonistCreationInfo)stackValues[1];
 
@@ -77,15 +77,15 @@ internal static class DoStartNewGamePatcher
                     if (CommonCommandKit.Enter.Check(view.Element))
                     {
                         isRolling = false;
-                        
+
                         break;
                     }
 
                     if (CommonCommandKit.Shift.Check(view.Element))
                     {
-                        AdaptableLog.Info("roll");
+                        Game.ClockAndLogInfo("roll", false);
 
-                        break; 
+                        break;
                     }
 
                     await UniTask.Yield();
@@ -99,7 +99,7 @@ internal static class DoStartNewGamePatcher
 
             afterRoll(uiNewGame, variables);
 
-            AdaptableLog.Info("After roll completed successfully");
+            Game.ClockAndLogInfo("After roll completed successfully", false);
         }
 
         doStartNewGame = DoStartNewGame;
