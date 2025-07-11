@@ -4,11 +4,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll">
+    <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
     <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll">
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll">
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>

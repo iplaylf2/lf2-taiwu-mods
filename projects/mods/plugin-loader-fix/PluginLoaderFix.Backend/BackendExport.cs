@@ -1,4 +1,5 @@
-﻿using TaiwuModdingLib.Core.Plugin;
+﻿using PluginLoaderFix.Common;
+using TaiwuModdingLib.Core.Plugin;
 
 namespace PluginLoaderFix.Backend;
 
@@ -7,5 +8,6 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
+        HarmonyInstance.PatchAll(typeof(PluginHelperPatcher));
     }
 }

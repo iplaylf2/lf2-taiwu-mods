@@ -6,7 +6,7 @@ namespace PluginLoaderFix.Common;
 
 public class PluginHelperFix
 {
-    public static Type? GetEntrypointTypeWithCecil(Assembly assembly)
+    public static Type? GetEntrypointType(Assembly assembly)
     {
         string harmonyPluginBaseName = typeof(TaiwuRemakeHarmonyPlugin).FullName!;
         string pluginBaseName = typeof(TaiwuRemakePlugin).FullName!;
