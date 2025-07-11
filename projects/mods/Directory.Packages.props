@@ -7,4 +7,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
+    <PackageReference Include="UniTask" Version="2.5.10" />
+  </ItemGroup>
 </Project>

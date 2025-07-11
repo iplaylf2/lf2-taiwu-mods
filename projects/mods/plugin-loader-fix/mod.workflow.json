@@ -1,0 +1,6 @@
+{
+    "buildProjects": [
+        "PluginLoaderFix.Backend",
+        "PluginLoaderFix.Frontend"
+    ]
+}
