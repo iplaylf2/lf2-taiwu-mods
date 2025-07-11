@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="$(LF2Mods)/plugin-loader-fix/PluginLoaderFix.Common/PluginLoaderFix.Common.csproj" />
+    </ItemGroup>
+</Project>

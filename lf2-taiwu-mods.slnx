@@ -14,6 +14,11 @@
     <File Path="projects/mods/Directory.Build.targets" />
     <File Path="projects/mods/Directory.Packages.props" />
   </Folder>
+  <Folder Name="/projects/mods/plugin-loader-fix/">
+    <Project Path="projects/mods/plugin-loader-fix/PluginLoaderFix.Backend/PluginLoaderFix.Backend.csproj" />
+    <Project Path="projects/mods/plugin-loader-fix/PluginLoaderFix.Common/PluginLoaderFix.Common.csproj" />
+    <Project Path="projects/mods/plugin-loader-fix/PluginLoaderFix.Frontend/PluginLoaderFix.Frontend.csproj" />
+  </Folder>
   <Folder Name="/projects/mods/roll-protagonist/">
     <Project Path="projects/mods/roll-protagonist/RollProtagonist.Backend/RollProtagonist.Backend.csproj" />
     <Project Path="projects/mods/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj" />

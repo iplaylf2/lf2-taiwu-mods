@@ -1,5 +1,10 @@
 <Project>
-  <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
-    <PackageReference Include="LF2.Transil" Version="0.0.1" />
+  <ItemGroup Condition="('$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true') and '$(LF2SingleLibrary)' == 'true'">
+    <PackageReference Include="Fody" Version="6.9.2">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Costura.Fody" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

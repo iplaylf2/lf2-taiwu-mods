@@ -1,2 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="LF2.Transil" Version="0.0.1" />
+    </ItemGroup>
 </Project>
