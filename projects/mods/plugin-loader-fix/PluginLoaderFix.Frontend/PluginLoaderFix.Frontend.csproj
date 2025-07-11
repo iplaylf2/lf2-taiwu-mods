@@ -2,5 +2,6 @@
     <ItemGroup>
         <ProjectReference Include="$(LF2Mods)/plugin-loader-fix/PluginLoaderFix.Common/PluginLoaderFix.Common.csproj" />
         <PackageReference Remove="UniTask" />
+        <PackageReference Remove="LF2.Transil"/>
     </ItemGroup>
 </Project>

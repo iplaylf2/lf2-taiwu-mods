@@ -8,6 +8,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
+    <PackageReference Include="LF2.Transil" Version="0.0.1" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
     <PackageReference Include="UniTask" Version="2.5.10" />
   </ItemGroup>
