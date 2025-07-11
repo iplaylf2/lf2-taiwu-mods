@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text;
 
-namespace LF2;
+namespace LF2.Common;
 
 public static class AssemblyDebugger
 {
