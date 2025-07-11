@@ -8,5 +8,9 @@
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
+    <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll">
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
   </ItemGroup>
 </Project>

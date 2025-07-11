@@ -1,21 +1,29 @@
 ﻿using System.Reflection;
+using Mono.Cecil;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace PluginLoaderFix.Common;
 
 public class PluginHelperFix
 {
-    public static Type? GetEntrypointType(Assembly assembly)
+    public static Type? GetEntrypointTypeWithCecil(Assembly assembly)
     {
-        Type typeFromHandle = typeof(TaiwuRemakeHarmonyPlugin);
-        Type typeFromHandle2 = typeof(TaiwuRemakePlugin);
-        Type[] exportedTypes = assembly.GetExportedTypes();
-        Type[] array = exportedTypes;
-        foreach (Type type in array)
+        string harmonyPluginBaseName = typeof(TaiwuRemakeHarmonyPlugin).FullName!;
+        string pluginBaseName = typeof(TaiwuRemakePlugin).FullName!;
+
+        using AssemblyDefinition assemblyDef = AssemblyDefinition.ReadAssembly(assembly.Location);
+
+        foreach (TypeDefinition typeDef in assemblyDef.MainModule.Types)
         {
-            if (type.BaseType == typeFromHandle2 || type.BaseType == typeFromHandle)
+            if (!typeDef.IsPublic || typeDef.BaseType == null)
             {
-                return type;
+                continue;
+            }
+
+            string baseTypeName = typeDef.BaseType.FullName;
+            if (baseTypeName == harmonyPluginBaseName || baseTypeName == pluginBaseName)
+            {
+                return assembly.GetType(typeDef.FullName, throwOnError: false);
             }
         }
 
