@@ -1,5 +1,5 @@
 <Project>
-    <ItemGroup Condition="'$(IsFrontend)' == 'true' or '$(IsBackend)' == 'true'">
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
         <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
@@ -16,6 +16,9 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup Condition="('$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true') and '$(LF2SingleLibrary)' == 'true'">
         <PackageReference Include="Fody" Version="6.9.2">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -24,14 +27,14 @@
         </PackageReference>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsBackend)' == 'true'">
+    <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
         <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsFrontend)' == 'true'">
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
         <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>

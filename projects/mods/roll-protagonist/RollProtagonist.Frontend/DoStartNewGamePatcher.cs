@@ -1,5 +1,4 @@
 using HarmonyLib;
-using GameData.Utilities;
 using MonoMod.Cil;
 using System.Reflection;
 using GameData.Domains.Character;

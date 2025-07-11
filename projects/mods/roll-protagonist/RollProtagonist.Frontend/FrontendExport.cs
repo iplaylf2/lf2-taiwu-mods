@@ -5,11 +5,6 @@ namespace RollProtagonist.Frontend;
 [PluginConfig("roll-protagonist", "lf2", "1.0.0")]
 public class FrontendExport : TaiwuRemakeHarmonyPlugin
 {
-    static FrontendExport()
-    {
-        CosturaUtility.Initialize();
-    }
-
     public override void Initialize()
     {
         HarmonyInstance.PatchAll(typeof(MouseTipCharacterCompletePatcher));

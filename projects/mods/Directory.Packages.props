@@ -1,5 +1,5 @@
 <Project>
-  <ItemGroup Condition="'$(IsFrontend)' == 'true' or '$(IsBackend)' == 'true'">
+  <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
     <PackageReference Include="LF2.Transil" Version="0.0.1" />
   </ItemGroup>
 </Project>
