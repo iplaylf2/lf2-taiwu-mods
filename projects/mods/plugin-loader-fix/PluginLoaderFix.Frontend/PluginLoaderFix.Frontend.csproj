@@ -1,6 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <PackageReference Remove="UniTask" />
-        <Compile Include="$(LF2Mods)/plugin-loader-fix/Common/**/*.cs" />
-    </ItemGroup>
-</Project>

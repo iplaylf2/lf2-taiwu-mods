@@ -1,9 +1,6 @@
 <Project>
   <ItemGroup Condition="('$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true') and '$(LF2SingleLibrary)' == 'true'">
-    <PackageReference Include="Fody" Version="6.9.2">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Costura.Fody" Version="6.0.0">
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.43">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
