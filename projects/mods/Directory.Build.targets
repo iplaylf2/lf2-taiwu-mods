@@ -1,6 +1,40 @@
 <Project>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 
+    <ItemGroup Condition="'$(LF2SingleLibrary)' == 'true'">
+        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.43">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <Target Name="RunILRepack" AfterTargets="Build" Condition="'$(LF2SingleLibrary)' == 'true'">
+        <ItemGroup>
+            <InternalizeExclude Include="$(TargetName)" />
+            <InputAssemblies Include="$(OutputPath)**\*.dll" />
+            <LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
+        </ItemGroup>
+
+        <ILRepack
+            Parallel="true"
+            Internalize="true"
+            InternalizeExclude="@(InternalizeExclude)"
+            InputAssemblies="@(InputAssemblies)"
+            LibraryPath="@(LibraryPath)"
+            TargetKind="SameAsPrimaryAssembly"
+            OutputFile="$(OutputPath)$(TargetName)$(TargetExt)"
+        />
+    </Target>
+
+    <Target Name="CleanAfterRepack" AfterTargets="RunILRepack" Condition="'$(LF2SingleLibrary)' == 'true'">
+        <ItemGroup>
+            <_AllFilesInOutput Include="$(OutputPath)**\*" />
+            <_FinalMerged Include="$(OutputPath)$(TargetName).*" />
+            <FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged)" />
+        </ItemGroup>
+
+        <Delete Files="@(FilesToDelete)" />
+    </Target>
+
     <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
         <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
             <Private>false</Private>
