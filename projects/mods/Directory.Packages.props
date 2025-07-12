@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
-    <PackageReference Include="LF2.Transil" Version="0.0.1" />
+    <PackageReference Include="LF2.Transil" Version="0.0.2" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">

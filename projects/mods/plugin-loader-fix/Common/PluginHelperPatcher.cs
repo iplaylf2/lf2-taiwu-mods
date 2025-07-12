@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using GameData.Utilities;
 using HarmonyLib;
 using Mono.Cecil;
 using TaiwuModdingLib.Core.Plugin;
@@ -9,7 +10,7 @@ using Transil.Operations;
 namespace PluginLoaderFix.Common;
 
 [HarmonyPatch(PluginHelperName)]
-public class PluginHelperPatcher
+internal static class PluginHelperPatcher
 {
     private const string PluginHelperName = "TaiwuModdingLib.Core.Plugin.PluginHelper";
 
@@ -20,31 +21,44 @@ public class PluginHelperPatcher
         [InjectArgumentValue(1)] string dllName
     )
     {
-        var location = Path.Combine(directoryPath, dllName);
-        var harmonyPluginBaseName = typeof(TaiwuRemakeHarmonyPlugin).FullName!;
-        var pluginBaseName = typeof(TaiwuRemakePlugin).FullName!;
-
-        using var assemblyDef = AssemblyDefinition.ReadAssembly(location);
-
-        foreach (var typeDef in assemblyDef.MainModule.Types)
+        try
         {
-            if (!typeDef.IsPublic || typeDef.BaseType == null)
+            var location = Path.Combine(directoryPath, dllName);
+            var harmonyPluginBaseName = typeof(TaiwuRemakeHarmonyPlugin).FullName!;
+            var pluginBaseName = typeof(TaiwuRemakePlugin).FullName!;
+
+            using var assemblyDef = AssemblyDefinition.ReadAssembly(location);
+
+            foreach (var typeDef in assemblyDef.MainModule.Types)
             {
-                continue;
+                if (!typeDef.IsPublic || typeDef.BaseType == null)
+                {
+                    continue;
+                }
+
+                var baseTypeName = typeDef.BaseType.FullName;
+
+                if (baseTypeName == harmonyPluginBaseName || baseTypeName == pluginBaseName)
+                {
+                    AdaptableLog.Info($"EntrypointType found: {typeDef.FullName} .");
+
+                    return assembly.GetType(typeDef.FullName, throwOnError: false);
+                }
             }
 
-            var baseTypeName = typeDef.BaseType.FullName;
+            AdaptableLog.Info("EntrypointType not found.");
 
-            if (baseTypeName == harmonyPluginBaseName || baseTypeName == pluginBaseName)
-            {
-                return assembly.GetType(typeDef.FullName, throwOnError: false);
-            }
+            return null;
         }
+        catch (Exception e)
+        {
+            AdaptableLog.Error(e.ToString());
 
-        return null;
+            throw;
+        }
     }
 
-    [HarmonyPatch("LoadPlugin")]
+    [HarmonyPatch(PluginHelperName, "LoadPlugin")]
     [HarmonyTranspiler]
     private static IEnumerable<CodeInstruction> HandleGetEntrypointType(IEnumerable<CodeInstruction> instructions)
     {
