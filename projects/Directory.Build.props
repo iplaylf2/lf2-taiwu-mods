@@ -2,6 +2,11 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
+        <LF2Common>$(MSBuildThisFileDirectory)/common</LF2Common>
+        <LF2Mods>$(MSBuildThisFileDirectory)/mods</LF2Mods>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
