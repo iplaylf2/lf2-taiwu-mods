@@ -17,8 +17,10 @@
   </Folder>
   <Folder Name="/projects/mods/plugin-loader-fix/">
     <Project Path="projects/mods/plugin-loader-fix/PluginLoaderFix.Backend/PluginLoaderFix.Backend.csproj" />
-    <Project Path="projects/mods/plugin-loader-fix/PluginLoaderFix.Common/PluginLoaderFix.Common.csproj" />
     <Project Path="projects/mods/plugin-loader-fix/PluginLoaderFix.Frontend/PluginLoaderFix.Frontend.csproj" />
+  </Folder>
+  <Folder Name="/projects/mods/plugin-loader-fix/Common/">
+    <File Path="projects/mods/plugin-loader-fix/Common/PluginHelperPatcher.cs" />
   </Folder>
   <Folder Name="/projects/mods/roll-protagonist/">
     <Project Path="projects/mods/roll-protagonist/RollProtagonist.Backend/RollProtagonist.Backend.csproj" />

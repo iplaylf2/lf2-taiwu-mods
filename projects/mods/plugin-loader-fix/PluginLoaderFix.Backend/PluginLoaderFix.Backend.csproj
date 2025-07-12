@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <ProjectReference Include="$(LF2Mods)/plugin-loader-fix/PluginLoaderFix.Common/PluginLoaderFix.Common.csproj" />
-        <PackageReference Remove="LF2.Transil"/>
+        <Compile Include="$(LF2Mods)/plugin-loader-fix/Common/**/*.cs" />
     </ItemGroup>
 </Project>
