@@ -23,6 +23,18 @@ internal static class PluginHelperPatcher
     {
         try
         {
+            var assemblyLoaderType = assembly.GetType("Costura.AssemblyLoader", throwOnError: false);
+
+            if (null != assemblyLoaderType)
+            {
+                Traverse
+                    .Create(assemblyLoaderType)
+                    .Method("Attach", true)
+                    .GetValue();
+
+                AdaptableLog.Info("try attach Costura.AssemblyLoader");
+            }
+
             var location = Path.Combine(directoryPath, dllName);
             var harmonyPluginBaseName = typeof(TaiwuRemakeHarmonyPlugin).FullName!;
             var pluginBaseName = typeof(TaiwuRemakePlugin).FullName!;
