@@ -3,16 +3,19 @@ using LF2.Frontend.Helper;
 
 namespace RollProtagonist.Frontend;
 
-[HarmonyPatch(typeof(MouseTipCharacterComplete), "LateUpdate")]
+[HarmonyPatch(typeof(MouseTipBase), "LateUpdate")]
 internal static class MouseTipCharacterCompletePatcher
 {
-    public static bool Prefix(MouseTipCharacterComplete __instance)
+    public static bool Prefix(MouseTipBase __instance)
     {
-        if (__instance.GetComponent<ModResourceFactory.ModdedUIBehavior>() != null)
+        if (
+            __instance is not MouseTipCharacterComplete
+            || __instance.GetComponent<ModResourceFactory.ModdedUIBehavior>() is null
+        )
         {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 }
