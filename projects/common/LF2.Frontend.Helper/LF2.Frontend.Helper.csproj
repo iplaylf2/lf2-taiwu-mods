@@ -1,5 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <LF2IsFrontend>true</LF2IsFrontend>
-    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+    </ItemGroup>
 </Project>

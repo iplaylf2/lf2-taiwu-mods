@@ -34,4 +34,42 @@
 
         <Delete Files="@(FilesToDelete)" />
     </Target>
+
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/MonoMod.Utils.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Compile Include="$(LF2Common)/Game.Helper/**/*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
+        <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2Upm)/**/*.dll">
+            <Private>true</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+    </ItemGroup>
 </Project>
