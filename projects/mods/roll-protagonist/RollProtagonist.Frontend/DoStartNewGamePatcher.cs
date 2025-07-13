@@ -107,7 +107,7 @@ internal static class DoStartNewGamePatcher
     [HarmonyPrefix]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        doStartNewGame!(__instance).Forget();
+        __instance.StartCoroutine(doStartNewGame!(__instance).ToCoroutine());
 
         return false;
     }

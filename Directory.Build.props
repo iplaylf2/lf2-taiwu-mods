@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
         <LF2GameLib>$(MSBuildThisFileDirectory)game-lib</LF2GameLib>
+        <LF2Upm>$(MSBuildThisFileDirectory)upm</LF2Upm>
     </PropertyGroup>
 </Project>
