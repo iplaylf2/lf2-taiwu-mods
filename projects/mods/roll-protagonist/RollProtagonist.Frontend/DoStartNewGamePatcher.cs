@@ -9,11 +9,11 @@ using LF2.Frontend.Helper;
 using UnityEngine;
 using GameData.Domains.Mod;
 using RollProtagonist.Common;
-using LF2.Kit;
 using Cysharp.Threading.Tasks;
 using GameData.Serializer;
 using FrameWork;
 using LF2.Kit.Extensions;
+using LF2.Game.Helper;
 
 namespace RollProtagonist.Frontend;
 
@@ -176,7 +176,7 @@ internal static class DoStartNewGamePatcher
         var data = new SerializableModData();
         data.Set(
             ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
-            StringSerializer.SerializeToString(creationInfo)
+            StringSerializer.Serialize(creationInfo)
         );
 
         ModDomainHelper.MethodCall.CallModMethodWithParam(

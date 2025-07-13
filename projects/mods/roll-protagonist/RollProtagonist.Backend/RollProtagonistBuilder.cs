@@ -7,7 +7,7 @@ using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
 using LF2.Cecil.Helper;
-using LF2.Kit;
+using LF2.Game.Helper;
 using MonoMod.Cil;
 using RollProtagonist.Common;
 
@@ -42,9 +42,9 @@ internal static class RollProtagonistBuilder
                     ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
                     out string infoString
                 );
-                var info = StringSerializer.DeserializeFromString<ProtagonistCreationInfo>(infoString);
+                var info = StringSerializer.Deserialize<ProtagonistCreationInfo>(infoString);
 
-                creationFlow.ExecuteInitial(context, info);
+                creationFlow.ExecuteInitial(context, info!);
             }
         );
 
