@@ -107,9 +107,9 @@ internal static class DoStartNewGamePatcher
                 }
             }
 
-            CharacterDomainHelper.MethodCall.CreateProtagonist(listenerId, creationInfo);
-
             game.ChangeGameState(gameState, argBox);
+
+            CharacterDomainHelper.MethodCall.CreateProtagonist(listenerId, creationInfo);
 
             afterRoll(uiNewGame, variables);
 
