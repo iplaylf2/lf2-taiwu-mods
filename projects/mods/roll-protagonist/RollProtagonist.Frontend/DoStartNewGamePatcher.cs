@@ -54,11 +54,26 @@ internal static class DoStartNewGamePatcher
                 throw new InvalidOperationException("New game initialization failed.");
             }
 
-            Game.ClockAndLogInfo("Before roll completed successfully", false);
+            if (
+                stackValues.AsTuple() is not (
+                    Game game,
+                    EGameState gameState,
+                    ArgumentBox argBox,
+                    int listenerId,
+                    ProtagonistCreationInfo creationInfo
+                )
+            )
+            {
+                throw new InvalidOperationException(
+                    "Failed to deconstruct stack values from the original method. The target method's structure has likely changed due to a game update."
+                );
+            }
 
-            var creationInfo = (ProtagonistCreationInfo)stackValues[1];
+            Game.ClockAndLogInfo("Before roll completed", false);
 
             ExecuteInitial(creationInfo);
+
+            Game.ClockAndLogInfo("Execute Initial completed", false);
 
             var isRolling = true;
 
@@ -92,28 +107,13 @@ internal static class DoStartNewGamePatcher
                 }
             }
 
-            if (
-                stackValues.AsTuple() is not (
-                    Game game,
-                    EGameState gameState,
-                    ArgumentBox argBox,
-                    int _listenerId,
-                    ProtagonistCreationInfo _creationInfo
-                )
-            )
-            {
-                throw new InvalidOperationException(
-                    "Failed to deconstruct stack values from the original method. The target method's structure has likely changed due to a game update."
-                );
-            }
-
-            CharacterDomainHelper.MethodCall.CreateProtagonist(_listenerId, _creationInfo);
+            CharacterDomainHelper.MethodCall.CreateProtagonist(listenerId, creationInfo);
 
             game.ChangeGameState(gameState, argBox);
 
             afterRoll(uiNewGame, variables);
 
-            Game.ClockAndLogInfo("After roll completed successfully", false);
+            Game.ClockAndLogInfo("After roll completed", false);
         }
 
         doStartNewGame = DoStartNewGame;
