@@ -10,8 +10,8 @@
     <Project Path="projects/common/LF2.Frontend.Helper/LF2.Frontend.Helper.csproj" />
     <Project Path="projects/common/LF2.Kit/LF2.Kit.csproj" />
   </Folder>
-  <Folder Name="/projects/common/Game.Helper/">
-    <File Path="projects/common/Game.Helper/StringSerializer.cs" />
+  <Folder Name="/projects/common/LF2.Game.Helper/">
+    <File Path="projects/common/LF2.Game.Helper/StringSerializer.cs" />
   </Folder>
   <Folder Name="/projects/mods/">
     <File Path="projects/mods/Directory.Build.props" />

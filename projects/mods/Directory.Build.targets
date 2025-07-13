@@ -52,7 +52,7 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Compile Include="$(LF2Common)/Game.Helper/**/*.cs" />
+        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">

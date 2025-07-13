@@ -4,5 +4,9 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
+        <Reference Include="$(LF2Upm)/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
     </ItemGroup>
 </Project>

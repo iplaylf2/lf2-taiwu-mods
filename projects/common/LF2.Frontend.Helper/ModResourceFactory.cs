@@ -7,11 +7,6 @@ public static class ModResourceFactory
 {
     public class ModdedUIBehavior : MonoBehaviour { }
 
-    /// <summary>
-    /// Creates a mod-specific copy of a UI element by loading its original prefab.
-    /// </summary>
-    /// <param name="originalElement">The live UI element instance to use as a reference.</param>
-    /// <param name="onInstantiated">Callback with the new instance, or null on failure.</param>
     public static void CreateModCopy(UIElement originalElement, Action<GameObject?> onInstantiated)
     {
         string uiPath = GetPathFromOriginal(originalElement);
