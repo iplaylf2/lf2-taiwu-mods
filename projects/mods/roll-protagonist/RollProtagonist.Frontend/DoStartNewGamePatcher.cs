@@ -13,6 +13,7 @@ using LF2.Kit;
 using Cysharp.Threading.Tasks;
 using GameData.Serializer;
 using FrameWork;
+using LF2.Kit.Extensions;
 
 namespace RollProtagonist.Frontend;
 
@@ -91,10 +92,24 @@ internal static class DoStartNewGamePatcher
                 }
             }
 
-            CharacterDomainHelper.MethodCall.CreateProtagonist(
-                (int)stackValues[0],
-                (ProtagonistCreationInfo)stackValues[1]
-            );
+            if (
+                stackValues.AsTuple() is not (
+                    Game game,
+                    EGameState gameState,
+                    ArgumentBox argBox,
+                    int _listenerId,
+                    ProtagonistCreationInfo _creationInfo
+                )
+            )
+            {
+                throw new InvalidOperationException(
+                    "Failed to deconstruct stack values from the original method. The target method's structure has likely changed due to a game update."
+                );
+            }
+
+            CharacterDomainHelper.MethodCall.CreateProtagonist(_listenerId, _creationInfo);
+
+            game.ChangeGameState(gameState, argBox);
 
             afterRoll(uiNewGame, variables);
 
@@ -107,7 +122,7 @@ internal static class DoStartNewGamePatcher
     [HarmonyPrefix]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        __instance.StartCoroutine(doStartNewGame!(__instance).ToCoroutine());
+        doStartNewGame!(__instance).Forget();
 
         return false;
     }
@@ -121,10 +136,24 @@ internal static class DoStartNewGamePatcher
         {
             var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
 
-            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
-            ilCursor.Remove();
+            ilCursor
+                .GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()))
+                .Remove();
 
-            return [typeof(int), typeof(ProtagonistCreationInfo)];
+            var changeGameState = Game.Instance.ChangeGameState;
+
+            ilCursor
+                .Clone()
+                .GotoPrev(x => x.MatchCallOrCallvirt(changeGameState.GetMethodInfo()))
+                .Remove();
+
+            return [
+                typeof(Game),
+                typeof(EGameState),
+                typeof(ArgumentBox),
+                typeof(int),
+                typeof(ProtagonistCreationInfo)
+            ];
         }
     }
 
@@ -137,7 +166,7 @@ internal static class DoStartNewGamePatcher
         {
             var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
 
-            ilCursor.GotoNext((x) => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
+            ilCursor.GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
             ilCursor.Index++;
         }
     }
