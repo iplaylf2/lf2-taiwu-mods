@@ -12,6 +12,7 @@
   </Folder>
   <Folder Name="/projects/common/LF2.Game.Helper/">
     <File Path="projects/common/LF2.Game.Helper/CommonModConstants.cs" />
+    <File Path="projects/common/LF2.Game.Helper/DebugTraceListener.cs" />
     <File Path="projects/common/LF2.Game.Helper/StringSerializer.cs" />
   </Folder>
   <Folder Name="/projects/mods/">

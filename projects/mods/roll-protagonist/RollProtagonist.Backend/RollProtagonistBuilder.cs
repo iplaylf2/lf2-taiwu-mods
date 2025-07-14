@@ -85,13 +85,13 @@ internal static class RollProtagonistBuilder
         protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
             var offlineCreateProtagonist =
-             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+                AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
 
             ilCursor.GotoNext(
+                MoveType.After,
                 x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
                 x => x.MatchStloc(out var _)
             );
-            ilCursor.Index++;
 
             return [];
         }
@@ -105,13 +105,13 @@ internal static class RollProtagonistBuilder
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
             var offlineCreateProtagonist =
-             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+                AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
 
             ilCursor.GotoNext(
+                MoveType.After,
                 x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
                 x => x.MatchStloc(out var _)
             );
-            ilCursor.Index++;
         }
     }
 

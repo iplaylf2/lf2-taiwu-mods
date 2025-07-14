@@ -33,7 +33,6 @@ public static class MethodSegmenter
             InjectSplitPoint(ilContext, config.InjectSplitPoint);
         });
 
-
         return dynamicMethod.Generate().CreateDelegate<T>();
     }
 
