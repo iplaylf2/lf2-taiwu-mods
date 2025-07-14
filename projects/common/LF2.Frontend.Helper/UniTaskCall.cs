@@ -11,7 +11,7 @@ public sealed class UniTaskCall
 {
     public static UniTaskCall Default { get => lazyDefault.Value; }
 
-    public UniTask<SerializableModData> CallModMethod(string modIdStr, string methodName, SerializableModData parameter)
+    public async UniTask<SerializableModData> CallModMethod(string modIdStr, string methodName, SerializableModData parameter)
     {
         var callId = nextCallId();
         var completionSource = new UniTaskCompletionSource<SerializableModData>();
@@ -21,7 +21,11 @@ public sealed class UniTaskCall
 
         ModDomainHelper.MethodCall.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
 
-        return completionSource.Task;
+        var result = await completionSource.Task;
+
+        CallRegistry.TryRemove(callId, out _);
+
+        return result;
     }
 
     public static Func<int> Create()
