@@ -8,5 +8,6 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
+        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
     </ItemGroup>
 </Project>
