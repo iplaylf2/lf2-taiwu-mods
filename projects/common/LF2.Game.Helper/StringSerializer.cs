@@ -7,7 +7,7 @@ internal static class StringSerializer
 {
     private const int DefaultInitialCapacity = 1024;
 
-    public static string Serialize<T>(T item, int initialCapacity = DefaultInitialCapacity)
+    public static string Serialize<T>(T item, int initialCapacity = DefaultInitialCapacity) where T : new()
     {
         if (initialCapacity <= 0)
         {
@@ -30,11 +30,13 @@ internal static class StringSerializer
         return Convert.ToBase64String(buffer);
     }
 
-    public static T? Deserialize<T>(string encodedString)
+    public static T Deserialize<T>(string encodedString) where T : new()
     {
+        var result = new T();
+
         if (string.IsNullOrEmpty(encodedString))
         {
-            return default;
+            return result;
         }
 
         var bytes = Convert.FromBase64String(encodedString);
@@ -42,14 +44,8 @@ internal static class StringSerializer
         using var dataPool = new RawDataPool(bytes.Length);
         dataPool.Write(bytes, 0, bytes.Length);
 
-        T? item = default;
-        if (item is null)
-        {
-            return item;
-        }
+        SerializerHolder<T>.Deserialize(dataPool, 0, ref result);
 
-        SerializerHolder<T>.Deserialize(dataPool, 0, ref item);
-
-        return item;
+        return result;
     }
 }
