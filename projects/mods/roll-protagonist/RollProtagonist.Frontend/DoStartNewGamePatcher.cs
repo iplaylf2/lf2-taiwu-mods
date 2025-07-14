@@ -10,7 +10,6 @@ using UnityEngine;
 using GameData.Domains.Mod;
 using RollProtagonist.Common;
 using Cysharp.Threading.Tasks;
-using GameData.Serializer;
 using FrameWork;
 using LF2.Kit.Extensions;
 using LF2.Game.Helper;
@@ -71,7 +70,7 @@ internal static class DoStartNewGamePatcher
 
             Game.ClockAndLogInfo("Before roll completed", false);
 
-            ExecuteInitial(creationInfo);
+            await ExecuteInitial(creationInfo);
 
             Game.ClockAndLogInfo("Execute Initial completed", false);
 
@@ -171,7 +170,7 @@ internal static class DoStartNewGamePatcher
         }
     }
 
-    private static void ExecuteInitial(ProtagonistCreationInfo creationInfo)
+    private static async UniTask ExecuteInitial(ProtagonistCreationInfo creationInfo)
     {
         var data = new SerializableModData();
         data.Set(
@@ -179,44 +178,27 @@ internal static class DoStartNewGamePatcher
             StringSerializer.Serialize(creationInfo)
         );
 
-        ModDomainHelper.MethodCall.CallModMethodWithParam(
+        await UniTaskCall.Default.CallModMethod(
             ModIdStr!,
             nameof(ModConstants.Method.ExecuteInitial),
             data
         );
     }
 
-    private static UniTask<CharacterDisplayDataForTooltip> ExecuteRoll()
+    private static async UniTask<CharacterDisplayDataForTooltip> ExecuteRoll()
     {
-        var source = new UniTaskCompletionSource<CharacterDisplayDataForTooltip>();
-
-        ModDomainHelper.AsyncMethodCall.CallModMethodWithRet(
-            EmptyIRequestHandler.Default,
+        var data = await UniTaskCall.Default.CallModMethod(
             ModIdStr!,
             nameof(ModConstants.Method.ExecuteRoll),
-            (offset, pool) =>
-            {
-                try
-                {
-                    var data = new SerializableModData();
-
-                    SerializerHolder<SerializableModData>.Deserialize(pool, offset, ref data);
-
-                    data.Get(
-                        ModConstants.Method.ExecuteRoll.Return.character,
-                        out CharacterDisplayDataForTooltip character
-                    );
-
-                    source.TrySetResult(character);
-                }
-                catch (Exception e)
-                {
-                    source.TrySetException(e);
-                }
-            }
+            new SerializableModData()
         );
 
-        return source.Task;
+        data.Get(
+            ModConstants.Method.ExecuteRoll.Return.character,
+            out CharacterDisplayDataForTooltip character
+        );
+
+        return character;
     }
 
     private static GameObject? displayObject;

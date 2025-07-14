@@ -9,7 +9,7 @@ namespace LF2.Frontend.Helper;
 
 public sealed class UniTaskCall
 {
-    public static readonly Lazy<UniTaskCall> Default = new(() => new UniTaskCall());
+    public static UniTaskCall Default { get => lazyDefault.Value; }
 
     public UniTask<SerializableModData> CallModMethod(string modIdStr, string methodName, SerializableModData parameter)
     {
@@ -17,7 +17,7 @@ public sealed class UniTaskCall
         var completionSource = new UniTaskCompletionSource<SerializableModData>();
 
         CallRegistry.TryAdd(callId, completionSource);
-        parameter.Set(ModConstants.UniTaskCallKey, callId);
+        parameter.Set(CommonModConstants.CallIdKey, callId);
 
         ModDomainHelper.MethodCall.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
 
@@ -30,6 +30,8 @@ public sealed class UniTaskCall
 
         return () => Interlocked.Increment(ref currentId);
     }
+
+    private static readonly Lazy<UniTaskCall> lazyDefault = new(() => new UniTaskCall());
 
     private UniTaskCall()
     {
@@ -45,7 +47,7 @@ public sealed class UniTaskCall
 
             Serializer.Deserialize(notification.DataPool, offset, ref modData);
 
-            modData.Get(ModConstants.UniTaskCallKey, out int callId);
+            modData.Get(CommonModConstants.CallIdKey, out int callId);
 
             CallRegistry.TryGetValue(callId, out var completionSource);
 

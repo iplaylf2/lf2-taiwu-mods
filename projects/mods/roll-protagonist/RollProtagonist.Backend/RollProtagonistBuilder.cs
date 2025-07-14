@@ -1,11 +1,11 @@
 using System.Reflection;
-using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Domains.Character.Display;
 using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
+using LF2.Backend.Helper;
 using LF2.Cecil.Helper;
 using LF2.Game.Helper;
 using MonoMod.Cil;
@@ -33,8 +33,8 @@ internal static class RollProtagonistBuilder
 
         creationFlow = new CreateProtagonistFlow(roll, commit);
 
-        DomainManager.Mod.AddModMethod(
-            ModIdStr,
+        TaskCall.AddModMethod(
+            ModIdStr!,
             nameof(ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
@@ -45,11 +45,13 @@ internal static class RollProtagonistBuilder
                 var info = StringSerializer.Deserialize<ProtagonistCreationInfo>(infoString);
 
                 creationFlow.ExecuteInitial(context, info!);
+
+                return new SerializableModData();
             }
         );
 
-        DomainManager.Mod.AddModMethod(
-            ModIdStr,
+        TaskCall.AddModMethod(
+            ModIdStr!,
             nameof(ModConstants.Method.ExecuteRoll),
             (context, data) =>
             {

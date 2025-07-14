@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
+      <Private>false</Private>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
+    <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+  </ItemGroup>
+</Project>
