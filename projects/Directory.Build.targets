@@ -1,5 +1,2 @@
 <Project>
-    <ItemGroup Condition="'$(LF2AssemblyDebugger)' == 'true'">
-       <Compile Include="$(LF2Common)/AssemblyDebugger.cs" />
-    </ItemGroup>
 </Project>
