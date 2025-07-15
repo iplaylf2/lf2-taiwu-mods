@@ -165,10 +165,10 @@ public static class MyHobbyValue
 
     [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
     public static void HandleBonusesAdd(
-        [ConsumeStackValue] List<SkillQualificationBonus> bonuses,
+        [ConsumeStackValue] IList<SkillQualificationBonus> bonuses,
         [ConsumeStackValue] SkillQualificationBonus origin,
         [InjectMemberValue(MemberInjectionType.Field, "_skillQualificationBonuses")]
-        List<SkillQualificationBonus> targetBonuses,
+        IList<SkillQualificationBonus> targetBonuses,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
     {

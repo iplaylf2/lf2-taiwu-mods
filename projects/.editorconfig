@@ -3,6 +3,9 @@ root = true
 [*.cs]
 
 dotnet_analyzer_diagnostic.severity = warning
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA2022.severity = none
 dotnet_diagnostic.IDE0008.severity = none
 dotnet_diagnostic.IDE0022.severity = none
 dotnet_diagnostic.IDE0058.severity = none
