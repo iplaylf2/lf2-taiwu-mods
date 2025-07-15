@@ -19,12 +19,7 @@ public static class AllGoodFeature
        [InjectArgumentValue(0)] ref FeatureCreationContext context
     )
     {
-        if (!Enabled || !context.IsProtagonist)
-        {
-            return origin;
-        }
-
-        return true;
+        return (Enabled && context.IsProtagonist) || origin;
     }
 
     [HarmonyPatch(typeof(CharacterCreation), "ApplyFeatureIds")]

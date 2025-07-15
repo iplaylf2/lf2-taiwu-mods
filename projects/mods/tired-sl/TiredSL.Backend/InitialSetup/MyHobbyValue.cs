@@ -160,12 +160,7 @@ public static class MyHobbyValue
         [ConsumeStackValue] sbyte original,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info)
     {
-        if (!Enabled || info.InscribedChar != null)
-        {
-            return original;
-        }
-
-        return 2;
+        return !Enabled || info.InscribedChar != null ? original : (sbyte)2;
     }
 
     [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
