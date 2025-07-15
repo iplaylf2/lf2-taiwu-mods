@@ -70,6 +70,14 @@ internal static class DoStartNewGamePatcher
 
             uiNewGame.CGet<GameObject>("Locker").SetActive(true);
 
+            SingletonObject.getInstance<BasicGameData>().CustomTexts.AddRangeOnlyAdd(
+                new()
+                {
+                    [0] = creationInfo.Surname,
+                    [1] = creationInfo.GivenName
+                }
+            );
+
             Game.ClockAndLogInfo("Before roll completed", false);
 
             await ExecuteInitial(creationInfo);
