@@ -9,7 +9,7 @@ namespace LF2.Frontend.Helper;
 
 public sealed class UniTaskCall
 {
-    public static UniTaskCall Default { get => lazyDefault.Value; }
+    public static UniTaskCall Default => lazyDefault.Value;
 
     public async UniTask<SerializableModData> CallModMethod(string modIdStr, string methodName, SerializableModData parameter)
     {

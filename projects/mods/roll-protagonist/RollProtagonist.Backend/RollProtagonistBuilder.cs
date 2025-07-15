@@ -61,7 +61,7 @@ internal static class RollProtagonistBuilder
                 var serializableModData = new SerializableModData();
 
                 serializableModData.Set(
-                    ModConstants.Method.ExecuteRoll.Return.character,
+                    ModConstants.Method.ExecuteRoll.ReturnValue.character,
                     BuildCharacterDisplayData(character)
                 );
 

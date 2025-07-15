@@ -8,14 +8,7 @@ internal static class MouseTipCharacterCompletePatcher
 {
     public static bool Prefix(MouseTipBase __instance)
     {
-        if (
-            __instance is not MouseTipCharacterComplete
-            || __instance.GetComponent<ModResourceFactory.ModdedUIBehavior>() is null
-        )
-        {
-            return true;
-        }
-
-        return false;
+        return __instance is not MouseTipCharacterComplete
+            || __instance.GetComponent<ModResourceFactory.ModdedUIBehavior>() is null;
     }
 }

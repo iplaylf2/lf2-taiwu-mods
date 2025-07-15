@@ -126,7 +126,7 @@ internal static class DoStartNewGamePatcher
         return false;
     }
 
-    private class BeforeRollConfig(MethodBase origin) :
+    private sealed class BeforeRollConfig(MethodBase origin) :
         MethodSegmenter.LeftConfig<
             Func<UI_NewGame, Tuple<object[], bool, object[]>>
         >((MethodInfo)origin)
@@ -156,7 +156,7 @@ internal static class DoStartNewGamePatcher
         }
     }
 
-    private class AfterRollConfig(MethodBase origin) :
+    private sealed class AfterRollConfig(MethodBase origin) :
         MethodSegmenter.RightConfig<
             Action<UI_NewGame, object[]>
         >((MethodInfo)origin)
@@ -194,7 +194,7 @@ internal static class DoStartNewGamePatcher
         );
 
         data.Get(
-            ModConstants.Method.ExecuteRoll.Return.character,
+            ModConstants.Method.ExecuteRoll.ReturnValue.character,
             out CharacterDisplayDataForTooltip character
         );
 

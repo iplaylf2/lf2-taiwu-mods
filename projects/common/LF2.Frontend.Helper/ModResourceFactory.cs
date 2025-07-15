@@ -62,5 +62,5 @@ public static class ModResourceFactory
     }
 
     private static readonly string rootPrefabPath =
-        Traverse.Create(typeof(UIElement)).Field("rootPrefabPath").GetValue<string>();
+        Traverse.Create<UIElement>().Field("rootPrefabPath").GetValue<string>();
 }

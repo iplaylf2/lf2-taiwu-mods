@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/projects/">
     <File Path="projects/Directory.Build.targets" />
+    <File Path="projects/.editorconfig" />
     <File Path="projects/Directory.Build.props" />
   </Folder>
   <Folder Name="/projects/common/">
@@ -19,6 +20,7 @@
     <File Path="projects/mods/Directory.Build.props" />
     <File Path="projects/mods/Directory.Build.targets" />
     <File Path="projects/mods/Directory.Packages.props" />
+    <File Path="projects/mods/.editorconfig" />
   </Folder>
   <Folder Name="/projects/mods/roll-protagonist/">
     <Project Path="projects/mods/roll-protagonist/RollProtagonist.Backend/RollProtagonist.Backend.csproj" />

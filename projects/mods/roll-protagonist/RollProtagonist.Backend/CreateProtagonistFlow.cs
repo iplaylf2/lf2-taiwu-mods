@@ -110,6 +110,8 @@ internal class CreateProtagonistFlow
                         yield return new RollResult(ExtractCharacter(stateVariables));
                     }
                     break;
+                default:
+                    break;
             }
         }
     }

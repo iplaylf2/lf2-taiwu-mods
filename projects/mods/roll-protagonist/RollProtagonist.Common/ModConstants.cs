@@ -14,7 +14,7 @@ public static class ModConstants
 
         public static class ExecuteRoll
         {
-            public static class Return
+            public static class ReturnValue
             {
                 public const string character = "character";
             }

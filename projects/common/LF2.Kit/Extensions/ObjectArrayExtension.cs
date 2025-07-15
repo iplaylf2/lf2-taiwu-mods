@@ -7,7 +7,7 @@ public static class ObjectArrayExtension
     public static ITuple AsTuple(this object[] objects) => new ObjectArrayTuple(objects);
 }
 
-file class ObjectArrayTuple(object[] source) : ITuple
+file sealed class ObjectArrayTuple(object[] source) : ITuple
 {
     public object this[int index] => source[index];
 

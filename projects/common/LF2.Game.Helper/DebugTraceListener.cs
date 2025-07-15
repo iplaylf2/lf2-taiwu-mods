@@ -3,7 +3,7 @@ using GameData.Utilities;
 
 namespace LF2.Game.Helper;
 
-internal class DebugTraceListener : TraceListener
+internal sealed class DebugTraceListener : TraceListener
 {
     public override void Write(string? message)
     {

@@ -11,25 +11,25 @@ public static class MethodSegmenter
 {
     public abstract class LeftConfig<T>(MethodInfo prototype) where T : Delegate
     {
-        internal protected readonly MethodInfo prototype = prototype;
-        internal protected abstract IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor);
+        protected internal MethodInfo Prototype => prototype;
+        protected internal abstract IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor);
     }
 
     public abstract class RightConfig<T>(
         MethodInfo prototype
     ) where T : Delegate
     {
-        internal protected readonly MethodInfo prototype = prototype;
-        internal protected abstract void InjectContinuationPoint(ILCursor ilCursor);
+        protected internal MethodInfo Prototype => prototype;
+        protected internal abstract void InjectContinuationPoint(ILCursor ilCursor);
     }
 
     public static T CreateLeftSegment<T>(LeftConfig<T> config) where T : Delegate
     {
-        InitILContext<T>(config.prototype, out var dynamicMethod, out var ilContext);
+        InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
 
         ilContext.Invoke(ilContext =>
         {
-            GuardOriginalReturns(ilContext, config.prototype);
+            GuardOriginalReturns(ilContext, config.Prototype);
             InjectSplitPoint(ilContext, config.InjectSplitPoint);
         });
 
@@ -38,7 +38,7 @@ public static class MethodSegmenter
 
     public static T CreateRightSegment<T>(RightConfig<T> config) where T : Delegate
     {
-        InitILContext<T>(config.prototype, out var dynamicMethod, out var ilContext);
+        InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
 
         ilContext.Invoke(ilContext =>
         {

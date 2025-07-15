@@ -11,8 +11,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
-        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <AnalysisMode>Recommended</AnalysisMode>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <NoWarn>CA1707;CA2022</NoWarn>
     </PropertyGroup>
