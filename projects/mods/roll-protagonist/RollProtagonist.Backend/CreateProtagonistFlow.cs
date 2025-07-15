@@ -34,12 +34,12 @@ internal class CreateProtagonistFlow
     )
     {
         dataContext = context;
-        creationInfo = info;
+        CreationInfo = info;
     }
 
     public Character ExecuteRoll()
     {
-        if (creationInfo is null)
+        if (CreationInfo is null)
         {
             throw new InvalidOperationException("CreateProtagonist not initialized");
         }
@@ -64,6 +64,8 @@ internal class CreateProtagonistFlow
         return commitResult.Data;
     }
 
+    public ProtagonistCreationInfo? CreationInfo { get; private set; }
+
     protected abstract record PhaseResult { }
     protected record RollResult(Character Character) : PhaseResult { }
     protected record CommitResult(int Data) : PhaseResult { }
@@ -81,7 +83,7 @@ internal class CreateProtagonistFlow
                         var data = commit(
                             DomainManager.Character,
                             dataContext!,
-                            creationInfo!,
+                            CreationInfo!,
                             stateVariables
                         );
 
@@ -102,7 +104,7 @@ internal class CreateProtagonistFlow
                         var (_, _, newVariables) = roll(
                             DomainManager.Character,
                             dataContext!,
-                            creationInfo!
+                            CreationInfo!
                         );
 
                         stateVariables = newVariables;
@@ -129,5 +131,4 @@ internal class CreateProtagonistFlow
     private readonly IEnumerator<PhaseResult> creationFlow;
     private CreationPhase currentPhase = CreationPhase.Roll;
     private DataContext? dataContext;
-    private ProtagonistCreationInfo? creationInfo;
 }

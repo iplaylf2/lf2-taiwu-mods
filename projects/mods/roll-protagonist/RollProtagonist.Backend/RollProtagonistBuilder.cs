@@ -62,7 +62,7 @@ internal static class RollProtagonistBuilder
 
                 serializableModData.Set(
                     ModConstants.Method.ExecuteRoll.ReturnValue.character,
-                    BuildCharacterDisplayData(character)
+                    BuildCharacterDisplayData(character, creationFlow.CreationInfo!)
                 );
 
                 return serializableModData;
@@ -78,9 +78,12 @@ internal static class RollProtagonistBuilder
         return false;
     }
 
-    private static CharacterDisplayDataForTooltip BuildCharacterDisplayData(Character character)
+    private static CharacterDisplayDataForTooltip BuildCharacterDisplayData(
+        Character character,
+        ProtagonistCreationInfo creationInfo
+    )
     {
-        return new CharacterDisplayDataForTooltip()
+        return new()
         {
             Id = character.GetId(),
             TemplateId = character.GetTemplateId(),
@@ -93,18 +96,23 @@ internal static class RollProtagonistBuilder
             CustomDisplayNameId =
                 DomainManager.Extra.GetCharacterCustomDisplayName(character.GetId()),
             BehaviorType = BehaviorType.GetBehaviorType(character.GetBaseMorality()),
-            Attraction = character.GetAttraction(),
-            AvatarRelatedData = new AvatarRelatedData(character),
-            MainAttributes = character.GetMaxMainAttributes(),
+            Attraction = character.GetBaseAttraction(),
+            AvatarRelatedData = new()
+            {
+                AvatarData = new(creationInfo!.Avatar),
+                DisplayAge = character.GetCurrAge(),
+                ClothingDisplayId = creationInfo.ClothingTemplateId
+            },
+            MainAttributes = character.GetBaseMainAttributes(),
             FeatureIds = character.GetFeatureIds(),
             Gender = character.GetGender(),
             Transgender = character.GetTransgender(),
-            CombatSkillQualifications = character.GetCombatSkillQualifications(),
+            CombatSkillQualifications = character.GetBaseCombatSkillQualifications(),
             CombatSkillQualificationGrowthType = character.GetCombatSkillQualificationGrowthType(),
-            LifeSkillQualifications = character.GetLifeSkillQualifications(),
+            LifeSkillQualifications = character.GetBaseLifeSkillQualifications(),
             LifeSkillQualificationGrowthType = character.GetLifeSkillQualificationGrowthType(),
             NickNameId = DomainManager.Taiwu.GetFollowingNpcNickNameId(character.GetId()),
-            LifeSkillAttainments = character.GetLifeSkillAttainments(),
+            LifeSkillAttainments = default,
         };
     }
 

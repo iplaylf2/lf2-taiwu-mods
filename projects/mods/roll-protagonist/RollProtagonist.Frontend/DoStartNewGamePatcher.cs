@@ -68,6 +68,8 @@ internal static class DoStartNewGamePatcher
                 );
             }
 
+            uiNewGame.CGet<GameObject>("Locker").SetActive(true);
+
             Game.ClockAndLogInfo("Before roll completed", false);
 
             await ExecuteInitial(creationInfo);
