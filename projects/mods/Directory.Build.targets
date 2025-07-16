@@ -11,10 +11,11 @@
         <ILRepack
             Parallel="true"
             Internalize="true"
+            DebugInfo="true"
+            TargetKind="SameAsPrimaryAssembly"
             InternalizeExclude="@(InternalizeExclude)"
             InputAssemblies="@(InputAssemblies)"
             LibraryPath="@(LibraryPath)"
-            TargetKind="SameAsPrimaryAssembly"
             OutputFile="$(OutputPath)$(TargetName)$(TargetExt)"
         />
     </Target>
