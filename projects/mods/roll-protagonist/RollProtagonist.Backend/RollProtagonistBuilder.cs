@@ -113,7 +113,7 @@ internal static class RollProtagonistBuilder
             CombatSkillQualificationGrowthType = character.GetCombatSkillQualificationGrowthType(),
             LifeSkillQualifications = character.GetBaseLifeSkillQualifications(),
             LifeSkillQualificationGrowthType = character.GetLifeSkillQualificationGrowthType(),
-            Personalities = character.GetPersonalities(),
+            Personalities = default,
             TeammateCommands =
                 DomainManager.Extra.GetCharTeammateCommands(context, character.GetId()),
             NickNameId = DomainManager.Taiwu.GetFollowingNpcNickNameId(character.GetId()),
