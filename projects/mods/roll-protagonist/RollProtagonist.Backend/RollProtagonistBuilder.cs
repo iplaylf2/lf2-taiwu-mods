@@ -1,4 +1,5 @@
 using System.Reflection;
+using GameData.Common;
 using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
@@ -62,7 +63,7 @@ internal static class RollProtagonistBuilder
 
                 serializableModData.Set(
                     ModConstants.Method.ExecuteRoll.ReturnValue.character,
-                    BuildCharacterDisplayData(character, creationFlow.CreationInfo!)
+                    BuildCharacterDisplayData(character, creationFlow.CreationInfo!, context)
                 );
 
                 return serializableModData;
@@ -80,7 +81,8 @@ internal static class RollProtagonistBuilder
 
     private static CharacterDisplayDataForTooltip BuildCharacterDisplayData(
         Character character,
-        ProtagonistCreationInfo creationInfo
+        ProtagonistCreationInfo creationInfo,
+        DataContext context
     )
     {
         return new()
@@ -111,8 +113,13 @@ internal static class RollProtagonistBuilder
             CombatSkillQualificationGrowthType = character.GetCombatSkillQualificationGrowthType(),
             LifeSkillQualifications = character.GetBaseLifeSkillQualifications(),
             LifeSkillQualificationGrowthType = character.GetLifeSkillQualificationGrowthType(),
+            Personalities = character.GetPersonalities(),
+            TeammateCommands =
+                DomainManager.Extra.GetCharTeammateCommands(context, character.GetId()),
             NickNameId = DomainManager.Taiwu.GetFollowingNpcNickNameId(character.GetId()),
-            LifeSkillAttainments = default,
+            LifeSkillAttainments = character.GetBaseLifeSkillQualifications(),
+            FavorabilityToTaiwu = 0,
+            IsInteractedCharacter = false
         };
     }
 
