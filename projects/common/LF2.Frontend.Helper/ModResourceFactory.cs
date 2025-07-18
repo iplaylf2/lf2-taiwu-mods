@@ -1,4 +1,3 @@
-using HarmonyLib;
 using UnityEngine;
 
 namespace LF2.Frontend.Helper;
@@ -7,60 +6,13 @@ public static class ModResourceFactory
 {
     public class ModdedUIBehavior : MonoBehaviour;
 
-    public static void CreateModCopy(UIElement originalElement, Action<GameObject?> onInstantiated)
+    public static UIElement CreateModCopy(Func<UIElement> factory, bool autoShow = false)
     {
-        string uiPath = GetPathFromOriginal(originalElement);
+        var copy = factory();
 
-        if (string.IsNullOrEmpty(uiPath))
-        {
-            Debug.LogError(
-                $"[ModResourceFactory] Error: Could not retrieve uiPath from originalElement: {originalElement.Name}"
-            );
+        copy.PrepareRes(autoShow);
+        copy.UiBase.gameObject.AddComponent<ModdedUIBehavior>();
 
-            onInstantiated(null);
-
-            return;
-        }
-
-        string fullPath = Path.Combine(rootPrefabPath, uiPath);
-
-        ResLoader.Load<GameObject>(fullPath, (prefab) =>
-        {
-            if (prefab == null)
-            {
-                Debug.LogError($"[ModResourceFactory] Failed to load game UI prefab at path: {fullPath}");
-
-                onInstantiated(null);
-
-                return;
-            }
-
-            GameObject modInstance = UnityEngine.Object.Instantiate(prefab);
-
-            modInstance.name = $"{prefab.name}_ModCopy";
-
-            if (UIManager.Instance?.transform != null)
-            {
-                modInstance.transform.SetParent(UIManager.Instance.transform, false);
-            }
-            else
-            {
-                Debug.LogWarning(
-                    "[ModResourceFactory] UIManager.Instance is not available. UI may not be parented correctly."
-                );
-            }
-
-            modInstance.AddComponent<ModdedUIBehavior>();
-
-            onInstantiated(modInstance);
-        });
+        return copy;
     }
-
-    private static string GetPathFromOriginal(UIElement originalElement)
-    {
-        return Traverse.Create(originalElement).Field("_path").GetValue<string>();
-    }
-
-    private static readonly string rootPrefabPath =
-        Traverse.Create<UIElement>().Field("rootPrefabPath").GetValue<string>();
 }

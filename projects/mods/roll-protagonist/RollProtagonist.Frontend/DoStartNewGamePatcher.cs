@@ -24,10 +24,22 @@ internal static class DoStartNewGamePatcher
     [HarmonyILManipulator]
     private static void RefactorDoStartNewGame(MethodBase origin)
     {
-        ModResourceFactory.CreateModCopy(
-            UIElement.MouseTipCharacterComplete,
-            (modInstance) => displayObject = modInstance
-        );
+        CharacterDisplay = ModResourceFactory.CreateModCopy(() =>
+        {
+            var path = Traverse
+                .Create(UIElement.MouseTipCharacterComplete)
+                .Field("_path")
+                .GetValue();
+
+            var copy = new UIElement();
+
+            Traverse
+                .Create(copy)
+                .Field("_path")
+                .SetValue(path);
+
+            return copy;
+        });
 
         Game.ClockAndLogInfo("RefactorDoStartNewGame started", false);
 
@@ -67,13 +79,15 @@ internal static class DoStartNewGamePatcher
 
             UIElement.FullScreenMask.Show();
 
-            SingletonObject.getInstance<BasicGameData>().CustomTexts.AddRangeOnlyAdd(
-                new()
-                {
-                    [0] = creationInfo.Surname,
-                    [1] = creationInfo.GivenName
-                }
-            );
+            SingletonObject
+                .getInstance<BasicGameData>()
+                .CustomTexts.AddRangeOnlyAdd(
+                    new()
+                    {
+                        [0] = creationInfo.Surname,
+                        [1] = creationInfo.GivenName
+                    }
+                );
 
             Game.ClockAndLogInfo("Before roll completed", false);
 
@@ -90,19 +104,18 @@ internal static class DoStartNewGamePatcher
                 var viewArg = new ArgumentBox();
                 viewArg.Set("Data", character);
 
-                var view = displayObject!.GetComponent<MouseTipCharacterComplete>();
-                view.OnInit(viewArg);
+                CharacterDisplay!.SetOnInitArgs(viewArg);
 
                 while (true)
                 {
-                    if (CommonCommandKit.Enter.Check(view.Element))
+                    if (CommonCommandKit.Enter.Check(CharacterDisplay))
                     {
                         isRolling = false;
 
                         break;
                     }
 
-                    if (CommonCommandKit.Shift.Check(view.Element))
+                    if (CommonCommandKit.Shift.Check(CharacterDisplay))
                     {
                         Game.ClockAndLogInfo("roll", false);
 
@@ -210,6 +223,6 @@ internal static class DoStartNewGamePatcher
         return character;
     }
 
-    private static GameObject? displayObject;
+    private static UIElement? CharacterDisplay;
     private static Func<UI_NewGame, UniTask>? doStartNewGame;
 }
