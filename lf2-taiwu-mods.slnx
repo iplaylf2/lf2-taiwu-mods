@@ -3,6 +3,7 @@
     <File Path="projects/Directory.Build.targets" />
     <File Path="projects/.editorconfig" />
     <File Path="projects/Directory.Build.props" />
+    <File Path="projects/Directory.Packages.props" />
   </Folder>
   <Folder Name="/projects/common/">
     <File Path="projects/common/Directory.Build.props" />
@@ -19,7 +20,6 @@
   <Folder Name="/projects/mods/">
     <File Path="projects/mods/Directory.Build.props" />
     <File Path="projects/mods/Directory.Build.targets" />
-    <File Path="projects/mods/Directory.Packages.props" />
     <File Path="projects/mods/.editorconfig" />
   </Folder>
   <Folder Name="/projects/mods/roll-protagonist/">
@@ -32,6 +32,7 @@
     <Project Path="projects/mods/tired-sl/TiredSL.Frontend/TiredSL.Frontend.csproj" />
   </Folder>
   <File Path="Directory.Build.props" />
+  <File Path="Directory.Packages.props" />
   <File Path="global.json" />
   <File Path="nuget.config" />
 </Solution>
