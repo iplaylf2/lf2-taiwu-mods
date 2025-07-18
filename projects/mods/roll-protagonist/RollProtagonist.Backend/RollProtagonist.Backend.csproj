@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <LF2SingleLibrary>true</LF2SingleLibrary>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(LF2Mods)/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj" />
+        <ProjectReference Include="$(LF2Common)/LF2.Kit/LF2.Kit.csproj" />
+        <ProjectReference Include="$(LF2Common)/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
+        <ProjectReference Include="$(LF2Common)/LF2.Backend.Helper/LF2.Backend.Helper.csproj" />
+    </ItemGroup>
+</Project>

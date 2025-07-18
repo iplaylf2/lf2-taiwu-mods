@@ -31,7 +31,6 @@ public static class FullCombatAI
             return true;
         }
 
-
         __result = true;
 
         return false;

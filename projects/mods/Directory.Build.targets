@@ -1,26 +1,32 @@
 <Project>
-    <ItemGroup Condition="'$(IsFrontend)' == 'true' or '$(IsBackend)' == 'true'">
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 
-    <ItemGroup Condition="'$(IsBackend)' == 'true'">
-        <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
+    <Target Name="RunILRepack" AfterTargets="Build" Condition="'$(LF2SingleLibrary)' == 'true'">
+        <ItemGroup>
+            <InternalizeExclude Include="$(TargetName)" />
+            <InputAssemblies Include="$(OutputPath)**\*.dll" />
+            <LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
+        </ItemGroup>
 
-    <ItemGroup Condition="'$(IsFrontend)' == 'true'">
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
+        <ILRepack
+            Parallel="true"
+            Internalize="true"
+            DebugInfo="true"
+            TargetKind="SameAsPrimaryAssembly"
+            InternalizeExclude="@(InternalizeExclude)"
+            InputAssemblies="@(InputAssemblies)"
+            LibraryPath="@(LibraryPath)"
+            OutputFile="$(OutputPath)$(TargetName)$(TargetExt)"
+        />
+    </Target>
+
+    <Target Name="CleanAfterRepack" AfterTargets="RunILRepack" Condition="'$(LF2SingleLibrary)' == 'true'">
+        <ItemGroup>
+            <_AllFilesInOutput Include="$(OutputPath)**\*" />
+            <_FinalMerged Include="$(OutputPath)$(TargetName).*" />
+            <FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged)" />
+        </ItemGroup>
+
+        <Delete Files="@(FilesToDelete)" />
+    </Target>
 </Project>

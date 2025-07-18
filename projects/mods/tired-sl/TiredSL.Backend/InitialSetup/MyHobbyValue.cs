@@ -21,7 +21,7 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static MainAttributes HandleMainAttributes(
         [ConsumeStackValue] MainAttributes original,
-        [InjectArgumentValue(0)] Character instance,
+        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -68,7 +68,7 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static LifeSkillShorts HandleLifeSkillQualifications(
         [ConsumeStackValue] LifeSkillShorts original,
-        [InjectArgumentValue(0)] Character instance,
+        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -113,7 +113,7 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static CombatSkillShorts HandleCombatSkillQualifications(
         [ConsumeStackValue] CombatSkillShorts original,
-        [InjectArgumentValue(0)] Character instance,
+        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -160,20 +160,15 @@ public static class MyHobbyValue
         [ConsumeStackValue] sbyte original,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info)
     {
-        if (!Enabled || info.InscribedChar != null)
-        {
-            return original;
-        }
-
-        return 2;
+        return !Enabled || info.InscribedChar != null ? original : (sbyte)2;
     }
 
     [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
     public static void HandleBonusesAdd(
-        [ConsumeStackValue] List<SkillQualificationBonus> bonuses,
+        [ConsumeStackValue] IList<SkillQualificationBonus> bonuses,
         [ConsumeStackValue] SkillQualificationBonus origin,
         [InjectMemberValue(MemberInjectionType.Field, "_skillQualificationBonuses")]
-        List<SkillQualificationBonus> targetBonuses,
+        IList<SkillQualificationBonus> targetBonuses,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
     {
@@ -239,7 +234,6 @@ public static class MyHobbyValue
 
                         return;
                     }
-
 
                     ILManipulator.ApplyTransformation(matcher, handleMethod, charType);
 
