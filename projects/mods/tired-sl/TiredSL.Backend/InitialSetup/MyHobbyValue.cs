@@ -21,7 +21,7 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static MainAttributes HandleMainAttributes(
         [ConsumeStackValue] MainAttributes original,
-        [InjectArgumentValue(0)] Character instance,
+        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -68,7 +68,7 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static LifeSkillShorts HandleLifeSkillQualifications(
         [ConsumeStackValue] LifeSkillShorts original,
-        [InjectArgumentValue(0)] Character instance,
+        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -113,7 +113,7 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static CombatSkillShorts HandleCombatSkillQualifications(
         [ConsumeStackValue] CombatSkillShorts original,
-        [InjectArgumentValue(0)] Character instance,
+        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -234,7 +234,6 @@ public static class MyHobbyValue
 
                         return;
                     }
-
 
                     ILManipulator.ApplyTransformation(matcher, handleMethod, charType);
 

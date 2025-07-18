@@ -94,9 +94,9 @@ public static class MethodSegmenter
 
         CaptureLocals(ilCursor);
 
-        ilCursor.Emit(OpCodes.Call, statePacking);
-
-        ilCursor.Emit(OpCodes.Ret);
+        ilCursor
+            .Emit(OpCodes.Call, statePacking)
+            .Emit(OpCodes.Ret);
     }
 
     public static ILLabel InjectContinuationPoint(ILContext ilContext, Action<ILCursor> injectContinuationPoint)
@@ -123,9 +123,10 @@ public static class MethodSegmenter
 
         foreach (var (variable, i) in ilContext.Body.Variables.Select((x, i) => (x, i)))
         {
-            ilCursor.Emit(OpCodes.Ldarg, stateIndex);
-            ilCursor.Emit(OpCodes.Ldc_I4, i);
-            ilCursor.Emit(OpCodes.Ldelem_Ref);
+            ilCursor
+                .Emit(OpCodes.Ldarg, stateIndex)
+                .Emit(OpCodes.Ldc_I4, i)
+                .Emit(OpCodes.Ldelem_Ref);
 
             if (variable.VariableType.IsValueType)
             {
@@ -206,14 +207,16 @@ public static class MethodSegmenter
     {
         var variables = ilCursor.Body.Variables;
 
-        ilCursor.Emit(OpCodes.Ldc_I4, variables.Count);
-        ilCursor.Emit(OpCodes.Newarr, typeof(object));
+        ilCursor
+            .Emit(OpCodes.Ldc_I4, variables.Count)
+            .Emit(OpCodes.Newarr, typeof(object));
 
         foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
         {
-            ilCursor.Emit(OpCodes.Dup);
-            ilCursor.Emit(OpCodes.Ldc_I4, i);
-            ilCursor.Emit(OpCodes.Ldloc, variable);
+            ilCursor
+                .Emit(OpCodes.Dup)
+                .Emit(OpCodes.Ldc_I4, i)
+                .Emit(OpCodes.Ldloc, variable);
 
             if (variable.VariableType.IsValueType)
             {

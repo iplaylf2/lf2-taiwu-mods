@@ -67,8 +67,8 @@ internal class CreateProtagonistFlow
     public ProtagonistCreationInfo? CreationInfo { get; private set; }
 
     protected abstract record PhaseResult { }
-    protected record RollResult(Character Character) : PhaseResult { }
-    protected record CommitResult(int Data) : PhaseResult { }
+    protected record RollResult(Character Character) : PhaseResult;
+    protected record CommitResult(int Data) : PhaseResult;
 
     private IEnumerator<PhaseResult> BuildCreationFlow(RollOperation roll, CommitOperation commit)
     {
@@ -112,8 +112,6 @@ internal class CreateProtagonistFlow
                         yield return new RollResult(ExtractCharacter(stateVariables));
                     }
                     break;
-                default:
-                    break;
             }
         }
     }
@@ -125,7 +123,7 @@ internal class CreateProtagonistFlow
 
     private enum CreationPhase
     {
-        Commit, Roll,
+        Commit = 0, Roll = 1,
     }
 
     private readonly IEnumerator<PhaseResult> creationFlow;

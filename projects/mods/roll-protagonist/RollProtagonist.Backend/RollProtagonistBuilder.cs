@@ -55,7 +55,7 @@ internal static class RollProtagonistBuilder
         TaskCall.AddModMethod(
             ModIdStr!,
             nameof(ModConstants.Method.ExecuteRoll),
-            (context, data) =>
+            (context, _) =>
             {
                 var character = creationFlow.ExecuteRoll();
 

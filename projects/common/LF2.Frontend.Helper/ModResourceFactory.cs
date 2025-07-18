@@ -5,7 +5,7 @@ namespace LF2.Frontend.Helper;
 
 public static class ModResourceFactory
 {
-    public class ModdedUIBehavior : MonoBehaviour { }
+    public class ModdedUIBehavior : MonoBehaviour;
 
     public static void CreateModCopy(UIElement originalElement, Action<GameObject?> onInstantiated)
     {

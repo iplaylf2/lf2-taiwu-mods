@@ -26,10 +26,7 @@ internal static class DoStartNewGamePatcher
     {
         ModResourceFactory.CreateModCopy(
             UIElement.MouseTipCharacterComplete,
-            (modInstance) =>
-            {
-                displayObject = modInstance;
-            }
+            (modInstance) => displayObject = modInstance
         );
 
         Game.ClockAndLogInfo("RefactorDoStartNewGame started", false);
@@ -216,4 +213,3 @@ internal static class DoStartNewGamePatcher
     private static GameObject? displayObject;
     private static Func<UI_NewGame, UniTask>? doStartNewGame;
 }
-
