@@ -68,7 +68,7 @@ internal static class DoStartNewGamePatcher
                 );
             }
 
-            uiNewGame.CGet<GameObject>("Locker").SetActive(true);
+            UIElement.FullScreenMask.Show();
 
             SingletonObject.getInstance<BasicGameData>().CustomTexts.AddRangeOnlyAdd(
                 new()
@@ -115,6 +115,8 @@ internal static class DoStartNewGamePatcher
                     await UniTask.Yield();
                 }
             }
+
+            UIElement.FullScreenMask.Hide();
 
             game.ChangeGameState(gameState, argBox);
 
