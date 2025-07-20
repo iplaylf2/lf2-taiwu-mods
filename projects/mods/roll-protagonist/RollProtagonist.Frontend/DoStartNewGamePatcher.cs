@@ -63,9 +63,6 @@ internal static class DoStartNewGamePatcher
 
             if (
                 stackValues.AsTuple() is not (
-                    Game game,
-                    EGameState gameState,
-                    ArgumentBox argBox,
                     int listenerId,
                     ProtagonistCreationInfo creationInfo
                 )
@@ -75,8 +72,6 @@ internal static class DoStartNewGamePatcher
                     "Failed to deconstruct stack values from the original method. The target method's structure has likely changed due to a game update."
                 );
             }
-
-            UIElement.FullScreenMask.Show();
 
             SingletonObject
                 .getInstance<BasicGameData>()
@@ -126,15 +121,11 @@ internal static class DoStartNewGamePatcher
                         break;
                     }
 
-                    await UniTask.Yield();
+                    await UniTask.NextFrame();
                 }
             }
 
             CharacterDisplay!.Destroy();
-
-            UIElement.FullScreenMask.Hide();
-
-            game.ChangeGameState(gameState, argBox);
 
             CharacterDomainHelper.MethodCall.CreateProtagonist(listenerId, creationInfo);
 
@@ -167,17 +158,7 @@ internal static class DoStartNewGamePatcher
                 .GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()))
                 .Remove();
 
-            var changeGameState = Game.Instance.ChangeGameState;
-
-            ilCursor
-                .Clone()
-                .GotoPrev(x => x.MatchCallOrCallvirt(changeGameState.GetMethodInfo()))
-                .Remove();
-
             return [
-                typeof(Game),
-                typeof(EGameState),
-                typeof(ArgumentBox),
                 typeof(int),
                 typeof(ProtagonistCreationInfo)
             ];
