@@ -104,6 +104,7 @@ internal static class DoStartNewGamePatcher
                 viewArg.Set("Data", character);
 
                 CharacterDisplay!.SetOnInitArgs(viewArg);
+                CharacterDisplay!.Show();
 
                 while (true)
                 {
@@ -124,6 +125,8 @@ internal static class DoStartNewGamePatcher
                     await UniTask.Yield();
                 }
             }
+
+            CharacterDisplay!.Destroy();
 
             UIElement.FullScreenMask.Hide();
 
