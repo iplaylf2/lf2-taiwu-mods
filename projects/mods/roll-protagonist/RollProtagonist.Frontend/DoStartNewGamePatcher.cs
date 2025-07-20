@@ -106,11 +106,15 @@ internal static class DoStartNewGamePatcher
                 CharacterDisplay!.SetOnInitArgs(viewArg);
                 CharacterDisplay!.Show();
 
+                Game.ClockAndLogInfo("Execute Roll completed", false);
+
                 while (true)
                 {
                     if (CommonCommandKit.Enter.Check(CharacterDisplay))
                     {
                         isRolling = false;
+
+                        Game.ClockAndLogInfo("enter", false);
 
                         break;
                     }
