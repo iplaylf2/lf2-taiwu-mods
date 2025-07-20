@@ -12,6 +12,7 @@ using Cysharp.Threading.Tasks;
 using FrameWork;
 using LF2.Kit.Extensions;
 using LF2.Game.Helper;
+using UnityEngine;
 
 namespace RollProtagonist.Frontend;
 
@@ -23,23 +24,6 @@ internal static class DoStartNewGamePatcher
     [HarmonyILManipulator]
     private static void RefactorDoStartNewGame(MethodBase origin)
     {
-        CharacterDisplay = ModResourceFactory.CreateModCopy(() =>
-        {
-            var path = Traverse
-                .Create(UIElement.MouseTipCharacterComplete)
-                .Field("_path")
-                .GetValue();
-
-            var copy = new UIElement();
-
-            Traverse
-                .Create(copy)
-                .Field("_path")
-                .SetValue(path);
-
-            return copy;
-        });
-
         Game.ClockAndLogInfo("RefactorDoStartNewGame started", false);
 
         var beforeRoll = MethodSegmenter.CreateLeftSegment(new BeforeRollConfig(origin));
@@ -140,9 +124,58 @@ internal static class DoStartNewGamePatcher
     [HarmonyPrefix]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        doStartNewGame!(__instance).Forget();
+        RollTaskProxy.Instance!.StartCoroutine(doStartNewGame!(__instance).ToCoroutine());
 
         return false;
+    }
+
+    [HarmonyPrepare]
+    private static void Prepare()
+    {
+        Debug.Log("UniTaskPlayerLoop ready? " + PlayerLoopHelper.IsInjectedUniTaskPlayerLoop());
+        PlayerLoopHelper.DumpCurrentPlayerLoop();
+
+        CharacterDisplay = ModResourceFactory.CreateModCopy(() =>
+        {
+            var path = Traverse
+                .Create(UIElement.MouseTipCharacterComplete)
+                .Field("_path")
+                .GetValue();
+
+            var copy = new UIElement();
+
+            Traverse
+                .Create(copy)
+                .Field("_path")
+                .SetValue(path);
+
+            return copy;
+        });
+
+        RollTaskProxy.Initialize();
+    }
+
+    [HarmonyCleanup]
+    private static void Cleanup()
+    {
+        CharacterDisplay?.Destroy();
+    }
+
+    private sealed class RollTaskProxy : MonoBehaviour
+    {
+        public static RollTaskProxy? Instance { get; private set; }
+
+        public static void Initialize()
+        {
+            if (Instance == null)
+            {
+                var go = new GameObject("RollProtagonist.RollTaskProxy");
+
+                Instance = go.AddComponent<RollTaskProxy>();
+
+                DontDestroyOnLoad(go);
+            }
+        }
     }
 
     private sealed class BeforeRollConfig(MethodBase origin) :
