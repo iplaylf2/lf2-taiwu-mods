@@ -9,5 +9,6 @@
             <SpecificVersion>false</SpecificVersion>
         </Reference>
         <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+        <PackageReference Include="LF2.Transil" />
     </ItemGroup>
 </Project>

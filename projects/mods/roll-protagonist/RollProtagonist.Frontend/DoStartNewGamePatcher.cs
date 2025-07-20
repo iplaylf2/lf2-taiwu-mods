@@ -6,7 +6,6 @@ using GameData.Domains.Character.Creation;
 using LF2.Cecil.Helper;
 using GameData.Domains.Character.Display;
 using LF2.Frontend.Helper;
-using UnityEngine;
 using GameData.Domains.Mod;
 using RollProtagonist.Common;
 using Cysharp.Threading.Tasks;

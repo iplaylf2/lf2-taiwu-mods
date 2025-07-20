@@ -17,6 +17,7 @@
         "netstandard",
         "newarr",
         "newobj",
+        "raycaster",
         "redzen",
         "roslynator",
         "stelem",
