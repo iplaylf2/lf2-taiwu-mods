@@ -31,6 +31,9 @@
     <Project Path="projects/mods/tired-sl/TiredSL.Backend/TiredSL.Backend.csproj" />
     <Project Path="projects/mods/tired-sl/TiredSL.Frontend/TiredSL.Frontend.csproj" />
   </Folder>
+  <Folder Name="/projects/mods/uni-task-support/">
+    <Project Path="projects/mods/uni-task-support/UniTaskSupport.Frontend/UniTaskSupport.Frontend.csproj" />
+  </Folder>
   <File Path="Directory.Build.props" />
   <File Path="Directory.Packages.props" />
   <File Path="global.json" />

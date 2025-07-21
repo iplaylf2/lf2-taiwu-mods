@@ -50,7 +50,7 @@
             <SpecificVersion>false</SpecificVersion>
         </Reference>
         <Reference Include="$(LF2Upm)/**/*.dll">
-            <Private>true</Private>
+            <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
     </ItemGroup>
