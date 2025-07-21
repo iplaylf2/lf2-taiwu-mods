@@ -1,6 +1,6 @@
 namespace TiredSL.Backend.Kit;
 
-static class RandomKit
+internal static class RandomKit
 {
     public static T NiceRetry<T>(Func<T> generator, IComparer<T> comparer, int retryCount)
     {

@@ -43,19 +43,19 @@ public static class RandomPatch
         float mu_adj = MathF.Sign(skewParam) * sqrt2OverPi * (E_scale - 1.0f);
 
         // 调整后变量方差（二阶矩展开）
-        float E_x2s2 = E_scale * E_scale + Var_scale;
-        float sigma_adj = MathF.Sqrt(E_x2s2 - mu_adj * mu_adj);
+        float E_x2s2 = (E_scale * E_scale) + Var_scale;
+        float sigma_adj = MathF.Sqrt(E_x2s2 - (mu_adj * mu_adj));
 
         // ========== 实施变换 ==========
         float scale = isPositiveSkew ?
-            1.0f + (k - 1.0f) * transition :
-            1.0f + (k - 1.0f) * (1.0f - transition);
+            1.0f + ((k - 1.0f) * transition) :
+            1.0f + ((k - 1.0f) * (1.0f - transition));
 
         float scaled = x * scale;
         float normalized = (scaled - mu_adj) / sigma_adj;
 
         // 最终输出
-        int result = (int)MathF.Round(mean + normalized * stdDev);
+        int result = (int)MathF.Round(mean + (normalized * stdDev));
 
         return Math.Clamp(result, min, max);
     }
