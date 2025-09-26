@@ -2,7 +2,6 @@ using HarmonyLib;
 using GameData.Utilities;
 using System.Reflection.Emit;
 using GameData.Domains.Building;
-using GameData.Common;
 using GameData.Domains;
 using Config;
 using GameData.Domains.Map;
@@ -33,7 +32,6 @@ public static class CanMoveResource
         {
             return origin;
         }
-
 
         if (
             BuildingBlock.Instance[origin.TemplateId] is { } block

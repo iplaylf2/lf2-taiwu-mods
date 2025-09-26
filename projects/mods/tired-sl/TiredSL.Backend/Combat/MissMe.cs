@@ -26,7 +26,7 @@ public static class MissMe
 
     [HarmonyPatch(typeof(CombatDomain), nameof(CombatDomain.CanCastSkill))]
     [HarmonyPostfix]
-    public static void CanCastSkill(ref bool __result, CombatDomain __instance, CombatCharacter character, short skillId, bool costFree, bool checkRange)
+    public static void CanCastSkill(ref bool __result, CombatDomain __instance, CombatCharacter character)
     {
         if (!Enabled || !__instance.IsInCombat())
         {

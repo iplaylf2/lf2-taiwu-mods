@@ -1,2 +1,5 @@
 game-lib/*
 !game-lib/version.workflow.info
+
+upm/*
+!upm/version.workflow.info

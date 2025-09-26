@@ -2,14 +2,56 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
-        <IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</IsBackend>
-        <IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</IsFrontend>
+        <LF2IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</LF2IsBackend>
+        <LF2IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</LF2IsFrontend>
 
-        <TargetFramework Condition="'$(IsBackend)' == 'true'">net6.0</TargetFramework>
-        <TargetFramework Condition="'$(IsFrontend)' == 'true'">netstandard2.1</TargetFramework>
+        <TargetFramework Condition="'$(LF2IsBackend)' == 'true'">net6.0</TargetFramework>
+        <TargetFramework Condition="'$(LF2IsFrontend)' == 'true'">netstandard2.1</TargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <NoWarn>CA1707</NoWarn>
-    </PropertyGroup>
+    <ItemGroup Condition="'$(LF2SingleLibrary)' == 'true'">
+        <PackageReference Include="ILRepack.Lib.MSBuild.Task">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/MonoMod.Utils.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+        <PackageReference Include="LF2.Transil" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
+        <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
+        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2Upm)/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+    </ItemGroup>
 </Project>
