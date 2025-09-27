@@ -166,7 +166,7 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
     public static void HandleBonusesAdd(
         [ConsumeStackValue] IList<SkillQualificationBonus> bonuses,
-        [ConsumeStackValue] SkillQualificationBonus origin,
+        [ConsumeStackValue] SkillQualificationBonus original,
         [InjectMemberValue(MemberInjectionType.Field, "_skillQualificationBonuses")]
         IList<SkillQualificationBonus> targetBonuses,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
@@ -174,12 +174,12 @@ public static class MyHobbyValue
     {
         if (!Enabled || info.InscribedChar != null || bonuses != targetBonuses)
         {
-            bonuses.Add(origin);
+            bonuses.Add(original);
 
             return;
         }
 
-        AdaptableLog.Info("skillQualificationBonus origin:" + origin.Bonus);
+        AdaptableLog.Info("skillQualificationBonus origin:" + original.Bonus);
 
         var niceValue = RandomKit.NiceRetry(
             () =>
@@ -193,7 +193,7 @@ public static class MyHobbyValue
             Comparer<SkillQualificationBonus>.Create((x, y) => x.Bonus.CompareTo(y.Bonus)),
             15
         );
-        var result = origin.Bonus < niceValue.Bonus ? niceValue : origin;
+        var result = original.Bonus < niceValue.Bonus ? niceValue : original;
 
         AdaptableLog.Info("skillQualificationBonus: " + result.Bonus);
 

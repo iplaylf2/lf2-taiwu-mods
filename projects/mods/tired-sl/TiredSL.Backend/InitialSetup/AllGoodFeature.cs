@@ -15,11 +15,11 @@ public static class AllGoodFeature
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static bool HandleAllGoodBasicFeature(
-       [ConsumeStackValue] bool origin,
+       [ConsumeStackValue] bool original,
        [InjectArgumentValue(0)] ref FeatureCreationContext context
     )
     {
-        return (Enabled && context.IsProtagonist) || origin;
+        return (Enabled && context.IsProtagonist) || original;
     }
 
     [HarmonyPatch(typeof(CharacterCreation), "ApplyFeatureIds")]

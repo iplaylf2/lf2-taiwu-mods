@@ -13,9 +13,9 @@ return {
     DefaultSettings = {
         [1] = {
             SettingType = "Toggle",
-            Key = "niceCatch",
-            DisplayName = "战斗只要能捉/敲就能捉/敲",
-            Description = "战斗中且允许捕捉时，将捕捉和敲剑概率放大到百分之百。",
+            Key = "collapseCatchOdds",
+            DisplayName = "战斗只要能捉就能捉",
+            Description = "太吾在捕捉时，只要概率大于零就必定成功。",
             DefaultValue = false
         },
         [2] = {
@@ -34,7 +34,7 @@ return {
         },
         [4] = {
             SettingType = "Toggle",
-            Key = "goodFeature",
+            Key = "allGoodFeature",
             DisplayName = "太吾开局特性全为正面",
             Description = "从青梅借鉴个好东西；还包抓周。",
             DefaultValue = false
@@ -48,7 +48,7 @@ return {
         },
         [6] = {
             SettingType = "Toggle",
-            Key = "hobbyValue",
+            Key = "myHobbyValue",
             DisplayName = "稳定的开局人物",
             Description = "作者喜好的开局调整。1. 双晚成。 2. 非门派倾向权重均值为C、D之间。3. 用16次roll中总值最高的数据。",
             DefaultValue = false
@@ -62,9 +62,9 @@ return {
         },
         [8] = {
             SettingType = "Toggle",
-            Key = "endlessStep",
-            DisplayName = "突破步数花不完",
-            Description = "只是花不完步数，造诣不够还是突破困难的。",
+            Key = "noCostOnFailMove",
+            DisplayName = "突破走的失败格子不消耗步数",
+            Description = "本来损失加成就够惨了，救一下步数好了。",
             DefaultValue = false
         }
     },

@@ -17,7 +17,7 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
         HarmonyInstance.PatchAll(typeof(InitialSetup.CanMoveResource));
         HarmonyInstance.PatchAll(typeof(InitialSetup.MyHobbyValue));
         HarmonyInstance.PatchAll(typeof(SkillBreakout.BrightenUp));
-        HarmonyInstance.PatchAll(typeof(SkillBreakout.EndlessStep));
+        HarmonyInstance.PatchAll(typeof(SkillBreakout.NoCostOnFailMove));
     }
 
     public override void OnModSettingUpdate()
@@ -25,7 +25,7 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
         {
             var enable = Combat.CollapseCatchOdds.Enabled;
             if (
-                DomainManager.Mod.GetSetting(ModIdStr, "niceCatch", ref enable)
+                DomainManager.Mod.GetSetting(ModIdStr, "collapseCatchOdds", ref enable)
                 && Combat.CollapseCatchOdds.Enabled != enable
             )
             {
@@ -55,7 +55,7 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
         {
             var enable = InitialSetup.AllGoodFeature.Enabled;
             if (
-                DomainManager.Mod.GetSetting(ModIdStr, "goodFeature", ref enable)
+                DomainManager.Mod.GetSetting(ModIdStr, "allGoodFeature", ref enable)
                 && InitialSetup.AllGoodFeature.Enabled != enable
             )
             {
@@ -75,7 +75,7 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
         {
             var enable = InitialSetup.MyHobbyValue.Enabled;
             if (
-                DomainManager.Mod.GetSetting(ModIdStr, "hobbyValue", ref enable)
+                DomainManager.Mod.GetSetting(ModIdStr, "myHobbyValue", ref enable)
                 && InitialSetup.MyHobbyValue.Enabled != enable
             )
             {
@@ -93,13 +93,13 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
             }
         }
         {
-            var enable = SkillBreakout.EndlessStep.Enabled;
+            var enable = SkillBreakout.NoCostOnFailMove.Enabled;
             if (
-                DomainManager.Mod.GetSetting(ModIdStr, "endlessStep", ref enable)
-                && SkillBreakout.EndlessStep.Enabled != enable
+                DomainManager.Mod.GetSetting(ModIdStr, "noCostOnFailMove", ref enable)
+                && SkillBreakout.NoCostOnFailMove.Enabled != enable
             )
             {
-                SkillBreakout.EndlessStep.Enabled = enable;
+                SkillBreakout.NoCostOnFailMove.Enabled = enable;
             }
         }
     }

@@ -4,7 +4,7 @@ using HarmonyLib;
 
 namespace TiredSL.Backend.Combat;
 
-[HarmonyPatch(typeof(CombatDomain), "CalcRopeOrSwordHitOdds")]
+[HarmonyPatch(typeof(CombatDomain), "CalcRopeHitOdds")]
 public static class CollapseCatchOdds
 {
     public static bool Enabled { get; set; }

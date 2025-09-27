@@ -11,8 +11,8 @@
 
     <ItemGroup Condition="'$(LF2SingleLibrary)' == 'true'">
         <PackageReference Include="ILRepack.Lib.MSBuild.Task">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 

@@ -1,6 +1,6 @@
 using GameData.Utilities;
 using HarmonyLib;
-using Redzen.Numerics.Distributions.Float;
+using Redzen.Numerics.Distributions.Double;
 using Redzen.Random;
 
 namespace TiredSL.Backend.Random;
@@ -24,7 +24,7 @@ public static class RandomPatch
         Tester.Assert(Math.Abs(skewParam) > 1.0f);
 
         // 标准正态采样
-        float x = ZigguratGaussian.Sample(randomSource);
+        float x = (float)ZigguratGaussian.Sample(randomSource);
         float k = Math.Abs(skewParam);
         bool isPositiveSkew = skewParam > 0;
 
