@@ -1,5 +1,9 @@
+using System.Reflection.Emit;
 using GameData.Domains.Taiwu;
+using GameData.Utilities;
 using HarmonyLib;
+using Transil.Attributes;
+using Transil.Operations;
 
 namespace TiredSL.Backend.SkillBreakout;
 
@@ -8,17 +12,39 @@ public static class EndlessStep
 {
     public static bool Enabled { get; set; }
 
-    public static void Prefix(SkillBreakPlateGrid __instance)
+    [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
+    public static byte HandleCalcCostStep(
+        [ConsumeStackValue] SkillBreakPlate plate,
+        [ConsumeStackValue] SkillBreakPlateIndex index
+    )
     {
-        if (!Enabled)
-        {
-            return;
-        }
+        return !Enabled || plate.Current == index ? plate.CalcCostStep(index) : (byte)0;
+    }
+    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    {
+        var matcher = new CodeMatcher(instructions);
 
-        var _stepExtraNormal = Traverse.Create(__instance).Field("_stepExtraNormal");
+        var targetMethod = AccessTools.Method(
+            typeof(SkillBreakPlate),
+            nameof(SkillBreakPlate.CalcCostStep)
+        );
 
-        int stepExtraNormal = _stepExtraNormal.GetValue<int>();
+        matcher
+        .MatchForward(
+            false,
+            new CodeMatch(OpCodes.Call, targetMethod)
+        )
+        .Repeat(
+            (matcher) =>
+            {
+                ILManipulator.ApplyTransformation(matcher, HandleCalcCostStep);
 
-        _stepExtraNormal.SetValue(stepExtraNormal + 1);
+                matcher.Advance(1);
+
+                AdaptableLog.Info($"handle {targetMethod}");
+            }
+        );
+
+        return matcher.InstructionEnumeration();
     }
 }

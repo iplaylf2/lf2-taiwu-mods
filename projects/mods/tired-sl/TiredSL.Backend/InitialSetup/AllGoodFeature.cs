@@ -15,14 +15,14 @@ public static class AllGoodFeature
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static bool HandleAllGoodBasicFeature(
-       [ConsumeStackValue] bool origin,
+       [ConsumeStackValue] bool original,
        [InjectArgumentValue(0)] ref FeatureCreationContext context
     )
     {
-        return (Enabled && context.IsProtagonist) || origin;
+        return (Enabled && context.IsProtagonist) || original;
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), "ApplyFeatureIds")]
+    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.ApplyFeatureIds))]
     [HarmonyPrefix]
     public static void PrefixApplyFeatureIds(ref FeatureCreationContext context, Dictionary<short, short> featureGroup2Id)
     {
@@ -42,17 +42,14 @@ public static class AllGoodFeature
 
         AdaptableLog.Info("GenerateOneYearOldCatchFeature");
 
-        Traverse
-            .Create(typeof(CharacterCreation))
-            .Method(
-                "AddFeature",
-                featureGroup2Id,
-                CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
-            )
-            .GetValue();
+        CharacterCreation.AddFeature
+        (
+            featureGroup2Id,
+            CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
+        );
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), "GenerateRandomBasicFeatures")]
+    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.GenerateRandomBasicFeatures))]
     [HarmonyTranspiler]
     public static IEnumerable<CodeInstruction> GenerateRandomBasicFeatures(IEnumerable<CodeInstruction> instructions)
     {

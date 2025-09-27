@@ -17,7 +17,7 @@ public static class CanMoveResource
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static BuildingBlockData HandleBlockDataNew(
-        [ConsumeStackValue] BuildingBlockData origin,
+        [ConsumeStackValue] BuildingBlockData original,
         [InjectArgumentValue(2)] short mapAreaId,
         [InjectArgumentValue(3)] short mapBlockId
     )
@@ -30,20 +30,20 @@ public static class CanMoveResource
             || taiwuSettlementId != settlement.GetId()
          )
         {
-            return origin;
+            return original;
         }
 
         if (
-            BuildingBlock.Instance[origin.TemplateId] is { } block
+            BuildingBlock.Instance[original.TemplateId] is { } block
             && BuildingBlockData.IsUsefulResource(block.Type)
-            && origin.Level == 1)
+            && original.Level == 1)
         {
-            origin.Level = 2;
+            original.Level = 2;
 
             AdaptableLog.Info("Upgrade level:" + block.Name);
         }
 
-        return origin;
+        return original;
     }
 
     public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)

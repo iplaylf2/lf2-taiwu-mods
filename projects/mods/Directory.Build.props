@@ -11,8 +11,8 @@
 
     <ItemGroup Condition="'$(LF2SingleLibrary)' == 'true'">
         <PackageReference Include="ILRepack.Lib.MSBuild.Task">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
@@ -42,6 +42,8 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
+        <Publicize Include="GameData" />
+        <Publicize Include="GameData.Shared" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">

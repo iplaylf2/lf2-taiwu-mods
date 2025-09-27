@@ -19,6 +19,7 @@
         "netstandard",
         "newarr",
         "newobj",
+        "Publicizer",
         "raycaster",
         "redzen",
         "roslynator",
