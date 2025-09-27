@@ -8,12 +8,12 @@ using Transil.Operations;
 namespace TiredSL.Backend.SkillBreakout;
 
 [HarmonyPatch(typeof(SkillBreakPlate), nameof(SkillBreakPlate.SelectBreak))]
-public static class EndlessStep
+public static class NoCostOnFailMove
 {
     public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
-    public static byte HandleCalcCostStep(
+    private static byte HandleCalcCostStep(
         [ConsumeStackValue] SkillBreakPlate plate,
         [ConsumeStackValue] SkillBreakPlateIndex index
     )
