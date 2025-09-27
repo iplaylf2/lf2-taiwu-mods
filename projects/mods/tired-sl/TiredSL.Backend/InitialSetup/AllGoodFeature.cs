@@ -22,7 +22,7 @@ public static class AllGoodFeature
         return (Enabled && context.IsProtagonist) || original;
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.ApplyFeatureIds))]
+    [HarmonyPatch(typeof(CharacterCreation), "ApplyFeatureIds")]
     [HarmonyPrefix]
     public static void PrefixApplyFeatureIds(ref FeatureCreationContext context, Dictionary<short, short> featureGroup2Id)
     {
@@ -42,14 +42,17 @@ public static class AllGoodFeature
 
         AdaptableLog.Info("GenerateOneYearOldCatchFeature");
 
-        CharacterCreation.AddFeature
-        (
-            featureGroup2Id,
-            CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
-        );
+        Traverse
+            .Create(typeof(CharacterCreation))
+            .Method(
+                "AddFeature",
+                featureGroup2Id,
+                CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
+            )
+            .GetValue();
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.GenerateRandomBasicFeatures))]
+    [HarmonyPatch(typeof(CharacterCreation), "GenerateRandomBasicFeatures")]
     [HarmonyTranspiler]
     public static IEnumerable<CodeInstruction> GenerateRandomBasicFeatures(IEnumerable<CodeInstruction> instructions)
     {
