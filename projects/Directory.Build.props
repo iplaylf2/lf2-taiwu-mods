@@ -34,13 +34,4 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
     </ItemGroup>
-
-    <Target Name="RemoveIgnoresAccessChecksToAttributeCs" AfterTargets="PublicizeAssemblies">
-        <ItemGroup>
-            <FilesToRemove Include="@(Compile)" Condition="'%(Filename)' == 'IgnoresAccessChecksToAttribute'" />
-        </ItemGroup>
-        <ItemGroup>
-            <Compile Remove="@(FilesToRemove)" />
-        </ItemGroup>
-    </Target>
 </Project>
