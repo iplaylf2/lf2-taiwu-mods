@@ -1,2 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <LF2SingleLibrary>true</LF2SingleLibrary>
+    </PropertyGroup>
 </Project>

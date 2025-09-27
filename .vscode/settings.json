@@ -8,6 +8,7 @@
         "dont",
         "finalizer",
         "instrs",
+        "iplaylf2",
         "ldarg",
         "ldelem",
         "ldfld",
