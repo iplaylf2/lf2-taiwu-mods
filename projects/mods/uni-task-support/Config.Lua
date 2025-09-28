@@ -5,7 +5,7 @@ return {
 	Version = "0.0.0.1",
 	GameVersion = "0.0.78.49-test",
 	Author = "我玩LF2",
-	Description = "Mod 支持向非面向玩家",
+	Description = "Mod 支持向；非面向玩家",
 	TagList = {
 		[1] = "Frameworks",
 	},

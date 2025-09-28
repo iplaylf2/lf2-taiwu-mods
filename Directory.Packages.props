@@ -3,6 +3,7 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
     <ItemGroup>
+        <PackageVersion Include="Krafs.Publicizer" Version="2.3.0" />
         <PackageVersion Include="ILRepack.Lib.MSBuild.Task" Version="2.0.43" />
         <PackageVersion Include="LF2.Transil" Version="0.0.2" />
         <PackageVersion Include="PolySharp" Version="1.15.0" />
