@@ -3,7 +3,7 @@ using HarmonyLib;
 
 namespace TiredSL.Backend.SkillBreakout;
 
-[HarmonyPatch(typeof(SkillBreakPlate), "RandomGridData")]
+[HarmonyPatch(typeof(SkillBreakPlate), nameof(SkillBreakPlate.RandomGridData))]
 public static class BrightenUp
 {
     public static bool Enabled { get; set; }
@@ -15,9 +15,6 @@ public static class BrightenUp
             return;
         }
 
-        Traverse
-            .Create(__result)
-            .Field("_internalState")
-            .SetValue((sbyte)ESkillBreakGridState.Showed);
+        __result._internalState = (sbyte)ESkillBreakGridState.Showed;
     }
 }

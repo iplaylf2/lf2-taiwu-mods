@@ -17,6 +17,7 @@
             InputAssemblies="@(InputAssemblies)"
             LibraryPath="@(LibraryPath)"
             OutputFile="$(OutputPath)$(TargetName)$(TargetExt)"
+            AttributeFile="$(OutputPath)$(TargetName)$(TargetExt)"
         />
     </Target>
 

@@ -21,7 +21,6 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static MainAttributes HandleMainAttributes(
         [ConsumeStackValue] MainAttributes original,
-        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -68,7 +67,6 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static LifeSkillShorts HandleLifeSkillQualifications(
         [ConsumeStackValue] LifeSkillShorts original,
-        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -113,7 +111,6 @@ public static class MyHobbyValue
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
     public static CombatSkillShorts HandleCombatSkillQualifications(
         [ConsumeStackValue] CombatSkillShorts original,
-        [InjectArgumentValue(0)] Character _,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -167,7 +164,7 @@ public static class MyHobbyValue
     public static void HandleBonusesAdd(
         [ConsumeStackValue] IList<SkillQualificationBonus> bonuses,
         [ConsumeStackValue] SkillQualificationBonus original,
-        [InjectMemberValue(MemberInjectionType.Field, "_skillQualificationBonuses")]
+        [InjectMemberValue(MemberInjectionType.Field, nameof(Character._skillQualificationBonuses))]
         IList<SkillQualificationBonus> targetBonuses,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
         [InjectArgumentValue(4)] DataContext context)
@@ -209,11 +206,25 @@ public static class MyHobbyValue
         {
             var handleMethodDict = new Dictionary<FieldInfo, Delegate>
             {
-                [AccessTools.Field(charType, "_baseMainAttributes")] = HandleMainAttributes,
-                [AccessTools.Field(charType, "_baseLifeSkillQualifications")] = HandleLifeSkillQualifications,
-                [AccessTools.Field(charType, "_baseCombatSkillQualifications")] = HandleCombatSkillQualifications,
-                [AccessTools.Field(charType, "_lifeSkillQualificationGrowthType")] = HandleGrowthType,
-                [AccessTools.Field(charType, "_combatSkillQualificationGrowthType")] = HandleGrowthType
+                [AccessTools.Field
+                (charType, nameof(Character._baseMainAttributes))
+                ] = HandleMainAttributes,
+
+                [AccessTools.Field
+                (charType, nameof(Character._baseLifeSkillQualifications))
+                ] = HandleLifeSkillQualifications,
+
+                [AccessTools.Field
+                (charType, nameof(Character._baseCombatSkillQualifications))
+                ] = HandleCombatSkillQualifications,
+
+                [AccessTools.Field
+                (charType, nameof(Character._lifeSkillQualificationGrowthType))
+                ] = HandleGrowthType,
+
+                [AccessTools.Field
+                (charType, nameof(Character._combatSkillQualificationGrowthType))
+                ] = HandleGrowthType
             };
 
             matcher
@@ -245,11 +256,13 @@ public static class MyHobbyValue
         }
 
         {
+#pragma warning disable IDE0340 // Use unbound generic type
             var targetMethod = AccessTools.Method(
                 typeof(List<SkillQualificationBonus>),
-                "Add",
+                nameof(List<SkillQualificationBonus>.Add),
                 [typeof(SkillQualificationBonus)]
             );
+#pragma warning restore IDE0340 // Use unbound generic type
 
             matcher
             .Start()

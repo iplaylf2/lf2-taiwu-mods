@@ -1,9 +1,10 @@
-using System.Reflection.Emit;
+using CharacterFeature = Config.CharacterFeature;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Utilities;
 using HarmonyLib;
 using Redzen.Random;
+using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
 
@@ -22,7 +23,7 @@ public static class AllGoodFeature
         return (Enabled && context.IsProtagonist) || original;
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), "ApplyFeatureIds")]
+    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.ApplyFeatureIds))]
     [HarmonyPrefix]
     public static void PrefixApplyFeatureIds(ref FeatureCreationContext context, Dictionary<short, short> featureGroup2Id)
     {
@@ -33,7 +34,7 @@ public static class AllGoodFeature
 
         if (
             !context.RandomFeaturesAtCreating
-            || featureGroup2Id.ContainsKey(171)
+            || featureGroup2Id.ContainsKey(CharacterFeature.DefKey.OneYearOldCatch0)
             || 1 > context.CurrAge
         )
         {
@@ -42,17 +43,14 @@ public static class AllGoodFeature
 
         AdaptableLog.Info("GenerateOneYearOldCatchFeature");
 
-        Traverse
-            .Create(typeof(CharacterCreation))
-            .Method(
-                "AddFeature",
-                featureGroup2Id,
-                CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
-            )
-            .GetValue();
+        CharacterCreation.AddFeature
+        (
+            featureGroup2Id,
+            CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
+        );
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), "GenerateRandomBasicFeatures")]
+    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.GenerateRandomBasicFeatures))]
     [HarmonyTranspiler]
     public static IEnumerable<CodeInstruction> GenerateRandomBasicFeatures(IEnumerable<CodeInstruction> instructions)
     {
