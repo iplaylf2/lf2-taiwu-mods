@@ -207,8 +207,8 @@ public static class MyHobbyValue
             var handleMethodDict = new Dictionary<FieldInfo, Delegate>
             {
                 [AccessTools.Field
-                (charType, nameof(Character._baseMainAttributes)
-                )] = HandleMainAttributes,
+                (charType, nameof(Character._baseMainAttributes))
+                ] = HandleMainAttributes,
 
                 [AccessTools.Field
                 (charType, nameof(Character._baseLifeSkillQualifications))
