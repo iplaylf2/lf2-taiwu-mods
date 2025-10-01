@@ -30,7 +30,7 @@ public static class MyHobbyValue
             return original;
         }
 
-        OrganizationMemberItem organizationMemberItem = OrganizationMember.Instance[orgMemberId];
+        var organizationMemberItem = OrganizationMember.Instance[orgMemberId];
 
         AdaptableLog.Info("Grade: " + organizationMemberItem.Grade);
 
@@ -76,7 +76,7 @@ public static class MyHobbyValue
             return original;
         }
 
-        OrganizationMemberItem organizationMemberItem = OrganizationMember.Instance[orgMemberId];
+        var organizationMemberItem = OrganizationMember.Instance[orgMemberId];
 
         AdaptableLog.Info("LifeSkillShorts original: " + string.Join(
             ',',
@@ -120,7 +120,7 @@ public static class MyHobbyValue
             return original;
         }
 
-        OrganizationMemberItem organizationMemberItem = OrganizationMember.Instance[orgMemberId];
+        var organizationMemberItem = OrganizationMember.Instance[orgMemberId];
 
         AdaptableLog.Info("CombatSkillShorts original: " + string.Join(
             ',',
@@ -227,7 +227,7 @@ public static class MyHobbyValue
                 ] = HandleGrowthType
             };
 
-            matcher
+            _ = matcher
             .Start()
             .MatchForward(
                 false,
@@ -241,14 +241,14 @@ public static class MyHobbyValue
                         || !handleMethodDict.TryGetValue(field, out var handleMethod)
                     )
                     {
-                        matcher.Advance(1);
+                        _ = matcher.Advance(1);
 
                         return;
                     }
 
                     ILManipulator.ApplyTransformation(matcher, handleMethod, charType);
 
-                    matcher.Advance(1);
+                    _ = matcher.Advance(1);
 
                     AdaptableLog.Info($"handle ${field} assignment");
                 }
@@ -262,7 +262,7 @@ public static class MyHobbyValue
                 [typeof(SkillQualificationBonus)]
             );
 
-            matcher
+            _ = matcher
             .Start()
             .MatchForward(
                 false,
@@ -273,7 +273,7 @@ public static class MyHobbyValue
                 {
                     ILManipulator.ApplyTransformation(matcher, HandleBonusesAdd, charType);
 
-                    matcher.Advance(1);
+                    _ = matcher.Advance(1);
 
                     AdaptableLog.Info($"handle ${targetMethod}");
                 }
