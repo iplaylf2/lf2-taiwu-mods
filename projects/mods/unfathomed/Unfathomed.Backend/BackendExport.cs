@@ -9,5 +9,6 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
     {
         HarmonyInstance.PatchAll(typeof(AgeCompletion.BuildingDomainPatcher));
         HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterPatcher));
+        HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterDomainPatcher));
     }
 }
