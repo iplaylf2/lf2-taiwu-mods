@@ -11,6 +11,7 @@ dotnet_diagnostic.IDE0010.severity = none
 dotnet_diagnostic.IDE0022.severity = none
 dotnet_diagnostic.IDE0058.severity = none
 dotnet_diagnostic.IDE0160.severity = none
+dotnet_diagnostic.IDE0340.severity = none
 
 roslynator_analyzers.enabled_by_default = true
 roslynator_refactorings.enabled = true

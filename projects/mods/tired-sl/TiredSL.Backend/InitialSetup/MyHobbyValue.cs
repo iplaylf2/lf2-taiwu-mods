@@ -256,13 +256,11 @@ public static class MyHobbyValue
         }
 
         {
-#pragma warning disable IDE0340 // Use unbound generic type
             var targetMethod = AccessTools.Method(
                 typeof(List<SkillQualificationBonus>),
                 nameof(List<SkillQualificationBonus>.Add),
                 [typeof(SkillQualificationBonus)]
             );
-#pragma warning restore IDE0340 // Use unbound generic type
 
             matcher
             .Start()
