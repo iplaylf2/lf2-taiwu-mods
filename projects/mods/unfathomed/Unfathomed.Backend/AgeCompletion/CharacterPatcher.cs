@@ -40,8 +40,28 @@ internal static class CharacterPatcher
     }
 
     [HarmonyTranspiler]
+    [HarmonyPatch(nameof(Character.OfflineCalcGeneralAction_GainExp))]
+    private static IEnumerable<CodeInstruction> OfflineCalcGeneralAction_GainExp
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
+    {
+        return EnableChild(instructions);
+    }
+
+    [HarmonyTranspiler]
     [HarmonyPatch(nameof(Character.OfflineCalcGeneralAction_SocialStatus_TeaWine))]
     private static IEnumerable<CodeInstruction> OfflineCalcGeneralAction_SocialStatus_TeaWine
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
+    {
+        return EnableChild(instructions);
+    }
+
+    [HarmonyTranspiler]
+    [HarmonyPatch(nameof(Character.OfflineCalcGeneralAction_TeaWine))]
+    private static IEnumerable<CodeInstruction> OfflineCalcGeneralAction_TeaWine
     (
         IEnumerable<CodeInstruction> instructions
     )
