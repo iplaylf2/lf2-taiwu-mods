@@ -7,8 +7,11 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
+        HarmonyInstance.PatchAll(typeof(AgeCompletion.AiConditionOptionUseItemWinePatcher));
         HarmonyInstance.PatchAll(typeof(AgeCompletion.BuildingDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterPatcher));
         HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterDomainPatcher));
+        HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterPatcher));
+        HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterSortFilterPatcher));
+        HarmonyInstance.PatchAll(typeof(AgeCompletion.CombatDomainPatcher));
     }
 }
