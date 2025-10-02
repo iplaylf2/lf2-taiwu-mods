@@ -13,6 +13,6 @@ internal static class EventHelperPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixStaticAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 }

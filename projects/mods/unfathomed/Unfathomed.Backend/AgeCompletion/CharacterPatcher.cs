@@ -13,7 +13,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -23,7 +23,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -33,7 +33,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -43,7 +43,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -53,7 +53,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -63,6 +63,6 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixStaticAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 }

@@ -13,6 +13,6 @@ internal static class LegendaryBookDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 }

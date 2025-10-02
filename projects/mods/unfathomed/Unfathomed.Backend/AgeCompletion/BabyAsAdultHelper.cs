@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 using GameData.Domains.Character;
 using GameData.Utilities;
@@ -9,20 +10,44 @@ namespace Unfathomed.Backend.AgeCompletion;
 
 internal static class BabyAsAdultHelper
 {
-    public static IEnumerable<CodeInstruction> ByHandleGetAgeGroup
+    public static IEnumerable<CodeInstruction> ByFixGetAgeGroup
     (
         IEnumerable<CodeInstruction> instructions
     )
     {
         var matcher = new CodeMatcher(instructions);
 
-        var targetMethod = AccessTools.Method
-        (
-            typeof(Character),
-            nameof(Character.GetAgeGroup)
-        );
+        {
+            var targetMethod = AccessTools.Method
+            (
+                typeof(AgeGroup),
+                nameof(AgeGroup.GetAgeGroup)
+            );
 
-        _ = matcher
+            _ = ApplyFixGetAgeGroupFor(matcher, targetMethod);
+        }
+
+        {
+            var targetMethod = AccessTools.Method
+            (
+                typeof(Character),
+                nameof(Character.GetAgeGroup)
+            );
+
+            _ = ApplyFixGetAgeGroupFor(matcher, targetMethod);
+        }
+
+        return matcher.InstructionEnumeration();
+    }
+
+    private static CodeMatcher ApplyFixGetAgeGroupFor
+    (
+        CodeMatcher matcher,
+        MethodInfo targetMethod
+    )
+    {
+        return matcher
+        .Start()
         .MatchForward(
             false,
             new CodeMatch(OpCodes.Call, targetMethod)
@@ -39,8 +64,6 @@ internal static class BabyAsAdultHelper
                 AdaptableLog.Info($"handle {targetMethod}");
             }
         );
-
-        return matcher.InstructionEnumeration();
     }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]

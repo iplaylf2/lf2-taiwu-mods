@@ -16,6 +16,6 @@ internal static class AiConditionPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
     }
 }
