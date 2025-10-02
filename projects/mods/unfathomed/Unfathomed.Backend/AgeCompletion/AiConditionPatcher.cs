@@ -3,12 +3,15 @@ using HarmonyLib;
 
 namespace Unfathomed.Backend.AgeCompletion;
 
-[HarmonyPatch(typeof(AiConditionOptionUseItemWine))]
-internal static class AiConditionOptionUseItemWinePatcher
+internal static class AiConditionPatcher
 {
     [HarmonyTranspiler]
-    [HarmonyPatch(nameof(AiConditionOptionUseItemWine.ExtraCheck))]
-    private static IEnumerable<CodeInstruction> ExtraCheck
+    [HarmonyPatch
+    (
+        typeof(AiConditionOptionUseItemWine),
+        nameof(AiConditionOptionUseItemWine.ExtraCheck)
+    )]
+    private static IEnumerable<CodeInstruction> AiConditionOptionUseItemWine_ExtraCheck
     (
         IEnumerable<CodeInstruction> instructions
     )

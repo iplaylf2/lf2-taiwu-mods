@@ -9,12 +9,13 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
     {
         var patchers = new[]
         {
-            typeof(AgeCompletion.AiConditionOptionUseItemWinePatcher),
+            typeof(AgeCompletion.AiConditionPatcher),
             typeof(AgeCompletion.BuildingDomainPatcher),
             typeof(AgeCompletion.CharacterDomainPatcher),
             typeof(AgeCompletion.CharacterPatcher),
             typeof(AgeCompletion.CharacterSortFilterPatcher),
             typeof(AgeCompletion.CombatDomainPatcher),
+            typeof(AgeCompletion.CombatSkillPatcher),
             typeof(AgeCompletion.ExtraDomainPatcher),
             typeof(AgeCompletion.LegendaryBookDomainPatcher),
             typeof(AgeCompletion.MapDomainPatcher),
