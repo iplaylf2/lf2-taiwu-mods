@@ -7,17 +7,25 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.AiConditionOptionUseItemWinePatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.BuildingDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.CharacterSortFilterPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.CombatDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.ExtraDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.LegendaryBookDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.MapDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.OrganizationDomainPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.SectPatcher));
-        HarmonyInstance.PatchAll(typeof(AgeCompletion.SettlementPatcher));
+        var patchers = new[]
+        {
+            typeof(AgeCompletion.AiConditionOptionUseItemWinePatcher),
+            typeof(AgeCompletion.BuildingDomainPatcher),
+            typeof(AgeCompletion.CharacterDomainPatcher),
+            typeof(AgeCompletion.CharacterPatcher),
+            typeof(AgeCompletion.CharacterSortFilterPatcher),
+            typeof(AgeCompletion.CombatDomainPatcher),
+            typeof(AgeCompletion.ExtraDomainPatcher),
+            typeof(AgeCompletion.LegendaryBookDomainPatcher),
+            typeof(AgeCompletion.MapDomainPatcher),
+            typeof(AgeCompletion.OrganizationDomainPatcher),
+            typeof(AgeCompletion.SectPatcher),
+            typeof(AgeCompletion.SettlementPatcher)
+        };
+
+        foreach (var patcher in patchers)
+        {
+            HarmonyInstance.PatchAll(patcher);
+        }
     }
 }
