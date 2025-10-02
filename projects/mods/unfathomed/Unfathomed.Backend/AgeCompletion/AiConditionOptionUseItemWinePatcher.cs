@@ -13,6 +13,6 @@ internal static class AiConditionOptionUseItemWinePatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return EnableChildHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
     }
 }

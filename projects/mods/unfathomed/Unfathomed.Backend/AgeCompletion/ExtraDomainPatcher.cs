@@ -13,7 +13,7 @@ internal static class ExtraDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return EnableChildHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -23,7 +23,7 @@ internal static class ExtraDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return EnableChildHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -33,6 +33,6 @@ internal static class ExtraDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return EnableChildHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
     }
 }

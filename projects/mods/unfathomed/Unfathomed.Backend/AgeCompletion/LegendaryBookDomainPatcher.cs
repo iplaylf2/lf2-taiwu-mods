@@ -13,16 +13,6 @@ internal static class LegendaryBookDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return EnableChildHelper.ByHandleGetAgeGroup(instructions);
-    }
-
-    [HarmonyTranspiler]
-    [HarmonyPatch(nameof(LegendaryBookDomain.SelectHarmActionTarget))]
-    private static IEnumerable<CodeInstruction> SelectHarmActionTarget
-    (
-        IEnumerable<CodeInstruction> instructions
-    )
-    {
-        return EnableChildHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
     }
 }

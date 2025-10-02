@@ -7,7 +7,7 @@ using Transil.Operations;
 
 namespace Unfathomed.Backend.AgeCompletion;
 
-internal static class EnableChildHelper
+internal static class ChildAsAdultHelper
 {
     public static IEnumerable<CodeInstruction> ByHandleGetAgeGroup
     (
