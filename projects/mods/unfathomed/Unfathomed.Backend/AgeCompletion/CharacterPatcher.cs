@@ -13,7 +13,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -23,7 +23,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -33,7 +33,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -43,7 +43,7 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -53,6 +53,16 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+    }
+
+    [HarmonyTranspiler]
+    [HarmonyPatch(nameof(Character.OfflineChangeXiangshuInfection))]
+    private static IEnumerable<CodeInstruction> OfflineChangeXiangshuInfection
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
+    {
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 }

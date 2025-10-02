@@ -13,6 +13,6 @@ internal static class CombatDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 }

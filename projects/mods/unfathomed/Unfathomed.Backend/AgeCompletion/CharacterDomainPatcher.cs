@@ -13,7 +13,7 @@ internal static class CharacterDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 
     [HarmonyTranspiler]
@@ -23,6 +23,6 @@ internal static class CharacterDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 }

@@ -13,6 +13,6 @@ internal static class SettlementPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByHandleGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
     }
 }
