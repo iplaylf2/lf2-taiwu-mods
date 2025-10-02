@@ -16,6 +16,7 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(AgeCompletion.CharacterSortFilterPatcher),
             typeof(AgeCompletion.CombatDomainPatcher),
             typeof(AgeCompletion.CombatSkillPatcher),
+            typeof(AgeCompletion.EventHelperPatcher),
             typeof(AgeCompletion.ExtraDomainPatcher),
             typeof(AgeCompletion.LegendaryBookDomainPatcher),
             typeof(AgeCompletion.MapDomainPatcher),

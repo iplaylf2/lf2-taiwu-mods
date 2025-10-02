@@ -7,6 +7,26 @@ namespace Unfathomed.Backend.AgeCompletion;
 internal static class CharacterDomainPatcher
 {
     [HarmonyTranspiler]
+    [HarmonyPatch(nameof(CharacterDomain.AssassinationByJieqing))]
+    private static IEnumerable<CodeInstruction> AssassinationByJieqing
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
+    {
+        return ChildAsAdultHelper.ByFixStaticAgeGroup(instructions);
+    }
+
+    [HarmonyTranspiler]
+    [HarmonyPatch(nameof(CharacterDomain.CreateSkeletonCharacter))]
+    private static IEnumerable<CodeInstruction> CreateSkeletonCharacter
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
+    {
+        return ChildAsAdultHelper.ByFixStaticAgeGroup(instructions);
+    }
+
+    [HarmonyTranspiler]
     [HarmonyPatch(nameof(CharacterDomain.RemoveAbnormalSkeletonCharacters))]
     private static IEnumerable<CodeInstruction> RemoveAbnormalSkeletonCharacters
     (

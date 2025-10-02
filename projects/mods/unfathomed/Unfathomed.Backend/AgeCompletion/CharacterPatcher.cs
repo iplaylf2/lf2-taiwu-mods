@@ -63,6 +63,6 @@ internal static class CharacterPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixInstanceGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixStaticAgeGroup(instructions);
     }
 }
