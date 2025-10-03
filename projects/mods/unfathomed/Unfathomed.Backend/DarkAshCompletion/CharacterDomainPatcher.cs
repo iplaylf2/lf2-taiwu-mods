@@ -31,7 +31,7 @@ internal static class CharacterDomainPatcher
         [ConsumeStackValue] int original
     )
     {
-        return Math.Max(0, original);
+        return Math.Max(1, original);
     }
 
     [HarmonyTranspiler]
