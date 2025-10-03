@@ -61,7 +61,7 @@ internal static class ChildAsAdultHelper
 
                 _ = matcher.Advance(1);
 
-                AdaptableLog.Info($"handle {targetMethod}");
+                AdaptableLog.Info($"handle {targetMethod} result");
             }
         );
     }

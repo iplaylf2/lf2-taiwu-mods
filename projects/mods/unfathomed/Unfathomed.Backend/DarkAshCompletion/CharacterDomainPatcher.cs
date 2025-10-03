@@ -12,7 +12,7 @@ namespace Unfathomed.Backend.DarkAshCompletion;
 internal static class CharacterDomainPatcher
 {
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    private static short FixGetActualAge
+    private static short FixGetActualAgeResult
     (
         [ConsumeStackValue] short original
     )
@@ -61,11 +61,11 @@ internal static class CharacterDomainPatcher
                 {
                     _ = matcher.Advance(1);
 
-                    ILManipulator.ApplyTransformation(matcher, FixGetActualAge);
+                    ILManipulator.ApplyTransformation(matcher, FixGetActualAgeResult);
 
                     _ = matcher.Advance(1);
 
-                    AdaptableLog.Info($"handle {targetMethod}");
+                    AdaptableLog.Info($"handle {targetMethod} result");
                 }
             );
         }
@@ -90,7 +90,7 @@ internal static class CharacterDomainPatcher
 
                     _ = matcher.Advance(1);
 
-                    AdaptableLog.Info($"handle {targetMethod}");
+                    AdaptableLog.Info($"handle {targetMethod} arg");
                 }
             );
         }
