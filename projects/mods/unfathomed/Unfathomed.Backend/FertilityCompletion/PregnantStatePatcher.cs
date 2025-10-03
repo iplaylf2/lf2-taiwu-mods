@@ -15,7 +15,7 @@ internal static class PregnantStatePatcher
     (
         [ConsumeStackValue] CharacterDomain instance,
         [ConsumeStackValue] int charId,
-        [ConsumeStackValue] ushort relationType,
+        [ConsumeStackValue] ushort _relationType,
         [InjectArgumentValue(3)] bool isRape
     )
     {
