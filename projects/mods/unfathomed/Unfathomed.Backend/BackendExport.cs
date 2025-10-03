@@ -29,6 +29,8 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(DarkAshCompletion.CharacterPatcher),
 
             typeof(FertilityCompletion.PregnantStatePatcher),
+
+            typeof(RandomCompletion.RedzenHelperPatcher),
         };
 
         foreach (var patcher in patchers)
