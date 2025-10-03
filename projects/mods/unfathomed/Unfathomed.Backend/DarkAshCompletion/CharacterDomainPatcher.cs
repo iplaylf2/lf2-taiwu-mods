@@ -1,7 +1,7 @@
 using System.Reflection.Emit;
 using GameData.Domains.Character;
-using GameData.Utilities;
 using HarmonyLib;
+using LF2.Game.Helper;
 using Redzen.Random;
 using Transil.Attributes;
 using Transil.Operations;
@@ -65,7 +65,7 @@ internal static class CharacterDomainPatcher
 
                     _ = matcher.Advance(1);
 
-                    AdaptableLog.Info($"handle {targetMethod} result");
+                    StructuredLogger.Info("FixGetActualAgeResult", new { targetMethod });
                 }
             );
         }
@@ -90,7 +90,7 @@ internal static class CharacterDomainPatcher
 
                     _ = matcher.Advance(1);
 
-                    AdaptableLog.Info($"handle {targetMethod} arg");
+                    StructuredLogger.Info("FixNextArg", new { targetMethod });
                 }
             );
         }

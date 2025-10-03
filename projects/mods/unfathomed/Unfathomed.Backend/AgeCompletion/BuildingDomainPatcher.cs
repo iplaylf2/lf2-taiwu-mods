@@ -2,8 +2,8 @@ using System.Reflection.Emit;
 using GameData.Domains;
 using GameData.Domains.Building;
 using GameData.Domains.Character;
-using GameData.Utilities;
 using HarmonyLib;
+using LF2.Game.Helper;
 using Transil.Attributes;
 using Transil.Operations;
 
@@ -52,7 +52,7 @@ internal static class BuildingDomainPatcher
 
                 _ = matcher.Advance(1);
 
-                AdaptableLog.Info($"handle {targetMethod}");
+                StructuredLogger.Info("FixSwapSoulCeremonyRemoveWhereArg", new { targetMethod });
             }
         );
 

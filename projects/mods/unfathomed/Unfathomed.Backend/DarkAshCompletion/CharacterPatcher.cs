@@ -1,8 +1,8 @@
 
 using System.Reflection.Emit;
 using GameData.Domains.Character;
-using GameData.Utilities;
 using HarmonyLib;
+using LF2.Game.Helper;
 using Transil.Attributes;
 using Transil.Operations;
 
@@ -53,7 +53,7 @@ internal static class CharacterPatcher
 
                 _ = matcher.Advance(1);
 
-                AdaptableLog.Info("handle baseTime assignment");
+                StructuredLogger.Info("FixBaseTimeValue");
             }
         );
 

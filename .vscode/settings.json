@@ -20,6 +20,7 @@
         "netstandard",
         "newarr",
         "newobj",
+        "newtonsoft",
         "publicizer",
         "raycaster",
         "redzen",

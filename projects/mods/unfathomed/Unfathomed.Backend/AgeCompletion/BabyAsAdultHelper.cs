@@ -1,8 +1,9 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using GameData.Domains.Character;
-using GameData.Utilities;
 using HarmonyLib;
+using LF2.Game.Helper;
 using Transil.Attributes;
 using Transil.Operations;
 
@@ -12,7 +13,8 @@ internal static class BabyAsAdultHelper
 {
     public static IEnumerable<CodeInstruction> ByFixGetAgeGroupResult
     (
-        IEnumerable<CodeInstruction> instructions
+        IEnumerable<CodeInstruction> instructions,
+        [CallerMemberName] string callerMember = ""
     )
     {
         var matcher = new CodeMatcher(instructions);
@@ -24,7 +26,7 @@ internal static class BabyAsAdultHelper
                 nameof(AgeGroup.GetAgeGroup)
             );
 
-            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod);
+            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod, callerMember);
         }
 
         {
@@ -34,7 +36,7 @@ internal static class BabyAsAdultHelper
                 nameof(Character.GetAgeGroup)
             );
 
-            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod);
+            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod, callerMember);
         }
 
         return matcher.InstructionEnumeration();
@@ -43,7 +45,8 @@ internal static class BabyAsAdultHelper
     private static CodeMatcher ApplyFixGetAgeGroupResult
     (
         CodeMatcher matcher,
-        MethodInfo targetMethod
+        MethodInfo targetMethod,
+        string callerMember
     )
     {
         return matcher
@@ -61,7 +64,7 @@ internal static class BabyAsAdultHelper
 
                 _ = matcher.Advance(1);
 
-                AdaptableLog.Info($"handle {targetMethod} result");
+                StructuredLogger.Info("FixGetAgeGroupResult", new { targetMethod }, callerMember);
             }
         );
     }
