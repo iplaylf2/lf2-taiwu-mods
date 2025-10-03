@@ -13,6 +13,6 @@ internal static class MapDomainPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return BabyAsAdultHelper.ByFixGetAgeGroup(instructions);
+        return BabyAsAdultHelper.ByFixGetAgeGroupResult(instructions);
     }
 }

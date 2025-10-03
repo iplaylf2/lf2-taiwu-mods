@@ -10,7 +10,7 @@ namespace Unfathomed.Backend.AgeCompletion;
 
 internal static class ChildAsAdultHelper
 {
-    public static IEnumerable<CodeInstruction> ByFixGetAgeGroup
+    public static IEnumerable<CodeInstruction> ByFixGetAgeGroupResult
     (
         IEnumerable<CodeInstruction> instructions
     )
@@ -24,7 +24,7 @@ internal static class ChildAsAdultHelper
                 nameof(AgeGroup.GetAgeGroup)
             );
 
-            _ = ApplyFixGetAgeGroupFor(matcher, targetMethod);
+            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod);
         }
 
         {
@@ -34,13 +34,13 @@ internal static class ChildAsAdultHelper
                 nameof(Character.GetAgeGroup)
             );
 
-            _ = ApplyFixGetAgeGroupFor(matcher, targetMethod);
+            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod);
         }
 
         return matcher.InstructionEnumeration();
     }
 
-    private static CodeMatcher ApplyFixGetAgeGroupFor
+    private static CodeMatcher ApplyFixGetAgeGroupResult
     (
         CodeMatcher matcher,
         MethodInfo targetMethod
@@ -57,7 +57,7 @@ internal static class ChildAsAdultHelper
             {
                 _ = matcher.Advance(1);
 
-                ILManipulator.ApplyTransformation(matcher, FixGetAgeGroup);
+                ILManipulator.ApplyTransformation(matcher, FixGetAgeGroupResult);
 
                 _ = matcher.Advance(1);
 
@@ -67,7 +67,7 @@ internal static class ChildAsAdultHelper
     }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    private static sbyte FixGetAgeGroup
+    private static sbyte FixGetAgeGroupResult
     (
         [ConsumeStackValue] sbyte original
     )

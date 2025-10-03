@@ -13,7 +13,7 @@ namespace Unfathomed.Backend.AgeCompletion;
 internal static class BuildingDomainPatcher
 {
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    private static Predicate<int> FixSwapSoulCeremonyRemoveMatch
+    private static Predicate<int> FixSwapSoulCeremonyRemoveWhereArg
     (
         [ConsumeStackValue] Predicate<int> _
     )
@@ -48,7 +48,7 @@ internal static class BuildingDomainPatcher
         .Repeat(
             (matcher) =>
             {
-                ILManipulator.ApplyTransformation(matcher, FixSwapSoulCeremonyRemoveMatch);
+                ILManipulator.ApplyTransformation(matcher, FixSwapSoulCeremonyRemoveWhereArg);
 
                 _ = matcher.Advance(1);
 

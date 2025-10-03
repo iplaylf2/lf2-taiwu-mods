@@ -13,6 +13,6 @@ internal static class SectPatcher
         IEnumerable<CodeInstruction> instructions
     )
     {
-        return ChildAsAdultHelper.ByFixGetAgeGroup(instructions);
+        return ChildAsAdultHelper.ByFixGetAgeGroupResult(instructions);
     }
 }
