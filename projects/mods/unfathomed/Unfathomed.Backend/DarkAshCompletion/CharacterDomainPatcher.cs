@@ -74,7 +74,8 @@ internal static class CharacterDomainPatcher
             var targetMethod = AccessTools.Method
             (
                 typeof(IRandomSource),
-                nameof(IRandomSource.Next)
+                nameof(IRandomSource.Next),
+                [typeof(int)]
             );
 
             _ = matcher

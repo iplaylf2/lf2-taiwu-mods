@@ -59,6 +59,14 @@ internal static class BabyAsAdultHelper
             .Start()
             .MatchForward(
                 false,
+                new CodeMatch(OpCodes.Call, targetMethod)
+            )
+            .Repeat(ApplyTransformation(callerMember));
+
+            _ = matcher
+            .Start()
+            .MatchForward(
+                false,
                 new CodeMatch(OpCodes.Callvirt, targetMethod)
             )
             .Repeat(ApplyTransformation(callerMember));

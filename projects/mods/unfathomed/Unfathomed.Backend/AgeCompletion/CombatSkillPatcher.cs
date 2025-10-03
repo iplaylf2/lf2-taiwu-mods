@@ -23,9 +23,9 @@ internal static class CombatSkillPatcher
     [HarmonyTranspiler]
     [HarmonyPatch(
         typeof(YaoJiYunYuShi),
-        nameof(YaoJiYunYuShi.OnEnable)
+        nameof(YaoJiYunYuShi.AllowAddAdore)
     )]
-    private static IEnumerable<CodeInstruction> YaoJiYunYuShi_OnEnable
+    private static IEnumerable<CodeInstruction> YaoJiYunYuShi_AllowAddAdore
     (
         IEnumerable<CodeInstruction> instructions
     )
