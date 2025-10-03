@@ -23,7 +23,9 @@ public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(AgeCompletion.OrganizationDomainPatcher),
             typeof(AgeCompletion.SectPatcher),
             typeof(AgeCompletion.SettlementPatcher),
-            typeof(AgeCompletion.VillagerRoleHeadPatcher)
+            typeof(AgeCompletion.VillagerRoleHeadPatcher),
+
+            typeof(FertilityCompletion.PregnantStatePatcher)
         };
 
         foreach (var patcher in patchers)
