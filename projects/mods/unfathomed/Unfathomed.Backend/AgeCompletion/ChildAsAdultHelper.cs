@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using GameData.Domains.Character;
@@ -19,6 +18,20 @@ internal static class ChildAsAdultHelper
     {
         var matcher = new CodeMatcher(instructions);
 
+        static Action<CodeMatcher> ApplyTransformation(string callerMember)
+        {
+            return (matcher) =>
+            {
+                _ = matcher.Advance(1);
+
+                ILManipulator.ApplyTransformation(matcher, FixGetAgeGroupResult);
+
+                _ = matcher.Advance(1);
+
+                StructuredLogger.Info("FixGetAgeGroupResult", null, callerMember);
+            };
+        }
+
         {
             var targetMethod = AccessTools.Method
             (
@@ -26,7 +39,13 @@ internal static class ChildAsAdultHelper
                 nameof(AgeGroup.GetAgeGroup)
             );
 
-            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod, callerMember);
+            _ = matcher
+            .Start()
+            .MatchForward(
+                false,
+                new CodeMatch(OpCodes.Call, targetMethod)
+            )
+            .Repeat(ApplyTransformation(callerMember));
         }
 
         {
@@ -36,37 +55,16 @@ internal static class ChildAsAdultHelper
                 nameof(Character.GetAgeGroup)
             );
 
-            _ = ApplyFixGetAgeGroupResult(matcher, targetMethod, callerMember);
+            _ = matcher
+            .Start()
+            .MatchForward(
+                false,
+                new CodeMatch(OpCodes.Callvirt, targetMethod)
+            )
+            .Repeat(ApplyTransformation(callerMember));
         }
 
         return matcher.InstructionEnumeration();
-    }
-
-    private static CodeMatcher ApplyFixGetAgeGroupResult
-    (
-        CodeMatcher matcher,
-        MethodInfo targetMethod,
-        string callerMember
-    )
-    {
-        return matcher
-        .Start()
-        .MatchForward(
-            false,
-            new CodeMatch(OpCodes.Call, targetMethod)
-        )
-        .Repeat(
-            (matcher) =>
-            {
-                _ = matcher.Advance(1);
-
-                ILManipulator.ApplyTransformation(matcher, FixGetAgeGroupResult);
-
-                _ = matcher.Advance(1);
-
-                StructuredLogger.Info("FixGetAgeGroupResult", null, callerMember);
-            }
-        );
     }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]

@@ -54,7 +54,7 @@ internal static class CharacterDomainPatcher
             .Start()
             .MatchForward(
                 false,
-                new CodeMatch(OpCodes.Call, targetMethod)
+                new CodeMatch(OpCodes.Callvirt, targetMethod)
             )
             .Repeat(
                 (matcher) =>
@@ -81,7 +81,7 @@ internal static class CharacterDomainPatcher
             .Start()
             .MatchForward(
                 false,
-                new CodeMatch(OpCodes.Call, targetMethod)
+                new CodeMatch(OpCodes.Callvirt, targetMethod)
             )
             .Repeat(
                 (matcher) =>

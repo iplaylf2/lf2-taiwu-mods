@@ -44,7 +44,7 @@ internal static class CharacterPatcher
         .Start()
         .MatchForward(
             false,
-            new CodeMatch(OpCodes.Starg_S, 3)
+            new CodeMatch(OpCodes.Starg_S, (byte)3)
         )
         .Repeat(
             (matcher) =>

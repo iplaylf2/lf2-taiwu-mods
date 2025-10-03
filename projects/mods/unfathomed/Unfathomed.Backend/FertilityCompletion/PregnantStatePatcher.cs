@@ -50,7 +50,7 @@ internal static class PregnantStatePatcher
         .Start()
         .MatchForward(
             false,
-            new CodeMatch(OpCodes.Call, targetMethod)
+            new CodeMatch(OpCodes.Callvirt, targetMethod)
         )
         .Repeat(
             (matcher) =>
