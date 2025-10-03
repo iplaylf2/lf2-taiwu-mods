@@ -64,7 +64,7 @@ internal static class BabyAsAdultHelper
 
                 _ = matcher.Advance(1);
 
-                StructuredLogger.Info("FixGetAgeGroupResult", new { targetMethod }, callerMember);
+                StructuredLogger.Info("FixGetAgeGroupResult", null, callerMember);
             }
         );
     }

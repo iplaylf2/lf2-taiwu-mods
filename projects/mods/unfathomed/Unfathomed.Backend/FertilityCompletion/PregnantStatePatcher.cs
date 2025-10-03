@@ -59,7 +59,7 @@ internal static class PregnantStatePatcher
 
                 _ = matcher.Advance(1);
 
-                StructuredLogger.Info("FixGetRelatedCharIds", new { targetMethod });
+                StructuredLogger.Info("FixGetRelatedCharIds");
             }
         );
 

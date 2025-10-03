@@ -65,7 +65,7 @@ internal static class CharacterDomainPatcher
 
                     _ = matcher.Advance(1);
 
-                    StructuredLogger.Info("FixGetActualAgeResult", new { targetMethod });
+                    StructuredLogger.Info("FixGetActualAgeResult");
                 }
             );
         }
@@ -90,7 +90,7 @@ internal static class CharacterDomainPatcher
 
                     _ = matcher.Advance(1);
 
-                    StructuredLogger.Info("FixNextArg", new { targetMethod });
+                    StructuredLogger.Info("FixNextArg");
                 }
             );
         }

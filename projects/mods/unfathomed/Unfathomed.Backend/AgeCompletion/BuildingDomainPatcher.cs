@@ -52,7 +52,7 @@ internal static class BuildingDomainPatcher
 
                 _ = matcher.Advance(1);
 
-                StructuredLogger.Info("FixSwapSoulCeremonyRemoveWhereArg", new { targetMethod });
+                StructuredLogger.Info("FixSwapSoulCeremonyRemoveWhereArg");
             }
         );
 
