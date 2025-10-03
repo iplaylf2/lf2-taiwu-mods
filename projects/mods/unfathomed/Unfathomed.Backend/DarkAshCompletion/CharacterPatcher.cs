@@ -28,7 +28,7 @@ internal static class CharacterPatcher
 
         var leftTime = (16 * 12) - CharacterDomain.GetLivedMonths(age, instance.GetBirthMonth());
 
-        return original += Math.Max(0, leftTime);
+        return original + Math.Max(0, leftTime);
     }
 
     [HarmonyTranspiler]
