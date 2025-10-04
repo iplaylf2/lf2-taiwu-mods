@@ -8,7 +8,8 @@ namespace RollProtagonist.Backend;
 
 internal class CreateProtagonistFlow
 {
-    public CreateProtagonistFlow(
+    public CreateProtagonistFlow
+    (
         RollOperation roll,
         CommitOperation commit
     )
@@ -16,19 +17,22 @@ internal class CreateProtagonistFlow
         creationFlow = BuildCreationFlow(roll, commit);
     }
 
-    public delegate Tuple<object[], bool, object[]> RollOperation(
+    public delegate Tuple<object[], bool, object[]> RollOperation
+    (
         CharacterDomain domain,
         DataContext context,
         ProtagonistCreationInfo info
     );
-    public delegate int CommitOperation(
+    public delegate int CommitOperation
+    (
         CharacterDomain domain,
         DataContext context,
         ProtagonistCreationInfo info,
         object[] variables
     );
 
-    public void ExecuteInitial(
+    public void ExecuteInitial
+    (
         DataContext context,
         ProtagonistCreationInfo info
     )
@@ -46,7 +50,7 @@ internal class CreateProtagonistFlow
 
         currentPhase = CreationPhase.Roll;
 
-        creationFlow.MoveNext();
+        _ = creationFlow.MoveNext();
 
         var rollResult = (RollResult)creationFlow.Current;
 
@@ -57,7 +61,7 @@ internal class CreateProtagonistFlow
     {
         currentPhase = CreationPhase.Commit;
 
-        creationFlow.MoveNext();
+        _ = creationFlow.MoveNext();
 
         var commitResult = (CommitResult)creationFlow.Current;
 
@@ -80,7 +84,8 @@ internal class CreateProtagonistFlow
             {
                 case CreationPhase.Commit:
                     {
-                        var data = commit(
+                        var data = commit
+                        (
                             DomainManager.Character,
                             dataContext!,
                             CreationInfo!,
@@ -101,7 +106,8 @@ internal class CreateProtagonistFlow
                     break;
                 case CreationPhase.Roll:
                     {
-                        var (_, _, newVariables) = roll(
+                        var (_, _, newVariables) = roll
+                        (
                             DomainManager.Character,
                             dataContext!,
                             CreationInfo!
@@ -112,6 +118,8 @@ internal class CreateProtagonistFlow
                         yield return new RollResult(ExtractCharacter(stateVariables));
                     }
                     break;
+                default:
+                    throw new InvalidProgramException();
             }
         }
     }

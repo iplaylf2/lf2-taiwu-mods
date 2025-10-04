@@ -1,8 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <LF2SingleLibrary>true</LF2SingleLibrary>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Remove="LF2.Transil" />
   </ItemGroup>

@@ -11,24 +11,33 @@ public sealed class UniTaskCall
 {
     public static UniTaskCall Default => lazyDefault.Value;
 
-    public async UniTask<SerializableModData> CallModMethod(string modIdStr, string methodName, SerializableModData parameter)
+    public async UniTask<SerializableModData> CallModMethod
+    (
+        string modIdStr,
+        string methodName,
+        SerializableModData parameter
+    )
     {
         var callId = nextCallId();
         var completionSource = new UniTaskCompletionSource<SerializableModData>();
 
-        CallRegistry.TryAdd(callId, completionSource);
-        parameter.Set(CommonModConstants.CallIdKey, callId);
+        try
+        {
+            _ = CallRegistry.TryAdd(callId, completionSource);
+            parameter.Set(CommonModConstants.CallIdKey, callId);
 
-        ModDomainHelper.MethodCall.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
+            ModDomainMethod.Call.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
 
-        var result = await completionSource.Task;
+            return await completionSource.Task;
+        }
+        finally
+        {
+            _ = CallRegistry.TryRemove(callId, out _);
+        }
 
-        CallRegistry.TryRemove(callId, out _);
-
-        return result;
     }
 
-    public static Func<int> Create()
+    private static Func<int> Create()
     {
         int currentId = int.MinValue;
 
@@ -49,13 +58,13 @@ public sealed class UniTaskCall
             var offset = notification.Notification.ValueOffset;
             var modData = new SerializableModData();
 
-            Serializer.Deserialize(notification.DataPool, offset, ref modData);
+            _ = Serializer.Deserialize(notification.DataPool, offset, ref modData);
 
-            modData.Get(CommonModConstants.CallIdKey, out int callId);
+            _ = modData.Get(CommonModConstants.CallIdKey, out int callId);
 
-            CallRegistry.TryGetValue(callId, out var completionSource);
+            _ = CallRegistry.TryGetValue(callId, out var completionSource);
 
-            completionSource.TrySetResult(modData);
+            _ = completionSource.TrySetResult(modData);
         }
     }
 
@@ -63,8 +72,10 @@ public sealed class UniTaskCall
 
     private readonly Func<int> nextCallId = Create();
 
-    private readonly ConcurrentDictionary<
+    private readonly ConcurrentDictionary
+    <
         int,
         UniTaskCompletionSource<SerializableModData>
-    > CallRegistry = new();
+    >
+    CallRegistry = new();
 }

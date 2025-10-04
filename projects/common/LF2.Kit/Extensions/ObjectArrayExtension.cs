@@ -4,7 +4,10 @@ namespace LF2.Kit.Extensions;
 
 public static class ObjectArrayExtension
 {
-    public static ITuple AsTuple(this object[] objects) => new ObjectArrayTuple(objects);
+    public static ITuple AsTuple(this object[] objects)
+    {
+        return new ObjectArrayTuple(objects);
+    }
 }
 
 file sealed class ObjectArrayTuple(object[] source) : ITuple
