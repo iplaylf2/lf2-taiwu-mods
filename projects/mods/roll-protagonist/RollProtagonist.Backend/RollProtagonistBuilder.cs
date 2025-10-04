@@ -83,7 +83,8 @@ internal static class RollProtagonistBuilder
         return false;
     }
 
-    private static CharacterDisplayDataForTooltip BuildCharacterDisplayData(
+    private static CharacterDisplayDataForTooltip BuildCharacterDisplayData
+    (
         Character character,
         ProtagonistCreationInfo creationInfo,
         DataContext context

@@ -8,7 +8,8 @@ public static class DynamicMethodDefinitionHelper
 {
     public static Type[] ExtraParameters(MethodBase origin)
     {
-        return [
+        return
+        [
             ..origin.IsStatic?[origin.GetThisParamType()]:(Type[])[],
             ..origin.GetParameters().Select(x=>x.ParameterType)
         ];
