@@ -11,5 +11,6 @@
         <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
         <PackageReference Include="LF2.Transil" />
         <Publicize Include="Assembly-CSharp" />
+        <Publicize Include="GameData.Shared" />
     </ItemGroup>
 </Project>

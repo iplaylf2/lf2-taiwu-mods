@@ -56,5 +56,6 @@
             <SpecificVersion>false</SpecificVersion>
         </Reference>
         <Publicize Include="Assembly-CSharp" />
+        <Publicize Include="GameData.Shared" />
     </ItemGroup>
 </Project>

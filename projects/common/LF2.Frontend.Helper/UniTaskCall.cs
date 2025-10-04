@@ -21,19 +21,23 @@ public sealed class UniTaskCall
         var callId = nextCallId();
         var completionSource = new UniTaskCompletionSource<SerializableModData>();
 
-        _ = CallRegistry.TryAdd(callId, completionSource);
-        parameter.Set(CommonModConstants.CallIdKey, callId);
+        try
+        {
+            _ = CallRegistry.TryAdd(callId, completionSource);
+            parameter.Set(CommonModConstants.CallIdKey, callId);
 
-        ModDomainHelper.MethodCall.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
+            ModDomainMethod.Call.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
 
-        var result = await completionSource.Task;
+            return await completionSource.Task;
+        }
+        finally
+        {
+            _ = CallRegistry.TryRemove(callId, out _);
+        }
 
-        _ = CallRegistry.TryRemove(callId, out _);
-
-        return result;
     }
 
-    public static Func<int> Create()
+    private static Func<int> Create()
     {
         int currentId = int.MinValue;
 
@@ -68,8 +72,10 @@ public sealed class UniTaskCall
 
     private readonly Func<int> nextCallId = Create();
 
-    private readonly ConcurrentDictionary<
+    private readonly ConcurrentDictionary
+    <
         int,
         UniTaskCompletionSource<SerializableModData>
-    > CallRegistry = new();
+    >
+    CallRegistry = new();
 }
