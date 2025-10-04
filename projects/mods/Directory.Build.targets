@@ -3,14 +3,15 @@
 
     <Target Name="LF2RepackPrepare" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
-            <Lf2KeepFiles Include="@(ReferenceCopyLocalPaths->WithMetadataValue('LF2KeepItAsIs', 'true'))" />
+            <_LF2KeepRef Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true'))" />
+            <LF2KeepFiles Include="@(_LF2KeepRef->'$(OutputPath)%(Filename).*')" />
         </ItemGroup>
     </Target>
 
     <Target Name="LF2RepackRun" AfterTargets="LF2RepackPrepare" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
             <_InternalizeExclude Include="$(TargetName)" />
-            <_InputAssemblies Include="$(OutputPath)**\*.dll" Exclude="@(Lf2KeepFiles)" />
+            <_InputAssemblies Include="$(OutputPath)**\*.dll" Exclude="@(LF2KeepFiles)" />
             <_LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
         </ItemGroup>
 
@@ -31,7 +32,7 @@
         <ItemGroup>
             <_AllFilesInOutput Include="$(OutputPath)**\*" />
             <_FinalMerged Include="$(OutputPath)$(TargetName).*" />
-            <_FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged);@(Lf2KeepFiles)" />
+            <_FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged);@(LF2KeepFiles)" />
         </ItemGroup>
 
         <Delete Files="@(_FilesToDelete)" />

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Remove="LF2.Transil" />
-    <Reference Include="$(LF2Upm)/**/*.dll">
+    <Reference Include="$(LF2Upm)/UniTask/**/*.dll">
       <Private>true</Private>
       <LF2KeepItAsIs>true</LF2KeepItAsIs>
     </Reference>
