@@ -1,11 +1,18 @@
 <Project>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 
-    <Target Name="RunILRepack" AfterTargets="Build" Condition="'$(LF2IsEndpoint)' == 'true'">
+    <Target Name="LF2RepackPrepare" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
-            <InternalizeExclude Include="$(TargetName)" />
-            <InputAssemblies Include="$(OutputPath)**\*.dll" />
-            <LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
+            <_LF2KeepRef Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true'))" />
+            <LF2KeepFiles Include="@(_LF2KeepRef->'$(OutputPath)%(Filename).*')" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="LF2RepackRun" AfterTargets="LF2RepackPrepare" Condition="'$(LF2IsModEntry)' == 'true'">
+        <ItemGroup>
+            <_InternalizeExclude Include="$(TargetName)" />
+            <_InputAssemblies Include="$(OutputPath)**\*.dll" Exclude="@(LF2KeepFiles)" />
+            <_LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
         </ItemGroup>
 
         <ILRepack
@@ -13,21 +20,21 @@
             Internalize="true"
             DebugInfo="true"
             TargetKind="SameAsPrimaryAssembly"
-            InternalizeExclude="@(InternalizeExclude)"
-            InputAssemblies="@(InputAssemblies)"
-            LibraryPath="@(LibraryPath)"
+            InternalizeExclude="@(_InternalizeExclude)"
+            InputAssemblies="@(_InputAssemblies)"
+            LibraryPath="@(_LibraryPath)"
             OutputFile="$(OutputPath)$(TargetName)$(TargetExt)"
             AttributeFile="$(OutputPath)$(TargetName)$(TargetExt)"
         />
     </Target>
 
-    <Target Name="CleanAfterRepack" AfterTargets="RunILRepack" Condition="'$(LF2IsEndpoint)' == 'true'">
+    <Target Name="LF2RepackClean" AfterTargets="LF2RepackRun" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
             <_AllFilesInOutput Include="$(OutputPath)**\*" />
             <_FinalMerged Include="$(OutputPath)$(TargetName).*" />
-            <FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged)" />
+            <_FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged);@(LF2KeepFiles)" />
         </ItemGroup>
 
-        <Delete Files="@(FilesToDelete)" />
+        <Delete Files="@(_FilesToDelete)" />
     </Target>
 </Project>

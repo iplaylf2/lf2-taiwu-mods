@@ -5,7 +5,7 @@ using UnityEngine.LowLevel;
 namespace UniTaskSupport.Frontend;
 
 [PluginConfig("uni-task-support", "lf2", "1.0.0")]
-public class FrontendExport : TaiwuRemakeHarmonyPlugin
+public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
