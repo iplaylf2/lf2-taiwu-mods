@@ -15,7 +15,7 @@ internal static class StringSerializer
         }
 
         using var dataPool = new RawDataPool(initialCapacity);
-        SerializerHolder<T>.Serialize(item, dataPool);
+        _ = SerializerHolder<T>.Serialize(item, dataPool);
 
         var dataSize = dataPool.RawDataSize;
         if (dataSize == 0)
@@ -25,7 +25,7 @@ internal static class StringSerializer
 
         var buffer = new byte[dataSize];
         dataPool.SetStreamReadingOffset(0);
-        dataPool.Read(buffer, 0, dataSize);
+        _ = dataPool.Read(buffer, 0, dataSize);
 
         return Convert.ToBase64String(buffer);
     }
@@ -44,7 +44,7 @@ internal static class StringSerializer
         using var dataPool = new RawDataPool(bytes.Length);
         dataPool.Write(bytes, 0, bytes.Length);
 
-        SerializerHolder<T>.Deserialize(dataPool, 0, ref result);
+        _ = SerializerHolder<T>.Deserialize(dataPool, 0, ref result);
 
         return result;
     }

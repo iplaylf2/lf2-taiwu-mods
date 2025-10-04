@@ -55,7 +55,7 @@ public static class CanMoveResource
             [typeof(short), typeof(short), typeof(sbyte), typeof(short)]
         );
 
-        matcher
+        _ = matcher
         .MatchForward(
             false,
             new CodeMatch(OpCodes.Newobj, targetCtor)
@@ -63,11 +63,11 @@ public static class CanMoveResource
         .Repeat(
             (matcher) =>
             {
-                matcher.Advance(1);
+                _ = matcher.Advance(1);
 
                 ILManipulator.ApplyTransformation(matcher, HandleBlockDataNew);
 
-                matcher.Advance(1);
+                _ = matcher.Advance(1);
 
                 AdaptableLog.Info($"handle {targetCtor} new");
             }

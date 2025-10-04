@@ -58,7 +58,7 @@ public static class AllGoodFeature
 
         var targetField = AccessTools.Field(typeof(FeatureCreationContext), nameof(FeatureCreationContext.AllGoodBasicFeature));
 
-        matcher
+        _ = matcher
         .Start()
         .MatchForward(
             false,
@@ -67,11 +67,11 @@ public static class AllGoodFeature
         .Repeat(
             (matcher) =>
             {
-                matcher.Advance(1);
+                _ = matcher.Advance(1);
 
                 ILManipulator.ApplyTransformation(matcher, HandleAllGoodBasicFeature);
 
-                matcher.Advance(1);
+                _ = matcher.Advance(1);
 
                 AdaptableLog.Info($"handle ${targetField} access");
             }

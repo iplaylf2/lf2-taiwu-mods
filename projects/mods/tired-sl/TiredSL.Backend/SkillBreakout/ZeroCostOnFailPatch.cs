@@ -29,7 +29,7 @@ public static class NoCostOnFailMove
             nameof(SkillBreakPlate.CalcCostStep)
         );
 
-        matcher
+        _ = matcher
         .MatchForward(
             false,
             new CodeMatch(OpCodes.Call, targetMethod)
@@ -39,7 +39,7 @@ public static class NoCostOnFailMove
             {
                 ILManipulator.ApplyTransformation(matcher, HandleCalcCostStep);
 
-                matcher.Advance(1);
+                _ = matcher.Advance(1);
 
                 AdaptableLog.Info($"handle {targetMethod}");
             }
