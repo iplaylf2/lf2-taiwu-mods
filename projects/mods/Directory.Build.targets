@@ -1,10 +1,16 @@
 <Project>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 
-    <Target Name="RunILRepack" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
+    <Target Name="LF2.Repack.Prepare" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
+        <ItemGroup>
+            <_ExemptedFiles Include="@(ReferenceCopyLocalPaths->WithMetadataValue('KeepAsIs', 'true'))" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="LF2.Repack.Run" AfterTargets="LF2.Repack.Prepare" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
             <InternalizeExclude Include="$(TargetName)" />
-            <InputAssemblies Include="$(OutputPath)**\*.dll" />
+            <InputAssemblies Include="$(OutputPath)**\*.dll" Exclude="@(_ExemptedFiles)" />
             <LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
         </ItemGroup>
 
@@ -21,11 +27,11 @@
         />
     </Target>
 
-    <Target Name="CleanAfterRepack" AfterTargets="RunILRepack" Condition="'$(LF2IsModEntry)' == 'true'">
+    <Target Name="LF2.Repack.Clean" AfterTargets="LF2.Repack.Run" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
             <_AllFilesInOutput Include="$(OutputPath)**\*" />
             <_FinalMerged Include="$(OutputPath)$(TargetName).*" />
-            <FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged)" />
+            <FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged);@(_ExemptedFiles)" />
         </ItemGroup>
 
         <Delete Files="@(FilesToDelete)" />
