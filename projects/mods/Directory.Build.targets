@@ -1,7 +1,7 @@
 <Project>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
 
-    <Target Name="RunILRepack" AfterTargets="Build" Condition="'$(LF2SingleLibrary)' == 'true'">
+    <Target Name="RunILRepack" AfterTargets="Build" Condition="'$(LF2IsEndpoint)' == 'true'">
         <ItemGroup>
             <InternalizeExclude Include="$(TargetName)" />
             <InputAssemblies Include="$(OutputPath)**\*.dll" />
@@ -21,7 +21,7 @@
         />
     </Target>
 
-    <Target Name="CleanAfterRepack" AfterTargets="RunILRepack" Condition="'$(LF2SingleLibrary)' == 'true'">
+    <Target Name="CleanAfterRepack" AfterTargets="RunILRepack" Condition="'$(LF2IsEndpoint)' == 'true'">
         <ItemGroup>
             <_AllFilesInOutput Include="$(OutputPath)**\*" />
             <_FinalMerged Include="$(OutputPath)$(TargetName).*" />
