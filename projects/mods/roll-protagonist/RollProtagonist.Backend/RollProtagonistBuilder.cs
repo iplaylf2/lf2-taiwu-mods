@@ -35,12 +35,14 @@ internal static class RollProtagonistBuilder
 
         creationFlow = new CreateProtagonistFlow(roll, commit);
 
-        TaskCall.AddModMethod(
+        TaskCall.AddModMethod
+        (
             ModIdStr!,
             nameof(ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
-                data.Get(
+                _ = data.Get
+                (
                     ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
                     out string infoString
                 );
@@ -52,7 +54,8 @@ internal static class RollProtagonistBuilder
             }
         );
 
-        TaskCall.AddModMethod(
+        TaskCall.AddModMethod
+        (
             ModIdStr!,
             nameof(ModConstants.Method.ExecuteRoll),
             (context, _) =>
@@ -61,7 +64,8 @@ internal static class RollProtagonistBuilder
 
                 var serializableModData = new SerializableModData();
 
-                serializableModData.Set(
+                serializableModData.Set
+                (
                     ModConstants.Method.ExecuteRoll.ReturnValue.character,
                     BuildCharacterDisplayData(character, creationFlow.CreationInfo!, context)
                 );
@@ -124,16 +128,18 @@ internal static class RollProtagonistBuilder
     }
 
     private class RollOperationConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig<CreateProtagonistFlow.RollOperation>(
+        MethodSegmenter.LeftConfig<CreateProtagonistFlow.RollOperation>
+        (
             (MethodInfo)origin
         )
     {
         protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
             var offlineCreateProtagonist =
-                AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+            AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
 
-            ilCursor.GotoNext(
+            _ = ilCursor.GotoNext
+            (
                 MoveType.After,
                 x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
                 x => x.MatchStloc(out var _)
@@ -151,9 +157,10 @@ internal static class RollProtagonistBuilder
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
             var offlineCreateProtagonist =
-                AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+            AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
 
-            ilCursor.GotoNext(
+            _ = ilCursor.GotoNext
+            (
                 MoveType.After,
                 x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
                 x => x.MatchStloc(out var _)

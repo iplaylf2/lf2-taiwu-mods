@@ -44,27 +44,28 @@ internal static class DoStartNewGamePatcher
                 throw new InvalidOperationException("New game initialization failed.");
             }
 
-            if (
-                stackValues.AsTuple() is not (
-                    int listenerId,
-                    ProtagonistCreationInfo creationInfo
-                )
+            if
+            (
+                stackValues.AsTuple() is not (int listenerId, ProtagonistCreationInfo creationInfo)
             )
             {
-                throw new InvalidOperationException(
-                    "Failed to deconstruct stack values from the original method. The target method's structure has likely changed due to a game update."
+                throw new InvalidOperationException
+                (
+                    "Failed to deconstruct stack values from the original method."
+                    + "The target method's structure has likely changed due to a game update."
                 );
             }
 
-            SingletonObject
-                .getInstance<BasicGameData>()
-                .CustomTexts.AddRangeOnlyAdd(
-                    new()
-                    {
-                        [0] = creationInfo.Surname,
-                        [1] = creationInfo.GivenName
-                    }
-                );
+            _ = SingletonObject
+            .getInstance<BasicGameData>()
+            .CustomTexts.AddRangeOnlyAdd
+            (
+                new()
+                {
+                    [0] = creationInfo.Surname,
+                    [1] = creationInfo.GivenName
+                }
+            );
 
             Game.ClockAndLogInfo("Before roll completed", false);
 
@@ -79,7 +80,7 @@ internal static class DoStartNewGamePatcher
                 var character = await ExecuteRoll();
 
                 var viewArg = new ArgumentBox();
-                viewArg.Set("Data", character);
+                _ = viewArg.Set("Data", character);
 
                 CharacterDisplay!.SetOnInitArgs(viewArg);
                 CharacterDisplay!.Show();
@@ -110,7 +111,7 @@ internal static class DoStartNewGamePatcher
 
             CharacterDisplay!.Destroy();
 
-            CharacterDomainHelper.MethodCall.CreateProtagonist(listenerId, creationInfo);
+            CharacterDomainMethod.Call.CreateProtagonist(listenerId, creationInfo);
 
             afterRoll(uiNewGame, variables);
 
@@ -131,22 +132,18 @@ internal static class DoStartNewGamePatcher
     [HarmonyPrepare]
     private static void Prepare()
     {
-        CharacterDisplay = ModResourceFactory.CreateModCopy(() =>
-        {
-            var path = Traverse
-                .Create(UIElement.MouseTipCharacterComplete)
-                .Field("_path")
-                .GetValue();
+        CharacterDisplay = ModResourceFactory.CreateModCopy
+        (
+            () =>
+            {
+                var path = UIElement.MouseTipCharacterComplete._path;
 
-            var copy = new UIElement();
-
-            Traverse
-                .Create(copy)
-                .Field("_path")
-                .SetValue(path);
-
-            return copy;
-        });
+                return new UIElement
+                {
+                    _path = path
+                };
+            }
+        );
     }
 
     [HarmonyCleanup]
@@ -156,19 +153,21 @@ internal static class DoStartNewGamePatcher
     }
 
     private sealed class BeforeRollConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig<
+        MethodSegmenter.LeftConfig
+        <
             Func<UI_NewGame, Tuple<object[], bool, object[]>>
         >((MethodInfo)origin)
     {
         protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
-            var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
+            var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
 
-            ilCursor
-                .GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()))
-                .Remove();
+            _ = ilCursor
+            .GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()))
+            .Remove();
 
-            return [
+            return
+            [
                 typeof(int),
                 typeof(ProtagonistCreationInfo)
             ];
@@ -176,15 +175,13 @@ internal static class DoStartNewGamePatcher
     }
 
     private sealed class AfterRollConfig(MethodBase origin) :
-        MethodSegmenter.RightConfig<
-            Action<UI_NewGame, object[]>
-        >((MethodInfo)origin)
+        MethodSegmenter.RightConfig<Action<UI_NewGame, object[]>>((MethodInfo)origin)
     {
         protected override void InjectContinuationPoint(ILCursor ilCursor)
         {
-            var createProtagonist = CharacterDomainHelper.MethodCall.CreateProtagonist;
+            var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
 
-            ilCursor.GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
+            _ = ilCursor.GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
             ilCursor.Index++;
         }
     }
@@ -192,12 +189,14 @@ internal static class DoStartNewGamePatcher
     private static async UniTask ExecuteInitial(ProtagonistCreationInfo creationInfo)
     {
         var data = new SerializableModData();
-        data.Set(
+        data.Set
+        (
             ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
             StringSerializer.Serialize(creationInfo)
         );
 
-        await UniTaskCall.Default.CallModMethod(
+        _ = await UniTaskCall.Default.CallModMethod
+        (
             ModIdStr!,
             nameof(ModConstants.Method.ExecuteInitial),
             data
@@ -206,13 +205,15 @@ internal static class DoStartNewGamePatcher
 
     private static async UniTask<CharacterDisplayDataForTooltip> ExecuteRoll()
     {
-        var data = await UniTaskCall.Default.CallModMethod(
+        var data = await UniTaskCall.Default.CallModMethod
+        (
             ModIdStr!,
             nameof(ModConstants.Method.ExecuteRoll),
             new SerializableModData()
         );
 
-        data.Get(
+        _ = data.Get
+        (
             ModConstants.Method.ExecuteRoll.ReturnValue.character,
             out CharacterDisplayDataForTooltip character
         );
