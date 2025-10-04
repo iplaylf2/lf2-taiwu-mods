@@ -55,7 +55,7 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2Upm)/**/*.dll">
+        <Reference Include="$(LF2Upm)/UniTask/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
