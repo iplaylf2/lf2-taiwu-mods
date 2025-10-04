@@ -4,11 +4,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Krafs.Publicizer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+
+    <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+
     <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>
-    <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+
     <Publicize Include="GameData" />
     <Publicize Include="GameData.Shared" />
   </ItemGroup>
