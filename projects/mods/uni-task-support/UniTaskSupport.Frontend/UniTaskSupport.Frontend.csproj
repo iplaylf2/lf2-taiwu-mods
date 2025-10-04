@@ -3,7 +3,7 @@
     <PackageReference Remove="LF2.Transil" />
     <Reference Include="$(LF2Upm)/**/*.dll">
       <Private>true</Private>
-      <KeepAsIs>true</KeepAsIs>
+      <LF2KeepItAsIs>true</LF2KeepItAsIs>
     </Reference>
   </ItemGroup>
 </Project>
