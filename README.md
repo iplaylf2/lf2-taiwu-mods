@@ -1,88 +1,103 @@
 # 太吾绘卷 Mods
 
-## 简介
+这是一个用于开发和管理《太吾绘卷》Mods 的 Monorepo 仓库。
 
-## 目录介绍
+本仓库旨在提供一个功能强大且易于维护的 Mod 开发环境，其核心特性包括：
+- 使用 **中央包管理 (CPM)** 统一管理 NuGet 依赖。
+- 通过 **自动化的程序集处理** 解决 Mod 间的依赖冲突，并提供对游戏内部 API 的强类型访问。
+
+
+## 目录结构
 
 ```
-$ tree --gitignore -I ".git" -L 4 -a
 .
-├── Directory.Build.props
-├── Directory.Packages.props        # 使用 CPM[^CPM] 管理包依赖
-├── game-lib                        # 游戏的程序集目录
-│   └── version.workflow.info
-├── .github
-│   └── workflows
-│       └── dotnet.yml
-├── .gitignore
-├── global.json                     # 定义项目 sdk 版本
-├── lf2-taiwu-mods.slnx
-├── LICENSE
-├── nuget.config                    # 将指定 github 账号作为第三方依赖的 nuget 源[^github nuget]
+├── Directory.Build.props           # MSBuild 全局属性，定义了游戏库等关键路径
+├── Directory.Packages.props        # 中央包管理 (CPM)，定义所有 NuGet 依赖版本
+├── game-lib                        # 存放游戏本体的程序集 (需要手动复制)
+├── global.json                     # 定义项目使用的 .NET SDK 版本
+├── nuget.config                    # 配置额外的 NuGet 源 (例如 GitHub Packages)
 ├── projects
-│   ├── common                      # 公共代码依赖
-│   │   ├── Directory.Build.props   # 通用的编译目标
-│   │   ├── LF2.Backend.Helper      # 游戏后端库依赖
-│   │   ├── LF2.Cecil.Helper        # 代码编辑库依赖
-│   │   ├── LF2.Frontend.Helper     # 游戏前端库依赖
-│   │   ├── LF2.Game.Helper         # 必选的文件依赖
-│   │   └── LF2.Kit                 # 通用工具库依赖
-│   ├── Directory.Build.props       # 代码风格检查与指定 C# 配置
-│   ├── Directory.Build.targets
-│   ├── Directory.Packages.props
-│   ├── .editorconfig               # 项目代码风格配置
-│   └── mods
-│       ├── Directory.Build.props   # 根据 *.Backend 或 *.Frontend 区分配置
-│       ├── Directory.Build.targets # 私有化所依赖的第三方程序集
-│       ├── any-mod
-│       │   ├── Config.lua
-│       │   ├── mod.workflow.json
-│       │   ├── AnyMod.Backend      # 后端 mod 项目
-│       │   └── AnyMod.Frontend     # 前端 mod 项目
-│       ├── ...
-├── README.md
-├── upm                             # 发布在 UPM[^UPM] 的第三方依赖
-│   └── version.workflow.info
-└── .vscode                         # vscode 开发风味更佳
+│   ├── common                      # 公共代码库
+│   │   ├── LF2.Backend.Helper      # 游戏后端辅助库
+│   │   ├── LF2.Cecil.Helper        # Mono.Cecil 辅助库，用于 IL 编织
+│   │   ├── LF2.Frontend.Helper     # 游戏前端辅助库
+│   │   ├── LF2.Game.Helper         # 游戏通用辅助库
+│   │   └── LF2.Kit                 # 通用工具库
+│   ├── mods                        # Mod 项目目录
+│   │   ├── any-mod                 # 示例 Mod 目录
+│   │   │   ├── Config.lua          # Mod 的说明和配置文件
+│   │   │   ├── mod.workflow.json   # Mod 的 CI 工作流元数据 (不影响本地使用)
+│   │   │   ├── AnyMod.Backend      # 后端 Mod 项目
+│   │   │   └── AnyMod.Frontend     # 前端 Mod 项目
+│   │   └── ...
+│   └── .editorconfig               # C# 代码风格配置
+├── upm                             # 存放 UPM (Unity Package Manager) 依赖 (需要手动复制)
+└── .vscode                         # 推荐的 VSCode 开发配置
     ├── extensions.json
     └── settings.json
 ```
 
-[^CPM]: CPM
+## 环境准备与初始化
 
-[^github nuget]: github nuget repo
+### 1. 安装 .NET SDK
 
-[^UPM]: UPM
+确保已安装 `global.json` 文件中指定的 .NET SDK 版本。
 
-## 影响 Mod 行为的两个依赖包
+### 2. 准备游戏文件
 
-### ILRepack.Lib.MSBuild.Task
+为了正常编译，你需要将游戏的部分程序集（DLL 文件）复制到 `game-lib` 目录中，并保持其原有的相对路径。
 
-将产物中的程序集，包括第三方包，合并到一个程序集并私有化，避免 Mod 之间的程序集冲突。
+例如，将《太吾绘卷》游戏根目录下的 `The Scroll of Taiwu_Data/Managed` 文件夹中的所有 `.dll` 文件复制到本项目的 `game-lib/The Scroll of Taiwu_Data/Managed` 目录中。
 
-在 csproj 使用 `<LF2KeepItAsIs>true</LF2KeepItAsIs>` 可以避免指定内容被集成。参考例子：projects/mods/uni-task-support/UniTaskSupport.Frontend/UniTaskSupport.Frontend.csproj
+### 3. 配置 GitHub NuGet 源
 
-### Krafs.Publicizer
+本项目依赖了一些托管在 GitHub Packages 上的公开 NuGet 包。即便这些包是公开的，`dotnet` 命令行工具在还原时也需要通过身份验证。
 
-将指定程序集中的内容全部公开化，在对游戏代码进行引用时能够直接访问其的私有内容，这在编译 Mod 时能增强健壮性。
-在游戏官方进行更新后，也能通过引用最新的文件并编译，来进行有效性检查。
+1.  **创建 Personal Access Token (PAT)**
+    - 前往 GitHub 的 [Personal access tokens](https://github.com/settings/tokens) 页面。
+    - 点击 **Generate new token (classic)**，授予 `read:packages` 权限。
+    - 生成并复制这个 Token，请妥善保管。
 
-## 项目初始化
+2.  **还原依赖**
+    在项目根目录执行以下命令，请将 `xxx` 替换为你的 GitHub 用户名和刚刚创建的 PAT。
+
+    ```bash
+    GITHUB_USERNAME="xxx" GITHUB_TOKEN="xxx" dotnet restore
+    ```
+
+### 4. 构建项目
+
+完成以上步骤后，执行以下命令来构建所有 Mod：
 
 ```bash
-GITHUB_USERNAME="xxx" GITHUB_TOKEN="xxx" dotnet restore
+dotnet build
 ```
-*简要的 github nuget 源的说明*
 
-## MSBuild 配置说明
+构建产物将位于各个 Mod 项目的 `bin/` 目录下。
 
-### 变量
+## MSBuild 构建系统说明
 
-LF2GameLib    游戏的程序集目录
-LF2Upm        UMP包目录
-LF2Common     通用代码目录
-LF2Mods       Mods目录
-LF2IsBackend  在Mods目录下，以".Backend"结尾的项目，自动置 true
-LF2IsFrontend 在Mods目录下，以".Frontend"结尾的项目，自动置 true
-LF2IsModEntry 满足 LF2IsBackend 或 LF2IsFrontend 时自动置 true
-LF2KeepItAsIs 当希望引用的程序集不被合并时，主动置 true
+本仓库的构建过程由一系列 MSBuild `*.props` 和 `*.targets` 文件驱动，它们不仅自动化了大部分繁琐的工作，也简化了重复的开发与依赖配置。
+
+### 核心构建工具
+
+- **[ILRepack.Lib.MSBuild.Task](https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task)**: 此工具负责将项目引用的所有第三方 DLL（不包括游戏自身的 DLL）合并到最终生成的 Mod 程序集中。这极大地简化了 Mod 的分发，并从根本上解决了不同 Mod 之间因共享库版本不同而引发的冲突。
+  - 如果你希望某个特定的引用不被合并，可以在 `.csproj` 文件中为对应的 `<Reference>` 或 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。
+  - *示例*: `projects/mods/uni-task-support/UniTaskSupport.Frontend/UniTaskSupport.Frontend.csproj`
+
+- **[Publicizer](https://github.com/krafs/Publicizer)**: 此工具的作用是让 C# 编译器能够像访问 `public` 成员一样访问程序集中的 `private` 和 `internal` 成员。在本项目中，它被用来处理游戏的核心库，使得我们可以在 Mod 代码中直接、安全地调用游戏内部的非公开 API，从而获得完整的智能提示和编译时类型检查，这对于提升开发效率和 Mod 稳定性至关重要。
+
+### 主要 MSBuild 变量
+
+这些变量定义在 `Directory.Build.props` 中，用于控制构建流程以及项目的工作环境。
+
+| 变量名          | 说明                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------ |
+| `LF2GameLib`    | 指向 `game-lib` 目录，用于引用游戏程序集。                                                       |
+| `LF2Upm`        | 指向 `upm` 目录，用于引用 UPM 包。                                                               |
+| `LF2Common`     | 指向 `projects/common` 目录，用于引用公共库项目。                                                |
+| `LF2Mods`       | 指向 `projects/mods` 目录。                                                                      |
+| `LF2IsBackend`  | 当项目位于 `mods` 目录下且项目名以 `.Backend` 结尾时，此属性自动为 `true`。                      |
+| `LF2IsFrontend` | 当项目位于 `mods` 目录下且项目名以 `.Frontend` 结尾时，此属性自动为 `true`。                     |
+| `LF2IsModEntry` | 当 `LF2IsBackend` 或 `LF2IsFrontend` 为 `true` 时，此属性自动为 `true`，用于标识 Mod 的入口项目。 |
+| `LF2KeepItAsIs` | 在项目文件中设置为 `true` 时，可防止 `ILRepack` 合并指定的程序集。                               |
