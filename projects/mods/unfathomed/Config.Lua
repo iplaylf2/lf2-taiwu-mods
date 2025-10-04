@@ -18,6 +18,6 @@ return {
 		[1] = "Unfathomed.Backend.dll",
 	},
 	NeedRestartWhenSettingChanged = false,
-	Cover = "unfathomed.png",
-	WorkshopCover = "unfathomed.png",
+	Cover = "unfathomed.jpg",
+	WorkshopCover = "unfathomed.jpg",
 }
