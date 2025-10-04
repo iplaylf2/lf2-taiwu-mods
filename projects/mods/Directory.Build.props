@@ -4,13 +4,13 @@
     <PropertyGroup>
         <LF2IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</LF2IsBackend>
         <LF2IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</LF2IsFrontend>
-        <LF2IsEndpoint Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">true</LF2IsEndpoint>
+        <LF2IsModEntry Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">true</LF2IsModEntry>
 
         <TargetFramework Condition="'$(LF2IsBackend)' == 'true'">net6.0</TargetFramework>
         <TargetFramework Condition="'$(LF2IsFrontend)' == 'true'">netstandard2.1</TargetFramework>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(LF2IsEndpoint)' == 'true'">
+    <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
         <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
         <PackageReference Include="LF2.Transil" />
         <PackageReference Include="ILRepack.Lib.MSBuild.Task">

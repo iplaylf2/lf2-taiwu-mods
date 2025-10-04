@@ -4,7 +4,7 @@ using TaiwuModdingLib.Core.Plugin;
 namespace TiredSL.Backend;
 
 [PluginConfig("tired-sl", "lf2", "1.0.0")]
-public class BackendExport : TaiwuRemakeHarmonyPlugin, IDisposable
+public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
