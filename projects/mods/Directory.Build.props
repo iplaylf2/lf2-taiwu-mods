@@ -11,12 +11,18 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
-        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
-        <PackageReference Include="LF2.Transil" />
         <PackageReference Include="ILRepack.Lib.MSBuild.Task">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Krafs.Publicizer">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="LF2.Transil" />
+
+        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+
         <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
@@ -33,7 +39,6 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
@@ -50,7 +55,7 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2Upm)/**/*.dll">
+        <Reference Include="$(LF2Upm)/UniTask/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>

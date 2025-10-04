@@ -1,15 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <PackageReference Include="Krafs.Publicizer">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+
+        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+
+        <Reference Include="$(LF2Upm)/UniTask/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
         <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2Upm)/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
-        <PackageReference Include="LF2.Transil" />
+
         <Publicize Include="Assembly-CSharp" />
         <Publicize Include="GameData.Shared" />
     </ItemGroup>
