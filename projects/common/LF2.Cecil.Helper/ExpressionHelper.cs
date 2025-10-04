@@ -12,12 +12,13 @@ public static class ExpressionHelper
     {
         var freshDelegate = lambda.Compile();
         var paramTypes = freshDelegate.Method
-            .GetParameters()
-            .Skip(1)
-            .Select(p => p.ParameterType)
-            .ToArray();
+        .GetParameters()
+        .Skip(1)
+        .Select(p => p.ParameterType)
+        .ToArray();
 
-        var dynamicMethod = new DynamicMethodDefinition(
+        var dynamicMethod = new DynamicMethodDefinition
+        (
             freshDelegate.Method.Name,
             freshDelegate.Method.ReturnType,
             paramTypes
@@ -27,14 +28,17 @@ public static class ExpressionHelper
         var il = dynamicMethod.GetILProcessor();
         var delegateType = freshDelegate.GetType();
 
-        if (freshDelegate.Target != null
-            && targetType.GetFields().Any(f => !f.IsStatic))
+        if
+        (
+            freshDelegate.Target != null
+            && targetType.GetFields().Any(f => !f.IsStatic)
+        )
         {
             var currentDelegateCounter = DelegateCounter++;
 
             DelegateCache[currentDelegateCounter] = freshDelegate;
 
-            var cacheField = AccessTools.Field(typeof(ExpressionHelper), nameof(DelegateCache));
+            var cacheField = AccessTools.Field(typeof(ExpressionHelper), "DelegateCache");
             var getMethod = AccessTools.Method(typeof(Dictionary<int, Delegate>), "get_Item");
 
             il.Emit(OpCodes.Ldsfld, cacheField);
@@ -49,7 +53,8 @@ public static class ExpressionHelper
             }
             else
             {
-                il.Emit(
+                il.Emit
+                (
                     OpCodes.Newobj,
                     AccessTools.FirstConstructor(targetType, x => x.GetParameters().Length == 0 && !x.IsStatic)
                 );

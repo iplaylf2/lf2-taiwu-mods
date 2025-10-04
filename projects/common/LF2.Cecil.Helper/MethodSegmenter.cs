@@ -15,7 +15,8 @@ public static class MethodSegmenter
         protected internal abstract IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor);
     }
 
-    public abstract class RightConfig<T>(
+    public abstract class RightConfig<T>
+    (
         MethodInfo prototype
     ) where T : Delegate
     {
@@ -27,11 +28,14 @@ public static class MethodSegmenter
     {
         InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
 
-        ilContext.Invoke(ilContext =>
-        {
-            GuardOriginalReturns(ilContext, config.Prototype);
-            InjectSplitPoint(ilContext, config.InjectSplitPoint);
-        });
+        ilContext.Invoke
+        (
+            ilContext =>
+            {
+                GuardOriginalReturns(ilContext, config.Prototype);
+                InjectSplitPoint(ilContext, config.InjectSplitPoint);
+            }
+        );
 
         return dynamicMethod.Generate().CreateDelegate<T>();
     }
@@ -40,27 +44,32 @@ public static class MethodSegmenter
     {
         InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
 
-        ilContext.Invoke(ilContext =>
-        {
-            var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
-            RestoreExecutionContext(ilContext, label);
-        });
+        ilContext.Invoke
+        (
+            ilContext =>
+            {
+                var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
+                RestoreExecutionContext(ilContext, label);
+            }
+        );
 
         return dynamicMethod.Generate().CreateDelegate<T>();
     }
 
-    private static void InitILContext<T>(
+    private static void InitILContext<T>
+    (
         MethodBase prototype,
         out DynamicMethodDefinition dynamicMethod,
         out ILContext ilContext
     ) where T : Delegate
     {
         var delegateType = typeof(T).GetMethod("Invoke");
-        dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom(
-             prototype,
-             delegateType.ReturnType,
-             [.. delegateType.GetParameters().Select(x => x.ParameterType)]
-         );
+        dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom
+        (
+            prototype,
+            delegateType.ReturnType,
+            [.. delegateType.GetParameters().Select(x => x.ParameterType)]
+        );
         ilContext = new ILContext(dynamicMethod.Definition);
     }
 
@@ -90,13 +99,13 @@ public static class MethodSegmenter
         var stackValueTypes = injectSplitPoint(ilCursor);
         var statePacking = CreateStatePacking(stackValueTypes);
 
-        ilCursor.Emit(OpCodes.Ldc_I4_1);
+        _ = ilCursor.Emit(OpCodes.Ldc_I4_1);
 
         CaptureLocals(ilCursor);
 
-        ilCursor
-            .Emit(OpCodes.Call, statePacking)
-            .Emit(OpCodes.Ret);
+        _ = ilCursor
+        .Emit(OpCodes.Call, statePacking)
+        .Emit(OpCodes.Ret);
     }
 
     public static ILLabel InjectContinuationPoint(ILContext ilContext, Action<ILCursor> injectContinuationPoint)
@@ -104,7 +113,7 @@ public static class MethodSegmenter
         var continuationLabel = ilContext.DefineLabel();
         var ilCursor = new ILCursor(ilContext);
 
-        ilCursor.Emit(OpCodes.Br, continuationLabel);
+        _ = ilCursor.Emit(OpCodes.Br, continuationLabel);
 
         injectContinuationPoint(ilCursor);
 
@@ -117,27 +126,22 @@ public static class MethodSegmenter
     {
         var ilCursor = new ILCursor(ilContext);
 
-        ilCursor.GotoLabel(continuationLabel);
+        _ = ilCursor.GotoLabel(continuationLabel);
 
         var stateIndex = ilContext.Method.Parameters.Count - 1;
 
         foreach (var (variable, i) in ilContext.Body.Variables.Select((x, i) => (x, i)))
         {
-            ilCursor
-                .Emit(OpCodes.Ldarg, stateIndex)
-                .Emit(OpCodes.Ldc_I4, i)
-                .Emit(OpCodes.Ldelem_Ref);
+            _ = ilCursor
+            .Emit(OpCodes.Ldarg, stateIndex)
+            .Emit(OpCodes.Ldc_I4, i)
+            .Emit(OpCodes.Ldelem_Ref);
 
-            if (variable.VariableType.IsValueType)
-            {
-                ilCursor.Emit(OpCodes.Unbox_Any, variable.VariableType);
-            }
-            else
-            {
-                ilCursor.Emit(OpCodes.Castclass, variable.VariableType);
-            }
+            _ = variable.VariableType.IsValueType
+            ? ilCursor.Emit(OpCodes.Unbox_Any, variable.VariableType)
+            : ilCursor.Emit(OpCodes.Castclass, variable.VariableType);
 
-            ilCursor.Emit(OpCodes.Stloc, variable);
+            _ = ilCursor.Emit(OpCodes.Stloc, variable);
         }
     }
 
@@ -151,15 +155,20 @@ public static class MethodSegmenter
         var objectType = typeof(object);
 
         var lambda = Expression
-            .Lambda(
-                Expression.New(
-                    AccessTools.FirstConstructor(
+            .Lambda
+            (
+                Expression.New
+                (
+                    AccessTools.FirstConstructor
+                    (
                         typeof(Tuple<object[], bool, object[]>),
                         x => x.GetParameters().Length == 3
                     ),
-                    Expression.NewArrayInit(
+                    Expression.NewArrayInit
+                    (
                         typeof(object),
-                        stackValueParams.Select(
+                        stackValueParams.Select
+                        (
                             x => x.Type.IsValueType ? Expression.Convert(x, objectType) : (Expression)x
                         )
                     ),
@@ -176,8 +185,9 @@ public static class MethodSegmenter
     {
         foreach (var ilCursor in ilCursors)
         {
-            ilCursor.Emit(OpCodes.Ldnull);
-            ilCursor.EmitDelegate(WrapReturnValue);
+            _ = ilCursor
+            .Emit(OpCodes.Ldnull)
+            .EmitDelegate(WrapReturnValue);
         }
     }
 
@@ -185,8 +195,9 @@ public static class MethodSegmenter
     {
         foreach (var ilCursor in ilCursors)
         {
-            ilCursor.Emit(OpCodes.Box, type);
-            ilCursor.EmitDelegate(WrapReturnValue);
+            _ = ilCursor
+            .Emit(OpCodes.Box, type)
+            .EmitDelegate(WrapReturnValue);
         }
     }
 
@@ -194,7 +205,7 @@ public static class MethodSegmenter
     {
         foreach (var ilCursor in ilCursors)
         {
-            ilCursor.EmitDelegate(WrapReturnValue);
+            _ = ilCursor.EmitDelegate(WrapReturnValue);
         }
     }
 
@@ -207,23 +218,23 @@ public static class MethodSegmenter
     {
         var variables = ilCursor.Body.Variables;
 
-        ilCursor
-            .Emit(OpCodes.Ldc_I4, variables.Count)
-            .Emit(OpCodes.Newarr, typeof(object));
+        _ = ilCursor
+        .Emit(OpCodes.Ldc_I4, variables.Count)
+        .Emit(OpCodes.Newarr, typeof(object));
 
         foreach (var (variable, i) in variables.Select((x, i) => (x, i)))
         {
-            ilCursor
-                .Emit(OpCodes.Dup)
-                .Emit(OpCodes.Ldc_I4, i)
-                .Emit(OpCodes.Ldloc, variable);
+            _ = ilCursor
+            .Emit(OpCodes.Dup)
+            .Emit(OpCodes.Ldc_I4, i)
+            .Emit(OpCodes.Ldloc, variable);
 
             if (variable.VariableType.IsValueType)
             {
-                ilCursor.Emit(OpCodes.Box, variable.VariableType);
+                _ = ilCursor.Emit(OpCodes.Box, variable.VariableType);
             }
 
-            ilCursor.Emit(OpCodes.Stelem_Ref);
+            _ = ilCursor.Emit(OpCodes.Stelem_Ref);
         }
     }
 }

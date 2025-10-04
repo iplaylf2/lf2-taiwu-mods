@@ -7,20 +7,22 @@ namespace LF2.Backend.Helper;
 
 public static class TaskCall
 {
-    public static void AddModMethod(
+    public static void AddModMethod
+    (
         string modIdStr,
         string methodName,
         Func<DataContext, SerializableModData, SerializableModData> method
     )
     {
-        DomainManager.Mod.AddModMethod(
+        DomainManager.Mod.AddModMethod
+        (
             modIdStr,
             methodName,
             (context, parameter) =>
             {
                 var result = method(context, parameter);
 
-                parameter.Get(CommonModConstants.CallIdKey, out int callId);
+                _ = parameter.Get(CommonModConstants.CallIdKey, out int callId);
                 result.Set(CommonModConstants.CallIdKey, callId);
 
                 return result;
