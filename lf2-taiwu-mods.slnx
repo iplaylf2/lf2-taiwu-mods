@@ -16,6 +16,7 @@
     <File Path="projects/common/LF2.Game.Helper/CommonModConstants.cs" />
     <File Path="projects/common/LF2.Game.Helper/DebugTraceListener.cs" />
     <File Path="projects/common/LF2.Game.Helper/StringSerializer.cs" />
+    <File Path="projects/common/LF2.Game.Helper/StructuredLogger.cs" />
   </Folder>
   <Folder Name="/projects/mods/">
     <File Path="projects/mods/Directory.Build.props" />

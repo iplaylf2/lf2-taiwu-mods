@@ -39,7 +39,7 @@ public static class ModResourceFactory
                 + " set empty prefab path!"
             );
         }
-        else if (UiBase != null)
+        else if (UiBase)
         {
             if (autoShow)
             {
@@ -89,7 +89,10 @@ public static class ModResourceFactory
                     UIManager.Instance.PlaceUI(UiBase);
                     UiBase.Element = instance;
                     var component2 = UiBase.GetComponent<ConchShipGraphicRaycaster>();
-                    _ = (component2?.TargetCamera = UIManager.Instance.UiCamera);
+                    if (component2)
+                    {
+                        component2.TargetCamera = UIManager.Instance.UiCamera;
+                    }
 
                     UiBase.RegisterRelativeAtlases();
                     var componentsInChildren = UiBase.GetComponentsInChildren<CButton>(includeInactive: true);
