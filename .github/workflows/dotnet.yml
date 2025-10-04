@@ -13,7 +13,7 @@ env:
 
 jobs:
   build-mod:
-    if: startsWith(github.ref, "refs/tags/mods/")
+    if: startsWith(github.ref, 'refs/tags/mods/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -157,7 +157,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   pr-build-check:
-    if: github.event_name == "pull_request" && github.event.pull_request.draft == false
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       contents: read
