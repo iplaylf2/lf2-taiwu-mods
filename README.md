@@ -6,7 +6,7 @@
 
 这个项目不仅是一个 Mod 合集，更是一套经过精心设计的 **Mod 开发解决方案**，其核心设计思想在于：
 
-- **🎯 标准化与自动化**：通过共享的 MSBuild 配置 (`.props`/`.targets`)，将 Mod 开发中的通用逻辑（如依赖打包、游戏 API 访问、项目引用）标准化，并实现构建过程的自动化。开发者因此可以专注于功能实现，而非繁琐的环境配置。
+- **🎯 标准化与自动化**：通过共享的 MSBuild 配置 (`.props`/`.targets`)，将 Mod 开发中的通用逻辑（如依赖打包、游戏 API 访问、项目引用）标准化，并实现构建过程的自动化。开发者因此可以专注于功能实现，而无需在繁琐的环境配置上耗费心力。
 
 - **📦 依赖隔离与稳定性**：每个 Mod 都是独立的项目，但其依赖的 `common` 库和部分 NuGet 包（如 `LF2.Transil`）会通过 `ILRepack` 在构建时自动内嵌到各自的程序集中。这从根本上解决了不同 Mod 之间因共享库版本冲突而导致的“DLL地狱”问题，确保了玩家环境的纯净与稳定。
 
@@ -33,7 +33,7 @@
 │   │   ├── LF2.Game.Helper/        # 游戏通用辅助代码 (以源码方式共享)
 │   │   └── LF2.Kit/                # 通用工具包
 │   ├── mods/                       # 所有独立 Mod 的项目目录
-│   │   ├── roll-protagonist/       # 真实 Mod 示例：开局Roll属性
+│   │   ├── roll-protagonist/       # 真实 Mod 示例：开局“Roll”点
 │   │   │   ├── Config.Lua          # 游戏加载Mod所需的元数据配置文件
 │   │   │   ├── mod.workflow.json   # CI 工作流配置，指定需要构建的项目
 │   │   │   ├── RollProtagonist.Backend/  # 后端 Mod 项目 (C#)
@@ -47,23 +47,23 @@
 
 ## 🚀 环境准备
 
-请跟随以下步骤配置您的开发环境。
+请跟随以下步骤配置你的开发环境。
 
 ### 1️⃣ 安装 .NET SDK
 
-确保已安装 `global.json` 文件中指定的 .NET SDK 版本 (`9.0.200` 或更高)。你可以使用 `dotnet --version` 命令检查当前版本。
+确保已安装 `global.json` 文件中指定的 .NET SDK 版本（当前为 `9.0.200` 或更高）。你可以使用 `dotnet --version` 命令检查当前版本。
 
 ### 2️⃣ 准备游戏文件
 
 为了让 MSBuild 能够找到游戏的程序集 (DLLs)，你需要将编写 Mod 所需的游戏文件复制到指定目录。
 
-- **前端依赖**: 从《太吾绘卷》游戏根目录下 `The Scroll of Taiwu_Data/Managed/` 文件夹中，复制你开发需要引用的 `.dll` 文件到本项目的 `game-lib/The Scroll of Taiwu_Data/Managed/` 目录中。
-- **后端依赖**: 从《太吾绘卷》游戏根目录下 `Backend/` 文件夹中，复制你开发需要引用的 `.dll` 文件到本项目的 `game-lib/Backend/` 目录中。
+- **前端依赖**: 从《太吾绘卷》游戏根目录下的 `The Scroll of Taiwu_Data/Managed/` 文件夹中，**按需复制**你开发时需要引用的 `.dll` 文件到本项目的 `game-lib/The Scroll of Taiwu_Data/Managed/` 目录。
+- **后端依赖**: 从《太吾绘卷》游戏根目录下的 `Backend/` 文件夹中，**按需复制**你开发时需要引用的 `.dll` 文件到本项目的 `game-lib/Backend/` 目录。
 - **UniTask 依赖**: 如果你的 Mod 需要 `UniTask`，请从 Unity 编辑器中获取对应的包，并将其复制到本项目的 `upm/UniTask/` 目录中。
 
 ### 3️⃣ 配置 GitHub NuGet 源
 
-本项目依赖了托管在 GitHub Packages 上的 NuGet 包，因此在还原时需要通过身份验证。
+本项目依赖了托管在 GitHub Packages 上的 NuGet 包，因此在“还原”依赖时需要通过身份验证。
 
 1.  **准备 Personal Access Token (PAT)**
     你需要一个拥有 `read:packages` 权限的 [Personal Access Token (PAT)](https://github.com/settings/tokens)。
@@ -100,7 +100,7 @@ dotnet build
 
 ### 2. 编辑项目文件
 
-一个最基础的项目文件只需要包含 Sdk 声明：
+一个最基础的项目文件仅需包含 Sdk 声明：
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -109,7 +109,7 @@ dotnet build
 
 **但这仅适用于不依赖任何 `common` 共享库的 Mod。**
 
-在实际开发中，你很可能需要引用 `projects/common/` 目录下的各种辅助库。你可以通过添加 `<ProjectReference>` 来实现这一点。一个更真实的项目文件如下所示：
+在实际开发中，你很可能需要引用 `projects/common/` 目录下的各种辅助库。你可以通过添加 `<ProjectReference>` 来实现这一点。一个更典型的项目文件如下所示：
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
@@ -141,9 +141,9 @@ dotnet build
 
 ### 3. 后续步骤
 
-1.  **添加到解决方案**: 在你的 IDE 中（或通过 `dotnet sln add` 命令）将这个新项目添加到解决方案中，方便管理和编码。
+1.  **添加到解决方案**: 在你的 IDE 中（或通过 `dotnet sln add` 命令）将这个新项目添加到解决方案，以便管理和编码。
 2.  **添加代码**: 在项目中创建你的 C# 代码文件（例如 `ModEntry.cs`）。
-3.  **开始开发**: 遵循游戏官方的 Mod 开发文档，开始编写你的 Mod 逻辑。
+3.  **开始开发**: 遵循游戏官方的 Mod 开发文档，即可开始编写你的 Mod 逻辑。
 
 
 ## ⚙️ MSBuild 构建系统详解
