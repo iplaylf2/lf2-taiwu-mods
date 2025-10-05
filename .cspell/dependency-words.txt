@@ -16,10 +16,14 @@ netstandard
 newarr
 newobj
 newtonsoft
+nologo
+optout
+pipefail
 publicizer
 raycaster
 redzen
 roslynator
+softprops
 starg
 stelem
 stfld
