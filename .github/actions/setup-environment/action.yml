@@ -31,7 +31,7 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.token }}
-      run: dotnet build --no-restore -t:RestoreBinaryDependencies
+      run: dotnet build --no-restore -t:LF2RestoreBinaryDependencies
 
     - name: Setup NuGet authentication
       shell: bash
