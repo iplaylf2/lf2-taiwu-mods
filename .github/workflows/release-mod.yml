@@ -1,19 +1,16 @@
-name: Build and Release
+name: Release Mod
 
 on:
   push:
     tags:
       - "mods/*/v*" # 匹配格式: mods/<mod-name>/v<version>
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   DOTNET_NOLOGO: true
 
 jobs:
-  build-mod:
-    if: startsWith(github.ref, 'refs/tags/mods/')
+  build-and-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -35,7 +32,7 @@ jobs:
           FULL_TAG="${GITHUB_REF#refs/tags/}"
 
           if [[ ! "$FULL_TAG" =~ ^mods/[^/]+/v[^/]+$ ]]; then
-            echo "::error::Invalid tag format. Expected 'mods/<mod-name>/v<version>'";
+            echo "::error::Invalid tag format. Expected 'mods/<mod-name>/v<version>'"
             exit 1
           fi
 
@@ -62,14 +59,14 @@ jobs:
           CONFIG_FILE="${{ env.MOD_DIR }}/mod.workflow.json"
 
           if [ ! -f "$CONFIG_FILE" ]; then
-            echo "::error::Build configuration file not found at $CONFIG_FILE";
+            echo "::error::Build configuration file not found at $CONFIG_FILE"
             exit 1
           fi
 
           PROJECTS=$(jq -r '.buildProjects | join(",")' "$CONFIG_FILE")
 
           if [ -z "$PROJECTS" ]; then
-            echo "::error::No build projects defined in configuration";
+            echo "::error::No build projects defined in configuration"
             exit 1
           fi
 
@@ -87,14 +84,14 @@ jobs:
 
             dotnet publish "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }} \
               --verbosity minimal --nologo || {
-                echo "::error::Publish failed for $project";
+                echo "::error::Publish failed for $project"
                 exit 1;
               }
 
             PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -type d -path "*/publish" | head -1)
             if [ -z "$PUBLISH_DIR" ]; then
-              echo "::error::Publish directory not found for $project";
-              exit 1;
+              echo "::error::Publish directory not found for $project"
+              exit 1
             fi
 
             BUILD_SUMMARY+="• $project → $(basename $(dirname "$PUBLISH_DIR"))\n"
@@ -118,8 +115,8 @@ jobs:
           for project in "${PROJECT_ARRAY[@]}"; do
             PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -type d -path "*/publish" | head -1)
             if [ -z "$PUBLISH_DIR" ]; then
-              echo "::error::Publish directory not found for $project in artifact preparation";
-              exit 1;
+              echo "::error::Publish directory not found for $project in artifact preparation"
+              exit 1
             fi
 
             PROJECT_ARTIFACT_DIR="combined-artifacts/$project"
@@ -155,28 +152,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  pr-build-check:
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Environment
-        uses: ./.github/actions/setup-environment
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build solution
-        run: dotnet build -c Release
-
-      - name: Upload mod build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: mod-build-artifacts-pr-${{ github.event.pull_request.number }}
-          path: "projects/mods/**/bin/Release"
-          retention-days: 7
