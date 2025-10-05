@@ -1,5 +1,5 @@
 name: 'Setup Environment'
-description: 'Sets up .NET and downloads game-lib/upm dependencies'
+description: 'Sets up .NET and downloads game-lib/upm dependencies, with caching.'
 inputs:
   token:
     description: 'GitHub token'
@@ -7,6 +7,20 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Cache game-lib
+      id: cache-gamelib
+      uses: actions/cache@v4
+      with:
+        path: game-lib
+        key: ${{ runner.os }}-gamelib-${{ hashFiles('game-lib/version.workflow.info') }}
+
+    - name: Cache upm
+      id: cache-upm
+      uses: actions/cache@v4
+      with:
+        path: upm
+        key: ${{ runner.os }}-upm-${{ hashFiles('upm/version.workflow.info') }}
+
     - name: Resolve game-lib version
       id: resolve-lib
       shell: bash
@@ -22,6 +36,7 @@ runs:
         echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_ENV
 
     - name: Download game-lib dependencies
+      if: steps.cache-gamelib.outputs.cache-hit != 'true'
       shell: bash
       run: |
         set -euo pipefail
@@ -48,6 +63,7 @@ runs:
         echo "UPM_VERSION=$UPM_VERSION" >> $GITHUB_ENV
 
     - name: Download upm dependencies
+      if: steps.cache-upm.outputs.cache-hit != 'true'
       shell: bash
       run: |
         set -euo pipefail
