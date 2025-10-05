@@ -1,11 +1,11 @@
-name: 'Setup Dependency'
-description: 'Sets up a dependency (e.g., game-lib, upm) with caching.'
+name: "Setup Dependency"
+description: "Sets up a dependency (e.g., game-lib, upm) with caching."
 inputs:
   name:
-    description: 'The name of the dependency (e.g., game-lib, upm). Used to derive paths and names.'
+    description: "The name of the dependency (e.g., game-lib, upm). Used to derive paths and names."
     required: true
   token:
-    description: 'GitHub token'
+    description: "GitHub token"
     required: true
 runs:
   using: "composite"

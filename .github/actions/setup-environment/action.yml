@@ -1,18 +1,20 @@
-name: 'Setup Environment'
-description: 'Sets up .NET and downloads game-lib/upm dependencies, with caching.'
+name: "Setup Environment"
+description: "Sets up .NET and downloads game-lib/upm dependencies, with caching."
 inputs:
   token:
-    description: 'GitHub token'
+    description: "GitHub token"
     required: true
 runs:
   using: "composite"
   steps:
     - name: Setup game-lib
       uses: ./.github/actions/fetch-binary-dependency
+      with:
+        name: game-lib
         token: ${{ inputs.token }}
 
     - name: Setup upm
-      uses: ./.github/actions/setup-dependency
+      uses: ./.github/actions/fetch-binary-dependency
       with:
         name: upm
         token: ${{ inputs.token }}

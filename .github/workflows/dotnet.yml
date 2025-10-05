@@ -172,4 +172,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build solution
-        run: dotnet build lf2-taiwu-mods.slnx -c Release
+        run: dotnet build -c Release
