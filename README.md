@@ -27,6 +27,11 @@
 ├── nuget.config                    # 配置额外的 NuGet 源 (本项目中为 GitHub Packages)
 ├── projects
 │   ├── common/                     # 公共代码库，为所有 Mod 提供可复用的功能
+│   │   ├── LF2.Backend.Helper/     # 后端 Mod 辅助功能
+│   │   ├── LF2.Cecil.Helper/       # Mono.Cecil 辅助功能
+│   │   ├── LF2.Frontend.Helper/    # 前端 Mod 辅助功能
+│   │   ├── LF2.Game.Helper/        # 游戏通用辅助代码 (以源码方式共享)
+│   │   └── LF2.Kit/                # 通用工具包
 │   ├── mods/                       # 所有独立 Mod 的项目目录
 │   │   ├── roll-protagonist/       # 真实 Mod 示例：开局Roll属性
 │   │   │   ├── Config.Lua          # 游戏加载Mod所需的元数据配置文件
@@ -104,14 +109,28 @@ dotnet build
 
 ### 2. 编辑项目文件
 
-将以下内容粘贴到你刚刚创建的 `.csproj` 文件中：
+一个最基础的项目文件只需要包含 Sdk 声明：
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 </Project>
 ```
 
-**这就完成了所有配置。**
+**但这仅适用于不依赖任何 `common` 共享库的 Mod。**
+
+在实际开发中，你很可能需要引用 `projects/common/` 目录下的各种辅助库。你可以通过添加 `<ProjectReference>` 来实现这一点。一个更真实的项目文件如下所示：
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <!-- 引用此 Mod 自身的前后端共享项目 -->
+        <ProjectReference Include="$(LF2Mods)/MyNewMod/MyNewMod.Common/MyNewMod.Common.csproj" />
+        <!-- 引用 monorepo 中的公共辅助库 -->
+        <ProjectReference Include="$(LF2Common)/LF2.Kit/LF2.Kit.csproj" />
+        <ProjectReference Include="$(LF2Common)/LF2.Backend.Helper/LF2.Backend.Helper.csproj" />
+    </ItemGroup>
+</Project>
+```
 
 因为项目的文件路径和命名（例如以 `.Backend` 结尾）符合 `projects/mods/Directory.Build.props` 中定义的规则，构建系统会自动为你完成以下所有配置：
 
@@ -119,6 +138,7 @@ dotnet build
   - 设置正确的 .NET TargetFramework (`net6.0` 或 `netstandard2.1`)。
   - 配置 `ILRepack` 以便在构建时自动合并第三方依赖项。
 - **游戏与公共库引用**:
+  - 自动引用 `LF2.Transil` 等核心 NuGet 包。
   - 添加对相应游戏核心程序集（前端或后端）的引用。
   - 启用 `Publicizer` 来安全地访问游戏的内部 API。
   - 自动包含 `LF2.Game.Helper` 的源码。
@@ -128,13 +148,11 @@ dotnet build
   - 统一应用仓库的代码风格、格式化规则，并在构建时进行检查。
   - 集成代码分析器，在开发过程中提供实时的辅助与重构建议。
 
-
 ### 3. 后续步骤
 
 1.  **添加到解决方案**: 在你的 IDE 中（或通过 `dotnet sln add` 命令）将这个新项目添加到解决方案中，方便管理和编码。
 2.  **添加代码**: 在项目中创建你的 C# 代码文件（例如 `ModEntry.cs`）。
-3.  **添加项目引用** (可选): 如果你需要引用 `common` 目录下的公共库，可以像现有 Mod 一样，在 `.csproj` 文件中添加 `<ProjectReference>`。
-4.  **开始开发**: 遵循游戏官方的 Mod 开发文档，开始编写你的 Mod 逻辑。
+3.  **开始开发**: 遵循游戏官方的 Mod 开发文档，开始编写你的 Mod 逻辑。
 
 
 ## MSBuild 构建系统详解
@@ -144,7 +162,7 @@ dotnet build
 ### 核心构建工具
 
 - **[ILRepack.Lib.MSBuild.Task](https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task)**: 负责将项目引用的所有第三方 DLL（游戏自身的 DLL 除外）合并到最终生成的 Mod 程序集中。
-  - 如果你希望某个特定的引用 **不被合并**，可以在 `.csproj` 文件中为对应的 `<Reference>` 或 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。此逻辑在 `projects/mods/Directory.Build.targets` 中实现。
+  - 如果你希望某个特定的引用 **不被合并**，可以在 `.csproj` 文件中为对应的 `<Reference>` 或 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。此逻辑在 `projects/mods/ILRepack.targets` 中实现。
 
 - **[Publicizer](https://github.com/krafs/Publicizer)**: 此工具能够让 C# 编译器像访问 `public` 成员一样访问程序集中的 `private` 和 `internal` 成员。在 `projects/mods/Directory.Build.props` 中，它被配置为自动 Publicize 前后端的多个核心游戏程序集。
 
@@ -156,5 +174,5 @@ dotnet build
 | :--- | :--- | :--- |
 | `LF2IsBackend` | 项目名以 `.Backend` 结尾 | 1. 标识为后端项目。<br>2. 设置 `TargetFramework` 为 `net6.0`。<br>3. 自动引用 `game-lib/Backend/` 下的 DLL。 |
 | `LF2IsFrontend` | 项目名以 `.Frontend` 结尾 | 1. 标识为前端项目。<br>2. 设置 `TargetFramework` 为 `netstandard2.1`。<br>3. 自动引用 `game-lib/The Scroll of Taiwu_Data/Managed/` 和 `upm/UniTask/` 下的 DLL。 |
-| `LF2IsModEntry` | `LF2IsBackend` 或 `LF2IsFrontend` 为 `true` | 1. 标识为 Mod 入口项目。<br>2. 自动为项目添加 `ILRepack` 和 `Publicizer` 的包引用。<br>3. 自动包含 `LF2.Game.Helper` 的源码。 |
+| `LF2IsModEntry` | `LF2IsBackend` 或 `LF2IsFrontend` 为 `true` | 1. 标识为 Mod 入口项目。<br>2. 自动为项目添加 `ILRepack`、`Publicizer`、`LF2.Transil` 的包引用。<br>3. 自动包含 `LF2.Game.Helper` 的源码。 |
 | `LF2KeepItAsIs` | 在 `.csproj` 中为程序集引用添加的元数据 | 在 `ILRepack` 阶段，防止被标记的程序集被合并进主 DLL，使其保持为独立文件。 |
