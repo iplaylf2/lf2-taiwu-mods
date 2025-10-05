@@ -11,7 +11,7 @@
 
     <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
 
-    <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
+    <Reference Include="$(LF2GameLibDir)/Backend/**/*.dll">
       <Private>false</Private>
       <SpecificVersion>false</SpecificVersion>
     </Reference>

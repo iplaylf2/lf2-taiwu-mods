@@ -26,25 +26,30 @@
         <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
     </ItemGroup>
 
+    <PropertyGroup>
+        <LF2GameBackendDir>$(LF2GameLibDir)/Backend</LF2GameBackendDir>
+        <LF2GameManagedDir>$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed</LF2GameManagedDir>
+    </PropertyGroup>
+
     <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
-        <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
+        <Reference Include="$(LF2GameBackendDir)/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
 
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
+        <Reference Include="$(LF2GameManagedDir)/0Harmony.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll">
+        <Reference Include="$(LF2GameManagedDir)/TaiwuModdingLib.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/MonoMod.Utils.dll">
+        <Reference Include="$(LF2GameManagedDir)/MonoMod.Utils.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll">
+        <Reference Include="$(LF2GameManagedDir)/Mono.Cecil.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
@@ -54,11 +59,11 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
+        <Reference Include="$(LF2GameManagedDir)/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2Upm)/UniTask/*.dll">
+        <Reference Include="$(LF2UpmDir)/UniTask/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
