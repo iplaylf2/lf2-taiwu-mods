@@ -10,18 +10,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set dependency path env
+      shell: bash
+      run: echo "DEP_PATH=${{ inputs.name }}" >> $GITHUB_ENV
+
     - name: Cache ${{ inputs.name }}
       id: cache-dep
       uses: actions/cache@v4
       with:
-        path: ${{ inputs.name }}
+        path: ${{ env.DEP_PATH }}
         key: ${{ runner.os }}-${{ inputs.name }}-${{ hashFiles(format('{0}/version.workflow.info', inputs.name)) }}
 
     - name: Resolve ${{ inputs.name }} version
       id: resolve-version
       shell: bash
       env:
-        VERSION_FILE: ${{ inputs.name }}/version.workflow.info
+        VERSION_FILE: ${{ env.DEP_PATH }}/version.workflow.info
       run: |
         set -euo pipefail
         if [ ! -f "$VERSION_FILE" ]; then
@@ -38,7 +42,7 @@ runs:
       env:
         DEP_VERSION: ${{ steps.resolve-version.outputs.DEP_VERSION }}
         ARTIFACT_NAME: ${{ inputs.name }}.zip
-        DESTINATION_DIR: ${{ inputs.name }}
+        DESTINATION_DIR: ${{ env.DEP_PATH }}
       run: |
         set -euo pipefail
         DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.DEP_VERSION }}/${{ env.ARTIFACT_NAME }}"
