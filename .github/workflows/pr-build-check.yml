@@ -1,0 +1,36 @@
+name: PR Build Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [master]
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: true
+
+jobs:
+  pr-build-check:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build solution
+        run: dotnet build -c Release
+
+      - name: Upload mod build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-build-artifacts-pr-${{ github.event.pull_request.number }}
+          path: "projects/mods/**/bin/Release"
+          retention-days: 7

@@ -1,6 +1,5 @@
 <Solution>
   <Folder Name="/projects/">
-    <File Path="projects/Directory.Build.targets" />
     <File Path="projects/.editorconfig" />
     <File Path="projects/Directory.Build.props" />
     <File Path="projects/Directory.Packages.props" />
@@ -20,7 +19,6 @@
   </Folder>
   <Folder Name="/projects/mods/">
     <File Path="projects/mods/Directory.Build.props" />
-    <File Path="projects/mods/Directory.Build.targets" />
     <File Path="projects/mods/.editorconfig" />
   </Folder>
   <Folder Name="/projects/mods/roll-protagonist/">
@@ -30,7 +28,6 @@
   </Folder>
   <Folder Name="/projects/mods/tired-sl/">
     <Project Path="projects/mods/tired-sl/TiredSL.Backend/TiredSL.Backend.csproj" />
-    <Project Path="projects/mods/tired-sl/TiredSL.Frontend/TiredSL.Frontend.csproj" />
   </Folder>
   <Folder Name="/projects/mods/unfathomed/">
     <Project Path="projects/mods/unfathomed/Unfathomed.Backend/Unfathomed.Backend.csproj" />

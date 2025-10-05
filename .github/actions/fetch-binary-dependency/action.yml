@@ -1,0 +1,54 @@
+name: "Setup Dependency"
+description: "Sets up a dependency (e.g., game-lib, upm) with caching."
+inputs:
+  name:
+    description: "The name of the dependency (e.g., game-lib, upm). Used to derive paths and names."
+    required: true
+  token:
+    description: "GitHub token"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Set dependency path env
+      shell: bash
+      run: echo "DEP_PATH=${{ inputs.name }}" >> $GITHUB_ENV
+
+    - name: Cache ${{ inputs.name }}
+      id: cache-dep
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.DEP_PATH }}
+        key: ${{ runner.os }}-${{ inputs.name }}-${{ hashFiles(format('{0}/version.workflow.info', inputs.name)) }}
+
+    - name: Resolve ${{ inputs.name }} version
+      id: resolve-version
+      shell: bash
+      env:
+        VERSION_FILE: ${{ env.DEP_PATH }}/version.workflow.info
+      run: |
+        set -euo pipefail
+        if [ ! -f "$VERSION_FILE" ]; then
+          echo "::error::${{ inputs.name }} version file not found at $VERSION_FILE"
+          exit 1
+        fi
+        DEP_VERSION=$(cat "$VERSION_FILE")
+        echo "Using ${{ inputs.name }} version: $DEP_VERSION"
+        echo "DEP_VERSION=$DEP_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Download ${{ inputs.name }} dependencies
+      if: steps.cache-dep.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        DEP_VERSION: ${{ steps.resolve-version.outputs.DEP_VERSION }}
+        ARTIFACT_NAME: ${{ inputs.name }}.zip
+        DESTINATION_DIR: ${{ env.DEP_PATH }}
+      run: |
+        set -euo pipefail
+        DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.DEP_VERSION }}/${{ env.ARTIFACT_NAME }}"
+        curl -fLsS -H "Authorization: token ${{ inputs.token }}" \
+          "$DOWNLOAD_URL" -o ${{ env.ARTIFACT_NAME }} || {
+            echo "::error::Failed to download ${{ inputs.name }}"
+            exit 1
+          }
+        unzip -oq ${{ env.ARTIFACT_NAME }} -d ${{ env.DESTINATION_DIR }}

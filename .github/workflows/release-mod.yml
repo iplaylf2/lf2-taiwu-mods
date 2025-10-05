@@ -1,4 +1,4 @@
-name: Build and Release Mod
+name: Release Mod
 
 on:
   push:
@@ -10,7 +10,7 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  build-mod:
+  build-and-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,6 +19,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Parse tag and set variables
         id: parse-tag
@@ -47,46 +52,6 @@ jobs:
           echo "full_tag=$FULL_TAG" >> $GITHUB_ENV
           echo "MOD_DIR=$MOD_DIR" >> $GITHUB_ENV
 
-      - name: Resolve game-lib version
-        id: resolve-lib
-        run: |
-          set -euo pipefail
-          LIB_VERSION_FILE="game-lib/version.workflow.info"
-
-          if [ ! -f "$LIB_VERSION_FILE" ]; then
-            echo "::error::game-lib version file not found at $LIB_VERSION_FILE"
-            exit 1
-          fi
-
-          LIB_VERSION=$(cat "$LIB_VERSION_FILE")
-          echo "Using game-lib version: $LIB_VERSION"
-          echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_ENV
-
-      - name: Download game-lib dependencies
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.LIB_VERSION }}/game-lib.zip"
-
-          curl -fLsS -H "Authorization: token $GITHUB_TOKEN" \
-            "$DOWNLOAD_URL" -o game-lib.zip || {
-              echo "::error::Failed to download game-lib"
-              exit 1
-            }
-
-          unzip -q game-lib.zip -d game-lib
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.x
-
-      - name: Setup NuGet authentication
-        run: |
-          echo "NUGET_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-          echo "NUGET_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-
       - name: Read build configuration
         id: read-config
         run: |
@@ -108,9 +73,6 @@ jobs:
           echo "PROJECTS=$PROJECTS" >> $GITHUB_ENV
 
       - name: Build projects
-        env:
-          GITHUB_USERNAME: ${{ env.NUGET_USERNAME }}
-          GITHUB_TOKEN: ${{ env.NUGET_PASSWORD }}
         run: |
           set -euo pipefail
           IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
@@ -123,7 +85,7 @@ jobs:
             dotnet publish "$PROJECT_PATH" -c Release -p:Version=${{ env.VERSION }} \
               --verbosity minimal --nologo || {
                 echo "::error::Publish failed for $project"
-                exit 1
+                exit 1;
               }
 
             PUBLISH_DIR=$(find "${{ env.MOD_DIR }}/$project/bin/Release" -type d -path "*/publish" | head -1)

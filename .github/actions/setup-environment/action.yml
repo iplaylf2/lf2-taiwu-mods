@@ -1,0 +1,31 @@
+name: "Setup Environment"
+description: "Sets up .NET and downloads game-lib/upm dependencies, with caching."
+inputs:
+  token:
+    description: "GitHub token"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Setup game-lib
+      uses: ./.github/actions/fetch-binary-dependency
+      with:
+        name: game-lib
+        token: ${{ inputs.token }}
+
+    - name: Setup upm
+      uses: ./.github/actions/fetch-binary-dependency
+      with:
+        name: upm
+        token: ${{ inputs.token }}
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Setup NuGet authentication
+      shell: bash
+      run: |
+        echo "GITHUB_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+        echo "GITHUB_TOKEN=${{ inputs.token }}" >> $GITHUB_ENV
