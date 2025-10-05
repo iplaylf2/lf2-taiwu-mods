@@ -22,6 +22,13 @@
         <PackageReference Include="LF2.Transil" />
 
         <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
+        <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
 
         <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/0Harmony.dll">
             <Private>false</Private>
@@ -39,13 +46,7 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-    </ItemGroup>
 
-    <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
-        <Reference Include="$(LF2GameLib)/Backend/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
         <Publicize Include="GameData" />
         <Publicize Include="GameData.Shared" />
     </ItemGroup>
@@ -59,6 +60,7 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
+        
         <Publicize Include="Assembly-CSharp" />
         <Publicize Include="GameData.Shared" />
     </ItemGroup>
