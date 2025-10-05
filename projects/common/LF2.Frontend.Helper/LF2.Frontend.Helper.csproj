@@ -7,11 +7,11 @@
 
         <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
 
-        <Reference Include="$(LF2Upm)/UniTask/**/*.dll">
+        <Reference Include="$(LF2UpmDir)/UniTask/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
-        <Reference Include="$(LF2GameLib)/The Scroll of Taiwu_Data/Managed/**/*.dll">
+        <Reference Include="$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
