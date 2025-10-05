@@ -1,6 +1,4 @@
 <Project>
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
-
     <Target Name="LF2RepackPrepare" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
             <_LF2KeepRef Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true'))" />
