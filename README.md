@@ -63,29 +63,20 @@
 
 ### 3. 配置 GitHub NuGet 源
 
-本项目依赖了托管在 GitHub Packages 上的 NuGet 包，因此 `dotnet` 在执行 `restore` 时需要通过身份验证。`nuget.config` 文件已预先配置为使用环境变量进行认证。
+本项目依赖了托管在 GitHub Packages 上的 NuGet 包，因此在还原时需要通过身份验证。
 
-1.  **创建 Personal Access Token (PAT)**
-    - 前往 GitHub 的 [Personal access tokens](https://github.com/settings/tokens) 页面。
-    - 点击 **Generate new token (classic)**，仅需授予 `read:packages` 权限。
-    - 生成并复制这个 Token，请妥善保管。
+1.  **准备 Personal Access Token (PAT)**
+    你需要一个拥有 `read:packages` 权限的 [Personal Access Token (PAT)](https://github.com/settings/tokens)。
 
-2.  **设置环境变量**
-    在你的开发环境中设置以下两个环境变量。请将 `xxx_user` 替换为你的 GitHub 用户名，`xxx_pat` 替换为上一步创建的 PAT。
+2.  **配置认证**
+    本项目的 `nuget.config` 已预设为从环境变量读取凭据，这是推荐的配置方式。请确保已设置以下两个环境变量：
+    - `GITHUB_USERNAME`：你的 GitHub 用户名
+    - `GITHUB_TOKEN`：上一步创建的 PAT
 
-    - **Linux/macOS**:
-      ```bash
-      export GITHUB_USERNAME="xxx_user"
-      export GITHUB_TOKEN="xxx_pat"
-      ```
+    关于创建 PAT 及配置认证的多种方法，请参阅 [GitHub 官方文档](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry#authenticating-to-github-packages)。
 
-    - **Windows (PowerShell)**:
-      ```powershell
-      $env:GITHUB_USERNAME="xxx_user"
-      $env:GITHUB_TOKEN="xxx_pat"
-      ```
 > **关于 Visual Studio 用户**
-> 如果你使用 Visual Studio，可以通过其内置的 NuGet 包管理器 UI 来添加凭据，过程可能更简单。但其原理与设置环境变量是相同的：都是为了向 NuGet 提供有效的 GitHub 用户名和 PAT，以便通过身份验证并成功还原包。
+> 如果你使用 Visual Studio，也可以通过其内置的 NuGet 包管理器 UI 添加凭据，这可能更直接。
 
 ### 4. 还原依赖与构建
 
