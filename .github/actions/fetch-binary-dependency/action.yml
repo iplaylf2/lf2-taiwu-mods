@@ -47,4 +47,4 @@ runs:
             echo "::error::Failed to download ${{ inputs.name }}"
             exit 1
           }
-        unzip -q ${{ env.ARTIFACT_NAME }} -d ${{ env.DESTINATION_DIR }}
+        unzip -oq ${{ env.ARTIFACT_NAME }} -d ${{ env.DESTINATION_DIR }}
