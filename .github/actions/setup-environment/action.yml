@@ -27,5 +27,5 @@ runs:
     - name: Setup NuGet authentication
       shell: bash
       run: |
-        echo "NUGET_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-        echo "NUGET_PASSWORD=${{ inputs.token }}" >> $GITHUB_ENV
+        echo "GITHUB_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+        echo "GITHUB_TOKEN=${{ inputs.token }}" >> $GITHUB_ENV
