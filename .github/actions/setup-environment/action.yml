@@ -7,73 +7,17 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Cache game-lib
-      id: cache-gamelib
-      uses: actions/cache@v4
+    - name: Setup game-lib
+      uses: ./.github/actions/setup-dependency
       with:
-        path: game-lib
-        key: ${{ runner.os }}-gamelib-${{ hashFiles('game-lib/version.workflow.info') }}
+        name: game-lib
+        token: ${{ inputs.token }}
 
-    - name: Cache upm
-      id: cache-upm
-      uses: actions/cache@v4
+    - name: Setup upm
+      uses: ./.github/actions/setup-dependency
       with:
-        path: upm
-        key: ${{ runner.os }}-upm-${{ hashFiles('upm/version.workflow.info') }}
-
-    - name: Resolve game-lib version
-      id: resolve-lib
-      shell: bash
-      run: |
-        set -euo pipefail
-        LIB_VERSION_FILE="game-lib/version.workflow.info"
-        if [ ! -f "$LIB_VERSION_FILE" ]; then
-          echo "::error::game-lib version file not found at $LIB_VERSION_FILE"
-          exit 1
-        fi
-        LIB_VERSION=$(cat "$LIB_VERSION_FILE")
-        echo "Using game-lib version: $LIB_VERSION"
-        echo "LIB_VERSION=$LIB_VERSION" >> $GITHUB_ENV
-
-    - name: Download game-lib dependencies
-      if: steps.cache-gamelib.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        set -euo pipefail
-        DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.LIB_VERSION }}/game-lib.zip"
-        curl -fLsS -H "Authorization: token ${{ inputs.token }}" \
-          "$DOWNLOAD_URL" -o game-lib.zip || {
-            echo "::error::Failed to download game-lib"
-            exit 1
-          }
-        unzip -q game-lib.zip -d game-lib
-
-    - name: Resolve upm version
-      id: resolve-upm
-      shell: bash
-      run: |
-        set -euo pipefail
-        UPM_VERSION_FILE="upm/version.workflow.info"
-        if [ ! -f "$UPM_VERSION_FILE" ]; then
-          echo "::error::upm version file not found at $UPM_VERSION_FILE"
-          exit 1
-        fi
-        UPM_VERSION=$(cat "$UPM_VERSION_FILE")
-        echo "Using upm version: $UPM_VERSION"
-        echo "UPM_VERSION=$UPM_VERSION" >> $GITHUB_ENV
-
-    - name: Download upm dependencies
-      if: steps.cache-upm.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        set -euo pipefail
-        DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${{ env.UPM_VERSION }}/upm.zip"
-        curl -fLsS -H "Authorization: token ${{ inputs.token }}" \
-          "$DOWNLOAD_URL" -o upm.zip || {
-            echo "::error::Failed to download upm"
-            exit 1
-          }
-        unzip -q upm.zip -d upm
+        name: upm
+        token: ${{ inputs.token }}
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
