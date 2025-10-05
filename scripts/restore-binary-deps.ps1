@@ -1,7 +1,7 @@
 # Restores a binary dependency from a GitHub Release if it's not already present.
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$DependencyName,
 
     [switch]$Force

@@ -20,6 +20,7 @@ nologo
 optout
 pipefail
 publicizer
+pwsh
 raycaster
 redzen
 roslynator

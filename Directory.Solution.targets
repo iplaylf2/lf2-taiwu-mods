@@ -3,7 +3,6 @@
   This is loaded automatically by MSBuild. The core logic is in 'scripts/restore-binary-deps.ps1'.
 -->
 <Project>
-
   <!-- Dependencies to be restored. -->
   <ItemGroup>
     <BinaryDependency Include="game-lib" />
@@ -21,5 +20,4 @@
     <Message Text="Solution: Forcing re-download of binary dependencies..." Importance="high" />
     <Exec Command="pwsh -File &quot;$(MSBuildThisFileDirectory)scripts/restore-binary-deps.ps1&quot; -DependencyName %(BinaryDependency.Identity) -Force" ContinueOnError="false" WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
-
 </Project>
