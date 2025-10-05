@@ -173,3 +173,10 @@ jobs:
 
       - name: Build solution
         run: dotnet build -c Release
+
+      - name: Upload mod build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-build-artifacts-pr-${{ github.event.pull_request.number }}
+          path: "projects/mods/**/bin/Release"
+          retention-days: 7
