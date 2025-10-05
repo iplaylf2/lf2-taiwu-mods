@@ -8,9 +8,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup game-lib
-      uses: ./.github/actions/setup-dependency
-      with:
-        name: game-lib
+      uses: ./.github/actions/fetch-binary-dependency
         token: ${{ inputs.token }}
 
     - name: Setup upm
