@@ -8,6 +8,7 @@
 
         <TargetFramework Condition="'$(LF2IsBackend)' == 'true'">net6.0</TargetFramework>
         <TargetFramework Condition="'$(LF2IsFrontend)' == 'true'">netstandard2.1</TargetFramework>
+        <ILRepackTargetsFile>$(MSBuildThisFileDirectory)Directory.Build.targets</ILRepackTargetsFile>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
