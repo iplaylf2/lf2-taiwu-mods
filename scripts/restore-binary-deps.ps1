@@ -31,29 +31,32 @@ if (-not $Force) {
 
 # Only perform more expensive checks now that we know a download is required.
 Write-Host "Action: Restoring '$DependencyName'..."
-$RepoOwner = $null
-$RepoName = $null
+$DefaultRepo = "iplaylf2/lf2-taiwu-mods"
+$RepoIdentifier = $null
 
-# Fallback from CI environment variable to local git remote.
-if ($env:GITHUB_REPOSITORY) {
-    $RepoOwner, $RepoName = $env:GITHUB_REPOSITORY.split("/")
+# Priority 1: User override via environment variable.
+if ($env:LF2_DEPS_REPO) {
+    Write-Host "Info: Using repository override from LF2_DEPS_REPO: $($env:LF2_DEPS_REPO)"
+    $RepoIdentifier = $env:LF2_DEPS_REPO
+}
+# Priority 2: CI environment variable.
+elseif ($env:GITHUB_REPOSITORY) {
+    $RepoIdentifier = $env:GITHUB_REPOSITORY
+}
+# Priority 3: Hardcoded default for local/forked builds.
+else {
+    Write-Host "Info: Defaulting to upstream dependency repository: $DefaultRepo"
+    $RepoIdentifier = $DefaultRepo
 }
 
-if (-not $RepoOwner -or -not $RepoName) {
-    try {
-        $gitUrl = git config --get remote.origin.url
-        if ($gitUrl -match "github.com[/:](?<owner>.*?)/(?<repo>.*?)(?:\.git)?$") {
-            $RepoOwner = $matches.owner
-            $RepoName = $matches.repo
-        }
-    }
-    catch {
-        # This can fail gracefully if not in a git repo.
+try {
+    $RepoOwner, $RepoName = $RepoIdentifier.split("/")
+    if (-not $RepoOwner -or -not $RepoName) {
+        throw "Invalid repository format: '$RepoIdentifier'. Expected 'owner/repo'."
     }
 }
-
-if (-not $RepoOwner -or -not $RepoName) {
-    Write-Error "Fatal: Could not determine GitHub repository. Please set GITHUB_REPOSITORY or ensure you are in a git repository with a valid GitHub remote."
+catch {
+    Write-Error "Fatal: Could not determine GitHub repository from '$RepoIdentifier'. Please ensure the format is 'owner/repo'."
     exit 1
 }
 

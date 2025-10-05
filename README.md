@@ -72,7 +72,7 @@
 
 ### 3️⃣ 自动恢复二进制依赖
 
-本项目会自动从 GitHub Releases 下载并解压游戏核心库 (`game-lib`) 和 UPM 依赖 (`upm`)。你 **不再需要** 手动复制任何文件。
+本项目会自动从 GitHub Releases 下载并解压游戏核心库 (`game-lib`) 和 UPM 依赖 (`upm`)。你 **不再需要** 手动复制任何文件。此过程默认从主仓库 `iplaylf2/lf2-taiwu-mods` 下载，fork 后可直接使用。若需指定私有仓库，请设置 `LF2_DEPS_REPO` 环境变量 (格式为 `owner/repo`)。
 
 这个过程会在你首次运行 `dotnet build` 或 `dotnet restore` 时自动执行。
 
