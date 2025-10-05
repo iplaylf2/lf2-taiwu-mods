@@ -45,7 +45,7 @@
 └── .vscode/                        # 推荐的 VSCode 开发配置
 ```
 
-## 🚀 环境准备
+## 🚀 如何开始
 
 请跟随以下步骤配置你的开发环境。
 
@@ -53,23 +53,15 @@
 
 确保已安装 `global.json` 文件中指定的 .NET SDK 版本（当前为 `9.0.200` 或更高）。你可以使用 `dotnet --version` 命令检查当前版本。
 
-### 2️⃣ 准备游戏文件
+### 2️⃣ 配置 GitHub 认证
 
-为了让 MSBuild 能够找到游戏的程序集 (DLLs)，你需要将编写 Mod 所需的游戏文件复制到指定目录。
-
-- **前端依赖**: 从《太吾绘卷》游戏根目录下的 `The Scroll of Taiwu_Data/Managed/` 文件夹中，**按需复制**你开发时需要引用的 `.dll` 文件到本项目的 `game-lib/The Scroll of Taiwu_Data/Managed/` 目录。
-- **后端依赖**: 从《太吾绘卷》游戏根目录下的 `Backend/` 文件夹中，**按需复制**你开发时需要引用的 `.dll` 文件到本项目的 `game-lib/Backend/` 目录。
-- **UniTask 依赖**: 如果你的 Mod 需要 `UniTask`，请从 Unity 编辑器中获取对应的包，并将其复制到本项目的 `upm/UniTask/` 目录中。
-
-### 3️⃣ 配置 GitHub NuGet 源
-
-本项目依赖了托管在 GitHub Packages 上的 NuGet 包，因此在“还原”依赖时需要通过身份验证。
+为了从 GitHub Packages 拉取 NuGet 依赖，你需要配置身份认证。这是 GitHub 的标准操作流程，即使对于公开仓库也是如此。配置好的凭据也会被用于下载二进制依赖。
 
 1.  **准备 Personal Access Token (PAT)**
     你需要一个拥有 `read:packages` 权限的 [Personal Access Token (PAT)](https://github.com/settings/tokens)。
 
-2.  **配置认证**
-    本项目的 `nuget.config` 已预设为从环境变量读取凭据，这是推荐的配置方式。请确保已设置以下两个环境变量：
+2.  **配置环境变量**
+    本项目推荐通过环境变量进行认证。请确保已设置以下两个环境变量：
     - `GITHUB_USERNAME`：你的 GitHub 用户名
     - `GITHUB_TOKEN`：上一步创建的 PAT
 
@@ -77,6 +69,17 @@
 
 > **💡 Visual Studio 用户提示**
 > 如果你使用 Visual Studio，也可以通过其内置的 NuGet 包管理器 UI 添加凭据，这可能更直接。
+
+### 3️⃣ 自动恢复二进制依赖
+
+本项目会自动从 GitHub Releases 下载并解压游戏核心库 (`game-lib`) 和 UPM 依赖 (`upm`)。你 **不再需要** 手动复制任何文件。此过程默认从主仓库 `iplaylf2/lf2-taiwu-mods` 下载，fork 后可直接使用。若需指定私有仓库，请设置 `LF2_DEPS_REPO` 环境变量 (格式为 `owner/repo`)。
+
+这个过程会在你首次运行 `dotnet build` 或 `dotnet restore` 时自动执行。
+
+如果依赖文件损坏或需要强制更新，可以运行以下命令重新下载：
+```bash
+dotnet build -t:LF2ForceRestoreBinaryDependencies
+```
 
 ### 4️⃣ 还原依赖与构建
 

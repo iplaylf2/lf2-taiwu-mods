@@ -1,28 +1,37 @@
 name: "Setup Environment"
-description: "Sets up .NET and downloads game-lib/upm dependencies, with caching."
+description: "Sets up .NET and restores all binary dependencies, with caching."
 inputs:
   token:
-    description: "GitHub token"
+    description: "GitHub token for downloading release artifacts and NuGet auth."
     required: true
 runs:
   using: "composite"
   steps:
-    - name: Setup game-lib
-      uses: ./.github/actions/fetch-binary-dependency
-      with:
-        name: game-lib
-        token: ${{ inputs.token }}
-
-    - name: Setup upm
-      uses: ./.github/actions/fetch-binary-dependency
-      with:
-        name: upm
-        token: ${{ inputs.token }}
-
     - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 9.0.x
+
+    - name: Cache game-lib
+      id: cache-game-lib
+      uses: actions/cache@v4
+      with:
+        path: game-lib
+        key: ${{ runner.os }}-game-lib-${{ hashFiles('game-lib/version.workflow.info') }}
+
+    - name: Cache upm
+      id: cache-upm
+      uses: actions/cache@v4
+      with:
+        path: upm
+        key: ${{ runner.os }}-upm-${{ hashFiles('upm/version.workflow.info') }}
+
+    - name: Restore Binary Dependencies
+      if: steps.cache-game-lib.outputs.cache-hit != 'true' || steps.cache-upm.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+      run: dotnet build --no-restore -t:LF2RestoreBinaryDependencies
 
     - name: Setup NuGet authentication
       shell: bash
