@@ -1,21 +1,22 @@
 using CharacterFeature = Config.CharacterFeature;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
-using GameData.Utilities;
 using HarmonyLib;
-using Redzen.Random;
 using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
+using LF2.Game.Helper;
+using GameData.Common;
 
 namespace TiredSL.Backend.InitialSetup;
 
-public static class AllGoodFeature
+internal static class AllGoodFeature
 {
     public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    public static bool HandleAllGoodBasicFeature(
+    private static bool HandleAllGoodBasicFeatureResult
+    (
        [ConsumeStackValue] bool original,
        [InjectArgumentValue(0)] ref FeatureCreationContext context
     )
@@ -23,57 +24,73 @@ public static class AllGoodFeature
         return (Enabled && context.IsProtagonist) || original;
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.ApplyFeatureIds))]
     [HarmonyPrefix]
-    public static void PrefixApplyFeatureIds(ref FeatureCreationContext context, Dictionary<short, short> featureGroup2Id)
+    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.ApplyFeatureIds))]
+    private static void ApplyFeatureIdsPatch
+    (
+        ref FeatureCreationContext context,
+        Dictionary<short, short> featureGroup2Id
+    )
     {
         if (!Enabled || !context.IsProtagonist)
         {
             return;
         }
 
-        if (
+        if
+        (
             !context.RandomFeaturesAtCreating
             || featureGroup2Id.ContainsKey(CharacterFeature.DefKey.OneYearOldCatch0)
-            || 1 > context.CurrAge
+            || context.CurrAge < 1
         )
         {
             return;
         }
 
-        AdaptableLog.Info("GenerateOneYearOldCatchFeature");
+        var dataContext = DataContextManager.GetCurrentThreadDataContext();
 
         CharacterCreation.AddFeature
         (
             featureGroup2Id,
-            CharacterDomain.GenerateOneYearOldCatchFeature(RandomDefaults.CreateRandomSource())
+            CharacterDomain.GenerateOneYearOldCatchFeature(dataContext.Random)
         );
+
+        StructuredLogger.Info("GenerateOneYearOldCatchFeature");
     }
 
-    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.GenerateRandomBasicFeatures))]
     [HarmonyTranspiler]
-    public static IEnumerable<CodeInstruction> GenerateRandomBasicFeatures(IEnumerable<CodeInstruction> instructions)
+    [HarmonyPatch(typeof(CharacterCreation), nameof(CharacterCreation.GenerateRandomBasicFeatures))]
+    private static IEnumerable<CodeInstruction> GenerateRandomBasicFeaturesPatch
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
     {
         var matcher = new CodeMatcher(instructions);
 
-        var targetField = AccessTools.Field(typeof(FeatureCreationContext), nameof(FeatureCreationContext.AllGoodBasicFeature));
+        var targetField = AccessTools.Field
+        (
+            typeof(FeatureCreationContext),
+            nameof(FeatureCreationContext.AllGoodBasicFeature)
+        );
 
         _ = matcher
         .Start()
-        .MatchForward(
+        .MatchForward
+        (
             false,
             new CodeMatch(OpCodes.Ldfld, targetField)
         )
-        .Repeat(
+        .Repeat
+        (
             (matcher) =>
             {
                 _ = matcher.Advance(1);
 
-                ILManipulator.ApplyTransformation(matcher, HandleAllGoodBasicFeature);
+                ILManipulator.ApplyTransformation(matcher, HandleAllGoodBasicFeatureResult);
 
                 _ = matcher.Advance(1);
 
-                AdaptableLog.Info($"handle ${targetField} access");
+                StructuredLogger.Info("HandleAllGoodBasicFeatureResult");
             }
         );
 

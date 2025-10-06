@@ -3,27 +3,28 @@ using HarmonyLib;
 using GameData.Utilities;
 using System.Reflection.Emit;
 using System.Reflection;
-using OrganizationMemberItem = Config.OrganizationMemberItem;
 using OrganizationMember = Config.OrganizationMember;
 using GameData.Domains.Character.Creation;
 using GameData.Common;
 using TiredSL.Backend.Kit;
 using Transil.Operations;
 using Transil.Attributes;
+using LF2.Game.Helper;
 
 namespace TiredSL.Backend.InitialSetup;
 
-[HarmonyPatch(typeof(Character), nameof(Character.OfflineCreateProtagonist))]
-public static class MyHobbyValue
+internal static class MyHobbyValue
 {
     public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    public static MainAttributes HandleMainAttributes(
+    private static MainAttributes HandleMainAttributes
+    (
         [ConsumeStackValue] MainAttributes original,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
-        [InjectArgumentValue(4)] DataContext context)
+        [InjectArgumentValue(4)] DataContext context
+    )
     {
         if (!Enabled || info.InscribedChar != null)
         {
@@ -32,40 +33,49 @@ public static class MyHobbyValue
 
         var organizationMemberItem = OrganizationMember.Instance[orgMemberId];
 
-        AdaptableLog.Info("Grade: " + organizationMemberItem.Grade);
-
-        AdaptableLog.Info("MainAttributes original: " + string.Join(
-            ',',
-            organizationMemberItem.MainAttributesAdjust.Select((_, i) => original[i]))
-        );
-
         var mainAttributesAdjust = organizationMemberItem
-            .MainAttributesAdjust
-            .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
-            .ToArray();
+        .MainAttributesAdjust
+        .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
+        .ToArray();
 
-        AdaptableLog.Info("mainAttributesAdjust: " + string.Join(", ", mainAttributesAdjust));
-
-        var result = RandomKit.NiceRetry(
-            () => CharacterCreation.CreateMainAttributes(
+        var result = RandomKit.NiceRetry
+        (
+            () => CharacterCreation.CreateMainAttributes
+            (
                 context.Random,
                 organizationMemberItem.Grade,
                 mainAttributesAdjust
             ),
             Comparer<MainAttributes>.Create((x, y) => x.GetSum().CompareTo(y.GetSum())),
             15
-         );
+        );
 
-        AdaptableLog.Info("MainAttributes: " + string.Join(
-           ',',
-           organizationMemberItem.MainAttributesAdjust.Select((_, i) => result[i]))
-       );
+        StructuredLogger.Info
+        (
+            "HandleMainAttributes",
+            new
+            {
+                actual = string.Join
+                (
+                   ',',
+                   organizationMemberItem.MainAttributesAdjust.Select((_, i) => result[i])
+                ),
+                attributesAdjust = string.Join(", ", mainAttributesAdjust),
+                organizationMemberItem.Grade,
+                original = string.Join
+                (
+                    ',',
+                    organizationMemberItem.MainAttributesAdjust.Select((_, i) => original[i])
+                )
+            }
+        );
 
         return result;
     }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    public static LifeSkillShorts HandleLifeSkillQualifications(
+    private static LifeSkillShorts HandleLifeSkillQualifications
+    (
         [ConsumeStackValue] LifeSkillShorts original,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
@@ -197,7 +207,12 @@ public static class MyHobbyValue
         bonuses.Add(result);
     }
 
-    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(Character), nameof(Character.OfflineCreateProtagonist))]
+    public static IEnumerable<CodeInstruction> OfflineCreateProtagonistPatch
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
     {
         var matcher = new CodeMatcher(instructions);
 
