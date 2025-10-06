@@ -1,8 +1,8 @@
 using HarmonyLib;
 
-namespace LF2.Game.Helper.Extensions;
+namespace LF2.Cecil.Helper.Extensions;
 
-internal static class HarmonyExtension
+public static class HarmonyExtension
 {
     public static void PatchArray(this Harmony harmony, Type[] patchers)
     {

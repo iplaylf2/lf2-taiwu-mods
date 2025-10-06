@@ -1,4 +1,4 @@
-﻿using LF2.Game.Helper.Extensions;
+﻿using LF2.Cecil.Helper.Extensions;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace Unfathomed.Backend;
