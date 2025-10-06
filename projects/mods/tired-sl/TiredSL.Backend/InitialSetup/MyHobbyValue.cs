@@ -18,7 +18,7 @@ internal static class MyHobbyValue
     public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    private static MainAttributes HandleMainAttributes
+    private static MainAttributes HandleMainAttributesValue
     (
         [ConsumeStackValue] MainAttributes original,
         [InjectArgumentValue(2)] short orgMemberId,
@@ -52,7 +52,7 @@ internal static class MyHobbyValue
 
         StructuredLogger.Info
         (
-            "HandleMainAttributes",
+            "MainAttributes",
             new
             {
                 actual = string.Join
@@ -74,12 +74,13 @@ internal static class MyHobbyValue
     }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    private static LifeSkillShorts HandleLifeSkillQualifications
+    private static LifeSkillShorts HandleLifeSkillQualificationsValue
     (
         [ConsumeStackValue] LifeSkillShorts original,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
-        [InjectArgumentValue(4)] DataContext context)
+        [InjectArgumentValue(4)] DataContext context
+    )
     {
         if (!Enabled || info.InscribedChar != null)
         {
@@ -88,42 +89,54 @@ internal static class MyHobbyValue
 
         var organizationMemberItem = OrganizationMember.Instance[orgMemberId];
 
-        AdaptableLog.Info("LifeSkillShorts original: " + string.Join(
-            ',',
-            organizationMemberItem.LifeSkillsAdjust.Select((_, i) => original[i]))
-        );
-
         var lifeSkillsAdjust = organizationMemberItem
-            .LifeSkillsAdjust
-            .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
-            .ToArray();
+        .LifeSkillsAdjust
+        .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
+        .ToArray();
 
-        AdaptableLog.Info("lifeSkillsAdjust: " + string.Join(", ", lifeSkillsAdjust));
-
-        var result = RandomKit.NiceRetry(
-            () => CharacterCreation.CreateLifeSkillQualifications(
+        var result = RandomKit.NiceRetry
+        (
+            () => CharacterCreation.CreateLifeSkillQualifications
+            (
                 context.Random,
                 organizationMemberItem.Grade,
                 lifeSkillsAdjust
             ),
             Comparer<LifeSkillShorts>.Create((x, y) => x.GetSum().CompareTo(y.GetSum())),
             15
-         );
+        );
 
-        AdaptableLog.Info("LifeSkillShorts: " + string.Join(
-            ',',
-            organizationMemberItem.LifeSkillsAdjust.Select((_, i) => result[i]))
+        StructuredLogger.Info
+        (
+            "LifeSkillQualifications",
+            new
+            {
+                actual = string.Join
+                (
+                   ',',
+                   organizationMemberItem.LifeSkillsAdjust.Select((_, i) => result[i])
+                ),
+                attributesAdjust = string.Join(", ", lifeSkillsAdjust),
+                organizationMemberItem.Grade,
+                original = string.Join
+                (
+                    ',',
+                    organizationMemberItem.LifeSkillsAdjust.Select((_, i) => original[i])
+                )
+            }
         );
 
         return result;
     }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    public static CombatSkillShorts HandleCombatSkillQualifications(
+    private static CombatSkillShorts HandleCombatSkillQualificationsValue
+    (
         [ConsumeStackValue] CombatSkillShorts original,
         [InjectArgumentValue(2)] short orgMemberId,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
-        [InjectArgumentValue(4)] DataContext context)
+        [InjectArgumentValue(4)] DataContext context
+    )
     {
         if (!Enabled || info.InscribedChar != null)
         {
@@ -132,20 +145,15 @@ internal static class MyHobbyValue
 
         var organizationMemberItem = OrganizationMember.Instance[orgMemberId];
 
-        AdaptableLog.Info("CombatSkillShorts original: " + string.Join(
-            ',',
-            organizationMemberItem.CombatSkillsAdjust.Select((_, i) => original[i]))
-        );
-
         var combatSkillsAdjust = organizationMemberItem
-            .CombatSkillsAdjust
-            .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
-            .ToArray();
+        .CombatSkillsAdjust
+        .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
+        .ToArray();
 
-        AdaptableLog.Info("combatSkillsAdjust: " + string.Join(", ", combatSkillsAdjust));
-
-        var result = RandomKit.NiceRetry(
-            () => CharacterCreation.CreateCombatSkillQualifications(
+        var result = RandomKit.NiceRetry
+        (
+            () => CharacterCreation.CreateCombatSkillQualifications
+            (
                 context.Random,
                 organizationMemberItem.Grade,
                 combatSkillsAdjust
@@ -154,41 +162,60 @@ internal static class MyHobbyValue
             15
         );
 
-        AdaptableLog.Info("CombatSkillShorts: " + string.Join(
-            ',',
-            organizationMemberItem.CombatSkillsAdjust.Select((_, i) => result[i]))
+        StructuredLogger.Info
+        (
+            "CombatSkillQualifications",
+            new
+            {
+                actual = string.Join
+                (
+                   ',',
+                   organizationMemberItem.CombatSkillsAdjust.Select((_, i) => result[i])
+                ),
+                attributesAdjust = string.Join(", ", combatSkillsAdjust),
+                organizationMemberItem.Grade,
+                original = string.Join
+                (
+                    ',',
+                    organizationMemberItem.CombatSkillsAdjust.Select((_, i) => original[i])
+                )
+            }
         );
 
         return result;
     }
 
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    public static sbyte HandleGrowthType(
+    private static sbyte HandleGrowthTypeValue
+    (
         [ConsumeStackValue] sbyte original,
-        [InjectArgumentValue(3)] ProtagonistCreationInfo info)
+        [InjectArgumentValue(3)] ProtagonistCreationInfo info
+    )
     {
-        return !Enabled || info.InscribedChar != null ? original : (sbyte)2;
+        return !Enabled || info.InscribedChar != null
+        ? original
+        : SkillQualificationGrowthType.LateBlooming;
     }
 
     [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
-    public static void HandleBonusesAdd(
+    private static void HandleBonusesAdd
+    (
         [ConsumeStackValue] IList<SkillQualificationBonus> bonuses,
         [ConsumeStackValue] SkillQualificationBonus original,
-        [InjectMemberValue(MemberInjectionType.Field, nameof(Character._skillQualificationBonuses))]
-        IList<SkillQualificationBonus> targetBonuses,
+        [InjectArgumentValue(0)] Character instance,
         [InjectArgumentValue(3)] ProtagonistCreationInfo info,
-        [InjectArgumentValue(4)] DataContext context)
+        [InjectArgumentValue(4)] DataContext context
+    )
     {
-        if (!Enabled || info.InscribedChar != null || bonuses != targetBonuses)
+        if (!Enabled || info.InscribedChar != null || bonuses != instance._skillQualificationBonuses)
         {
             bonuses.Add(original);
 
             return;
         }
 
-        AdaptableLog.Info("skillQualificationBonus origin:" + original.Bonus);
-
-        var niceValue = RandomKit.NiceRetry(
+        var niceValue = RandomKit.NiceRetry
+        (
             () =>
             {
                 var random = context.Random;
@@ -200,16 +227,21 @@ internal static class MyHobbyValue
             Comparer<SkillQualificationBonus>.Create((x, y) => x.Bonus.CompareTo(y.Bonus)),
             15
         );
+
         var result = original.Bonus < niceValue.Bonus ? niceValue : original;
 
-        AdaptableLog.Info("skillQualificationBonus: " + result.Bonus);
-
         bonuses.Add(result);
+
+        StructuredLogger.Info
+        (
+            "SkillQualificationBonus",
+            new { actual = result.Bonus, original = original.Bonus }
+        );
     }
 
     [HarmonyTranspiler]
     [HarmonyPatch(typeof(Character), nameof(Character.OfflineCreateProtagonist))]
-    public static IEnumerable<CodeInstruction> OfflineCreateProtagonistPatch
+    private static IEnumerable<CodeInstruction> OfflineCreateProtagonistPatch
     (
         IEnumerable<CodeInstruction> instructions
     )
@@ -223,32 +255,34 @@ internal static class MyHobbyValue
             {
                 [AccessTools.Field
                 (charType, nameof(Character._baseMainAttributes))
-                ] = HandleMainAttributes,
+                ] = HandleMainAttributesValue,
 
                 [AccessTools.Field
                 (charType, nameof(Character._baseLifeSkillQualifications))
-                ] = HandleLifeSkillQualifications,
+                ] = HandleLifeSkillQualificationsValue,
 
                 [AccessTools.Field
                 (charType, nameof(Character._baseCombatSkillQualifications))
-                ] = HandleCombatSkillQualifications,
+                ] = HandleCombatSkillQualificationsValue,
 
                 [AccessTools.Field
                 (charType, nameof(Character._lifeSkillQualificationGrowthType))
-                ] = HandleGrowthType,
+                ] = HandleGrowthTypeValue,
 
                 [AccessTools.Field
                 (charType, nameof(Character._combatSkillQualificationGrowthType))
-                ] = HandleGrowthType
+                ] = HandleGrowthTypeValue
             };
 
             _ = matcher
             .Start()
-            .MatchForward(
+            .MatchForward
+            (
                 false,
                 new CodeMatch(OpCodes.Stfld)
             )
-            .Repeat(
+            .Repeat
+            (
                 (matcher) =>
                 {
                     if (
@@ -261,17 +295,18 @@ internal static class MyHobbyValue
                         return;
                     }
 
-                    ILManipulator.ApplyTransformation(matcher, handleMethod, charType);
+                    ILManipulator.ApplyTransformation(matcher, handleMethod);
 
                     _ = matcher.Advance(1);
 
-                    AdaptableLog.Info($"handle ${field} assignment");
+                    StructuredLogger.Info("handleStfld", new { field = field.Name });
                 }
             );
         }
 
         {
-            var targetMethod = AccessTools.Method(
+            var targetMethod = AccessTools.Method
+            (
                 typeof(List<SkillQualificationBonus>),
                 nameof(List<SkillQualificationBonus>.Add),
                 [typeof(SkillQualificationBonus)]
@@ -279,18 +314,20 @@ internal static class MyHobbyValue
 
             _ = matcher
             .Start()
-            .MatchForward(
+            .MatchForward
+            (
                 false,
                 new CodeMatch(OpCodes.Callvirt, targetMethod)
             )
-            .Repeat(
+            .Repeat
+            (
                 (matcher) =>
                 {
-                    ILManipulator.ApplyTransformation(matcher, HandleBonusesAdd, charType);
+                    ILManipulator.ApplyTransformation(matcher, HandleBonusesAdd);
 
                     _ = matcher.Advance(1);
 
-                    AdaptableLog.Info($"handle ${targetMethod}");
+                    StructuredLogger.Info("HandleBonusesAdd");
                 }
             );
         }
