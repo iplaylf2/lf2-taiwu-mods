@@ -5,7 +5,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
 
-        <Compile Include="$(LF2Common)/LF2.Game.Helper/**/*.cs" />
+        <Compile Include="$(LF2CommonDir)/LF2.Game.Helper/**/*.cs" />
 
         <Reference Include="$(LF2UpmDir)/UniTask/**/*.dll">
             <Private>false</Private>
