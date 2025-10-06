@@ -1,2 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="$(LF2Common)/LF2.Kit/LF2.Kit.csproj" />
+    </ItemGroup>
 </Project>

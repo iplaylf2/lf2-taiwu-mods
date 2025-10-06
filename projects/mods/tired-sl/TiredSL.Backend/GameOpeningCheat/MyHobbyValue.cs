@@ -4,10 +4,10 @@ using GameData.Domains.Character.Creation;
 using GameData.Utilities;
 using HarmonyLib;
 using LF2.Game.Helper;
+using LF2.Kit.Random;
 using OrganizationMember = Config.OrganizationMember;
 using System.Reflection;
 using System.Reflection.Emit;
-using TiredSL.Backend.Kit;
 using Transil.Attributes;
 using Transil.Operations;
 
@@ -38,7 +38,7 @@ internal static class MyHobbyValue
         .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
         .ToArray();
 
-        var result = RandomKit.NiceRetry
+        var result = RollHelper.RetryAndCompare
         (
             () => CharacterCreation.CreateMainAttributes
             (
@@ -94,7 +94,7 @@ internal static class MyHobbyValue
         .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
         .ToArray();
 
-        var result = RandomKit.NiceRetry
+        var result = RollHelper.RetryAndCompare
         (
             () => CharacterCreation.CreateLifeSkillQualifications
             (
@@ -150,7 +150,7 @@ internal static class MyHobbyValue
         .Select(x => 0 <= x ? x : (short)RedzenHelper.SkewDistribute(context.Random, 4, 8 / 3, 2, 2, 12))
         .ToArray();
 
-        var result = RandomKit.NiceRetry
+        var result = RollHelper.RetryAndCompare
         (
             () => CharacterCreation.CreateCombatSkillQualifications
             (
@@ -214,7 +214,7 @@ internal static class MyHobbyValue
             return;
         }
 
-        var niceValue = RandomKit.NiceRetry
+        var niceValue = RollHelper.RetryAndCompare
         (
             () =>
             {
