@@ -1,47 +1,53 @@
-using System.Reflection.Emit;
 using GameData.Domains.Taiwu;
-using GameData.Utilities;
 using HarmonyLib;
+using LF2.Game.Helper;
+using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
 
-namespace TiredSL.Backend.SkillBreakout;
+namespace TiredSL.Backend.SkillBreakoutCheat;
 
-[HarmonyPatch(typeof(SkillBreakPlate), nameof(SkillBreakPlate.SelectBreak))]
-public static class NoCostOnFailMove
+internal static class NoCostOnFailMove
 {
     public static bool Enabled { get; set; }
 
     [ILHijackHandler(HijackStrategy.ReplaceOriginal)]
-    private static byte HandleCalcCostStep(
+    private static byte HandleCalcCostStep
+    (
         [ConsumeStackValue] SkillBreakPlate plate,
         [ConsumeStackValue] SkillBreakPlateIndex index
     )
     {
         return !Enabled || plate.Current == index ? plate.CalcCostStep(index) : (byte)0;
     }
-    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+
+    [HarmonyTranspiler]
+    [HarmonyPatch(typeof(SkillBreakPlate), nameof(SkillBreakPlate.SelectBreak))]
+    private static IEnumerable<CodeInstruction> SelectBreakPatch(IEnumerable<CodeInstruction> instructions)
     {
         var matcher = new CodeMatcher(instructions);
 
-        var targetMethod = AccessTools.Method(
+        var targetMethod = AccessTools.Method
+        (
             typeof(SkillBreakPlate),
             nameof(SkillBreakPlate.CalcCostStep)
         );
 
         _ = matcher
-        .MatchForward(
+        .MatchForward
+        (
             false,
             new CodeMatch(OpCodes.Call, targetMethod)
         )
-        .Repeat(
+        .Repeat
+        (
             (matcher) =>
             {
                 ILManipulator.ApplyTransformation(matcher, HandleCalcCostStep);
 
                 _ = matcher.Advance(1);
 
-                AdaptableLog.Info($"handle {targetMethod}");
+                StructuredLogger.Info("HandleCalcCostStep");
             }
         );
 
