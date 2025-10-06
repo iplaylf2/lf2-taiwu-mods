@@ -1,172 +1,127 @@
 # 📜 太吾绘卷 Mod 开发模板与示范
 
-本仓库是一个为《太吾绘卷》Mod 开发打造的模板与示范项目，旨在通过现代化的工具链和高度自动化的构建系统，解决传统 Mod 开发中的痛点，为开发者提供一个高效、稳定且易于协作的开发环境。
+本仓库是一个为《太吾绘卷》Mod 开发打造的模板与示范项目，旨在通过现代化的工具链和高度自动化的构建系统，为开发者提供一个高效、稳定且易于协作的开发环境。
 
-## ✨ 设计理念
+## ✨ 核心特性
 
-这个项目不仅是一个 Mod 合集，更是一套经过精心设计的 **Mod 开发解决方案**，其核心设计思想在于：
+- ✅ **自动化项目配置**: 创建项目并按约定命名，框架会自动**完成**目标平台、依赖引用等所有繁琐配置。
+- ✅ **依赖自动内嵌**: 告别“DLL冲突”，你的 Mod 发布时会是一个独立的纯净文件。
+- ✅ **完整智能提示**: 游戏私有 API 也拥有完整的代码提示，像调用官方函数一样顺滑。
+- ✅ **一键式环境准备**: 只需一个 `dotnet restore` 命令，即可自动备齐所有游戏库和开发库。
 
-- **🎯 标准化与自动化**：通过共享的 MSBuild 配置 (`.props`/`.targets`)，将 Mod 开发中的通用逻辑（如依赖打包、游戏 API 访问、项目引用）标准化，并实现构建过程的自动化。开发者因此可以专注于功能实现，而无需在繁琐的环境配置上耗费心力。
+## 🚀 快速上手
 
-- **📦 依赖隔离与稳定性**：每个 Mod 都是独立的项目，但其依赖的 `common` 库和部分 NuGet 包（如 `LF2.Transil`）会通过 `ILRepack` 在构建时自动内嵌到各自的程序集中。这从根本上解决了不同 Mod 之间因共享库版本冲突而导致的“DLL地狱”问题，确保了玩家环境的纯净与稳定。
+本章节将引导你完成从环境配置到创建第一个 Mod 的完整流程。
 
-- **🔗 强类型与开发效率**：利用 `Publicizer` 工具，我们将游戏内部的 `private` 和 `internal` API “公开化”，使得开发者可以在代码中直接、安全地调用这些非公开成员，并获得完整的智能提示（IntelliSense）和编译时类型检查。这极大地提升了开发效率，并减少了因拼写错误或 API 变更导致的运行时 Bug。
+### 前置条件
 
-- **📚 集中式依赖管理**：通过根目录的 **中央包管理 (CPM)** (`Directory.Packages.props`)，所有项目的 NuGet 依赖版本都在一个文件中统一定义。这确保了整个仓库中所有 Mod 和公共库使用的依赖版本一致，便于统一升级和维护。
+- **.NET SDK**: 版本需满足 `global.json` 文件中的定义。
+- **GitHub PAT**: 一个拥有 `read:packages` 权限的 [Personal Access Token](https://github.com/settings/tokens)。
 
-## 📁 目录结构
+### 1. ⚙️ 环境配置
 
-项目的结构经过精心组织，以实现关注点分离和最大化的代码复用。
+本项目的依赖（游戏核心库、NuGet 包）都托管在 GitHub 上，你需要先完成身份认证。
 
-```
-.
-├── Directory.Build.props           # MSBuild 全局属性，定义游戏库、UPM库等关键路径
-├── Directory.Packages.props        # 中央包管理 (CPM)，统一定义所有 NuGet 依赖的版本
-├── game-lib/                       # 存放游戏本体的程序集 (需手动复制)
-├── global.json                     # 定义项目使用的 .NET SDK 版本
-├── nuget.config                    # 配置额外的 NuGet 源 (本项目中为 GitHub Packages)
-├── projects
-│   ├── common/                     # 公共代码库，为所有 Mod 提供可复用的功能
-│   │   ├── LF2.Backend.Helper/     # 后端 Mod 辅助功能
-│   │   ├── LF2.Cecil.Helper/       # Mono.Cecil 辅助功能
-│   │   ├── LF2.Frontend.Helper/    # 前端 Mod 辅助功能
-│   │   ├── LF2.Game.Helper/        # 游戏通用辅助代码 (以源码方式共享)
-│   │   └── LF2.Kit/                # 通用工具包
-│   ├── mods/                       # 所有独立 Mod 的项目目录
-│   │   ├── roll-protagonist/       # 真实 Mod 示例：开局“Roll”点
-│   │   │   ├── Config.Lua          # 游戏加载Mod所需的元数据配置文件
-│   │   │   ├── mod.workflow.json   # CI 工作流配置，指定需要构建的项目
-│   │   │   ├── RollProtagonist.Backend/  # 后端 Mod 项目 (C#)
-│   │   │   ├── RollProtagonist.Common/   # 该 Mod 的前后端共享代码 (C#)
-│   │   │   └── RollProtagonist.Frontend/ # 前端 Mod 项目 (C#)
-│   │   └── ...
-│   └── .editorconfig               # C# 代码风格配置
-├── upm/                            # 存放 UPM (Unity Package Manager) 依赖 (需手动复制)
-└── .vscode/                        # 推荐的 VSCode 开发配置
-```
+- **VS Code / 命令行用户**:
+  1.  将你的 GitHub 用户名和 PAT 配置为环境变量 `GITHUB_USERNAME` 和 `GITHUB_TOKEN`。
+  2.  在项目根目录运行 `dotnet restore`。
+      > **✨ 自动化魔法**
+      > 此命令不仅会还原标准的 NuGet 包，还会自动从 GitHub Releases 下载并解压**本项目所需**的游戏核心库 (`game-lib`) 和 Unity 库 (`upm`)。
 
-## 🚀 如何开始
+- **Visual Studio 用户**:
+  > **💡 IDE 提示**
+  > Visual Studio 会在打开解决方案时自动处理大部分依赖还原。你可能无需设置环境变量，只需在 `工具 > NuGet 包管理器 > 程序包管理器设置` 中添加 GitHub 包源并配置一次凭据即可。
 
-请跟随以下步骤配置你的开发环境。
+### 2. 🎮 创建你的第一个 Mod
 
-### 1️⃣ 安装 .NET SDK
+本框架遵循**约定优于配置**的理念。创建一个新 Mod 的过程被大大简化：
 
-确保已安装 `global.json` 文件中指定的 .NET SDK 版本（当前为 `9.0.200` 或更高）。你可以使用 `dotnet --version` 命令检查当前版本。
+1.  在 `projects/mods/` 目录下为你的新 Mod 创建一个文件夹，如 `MyNewMod`。
+2.  在其中创建对应的项目文件夹，并遵循命名约定，如 `MyNewMod.Backend`。
+3.  在项目文件夹中，创建一个最简化的 C# 项目文件 `MyNewMod.Backend.csproj`：
+    ```xml
+    <Project Sdk="Microsoft.NET.Sdk">
+    </Project>
+    ```
 
-### 2️⃣ 配置 GitHub 认证
+完成！仅需遵循 `.Backend` 或 `.Frontend` 的命名约定，构建系统就会自动为你设定目标框架、引用所有游戏程序集、配置 `Publicizer` 与 `ILRepack` 等。你无需关心任何构建细节，可以立即开始编写 Mod 逻辑。
 
-为了从 GitHub Packages 拉取 NuGet 依赖，你需要配置身份认证。这是 GitHub 的标准操作流程，即使对于公开仓库也是如此。配置好的凭据也会被用于下载二进制依赖。
+### 3. 💻 开始编码
 
-1.  **准备 Personal Access Token (PAT)**
-    你需要一个拥有 `read:packages` 权限的 [Personal Access Token (PAT)](https://github.com/settings/tokens)。
+现在，在你的项目文件夹中添加 C# 代码（如 `ModEntry.cs`），并遵循游戏官方的 Mod 开发文档编写逻辑即可。
 
-2.  **配置环境变量**
-    本项目推荐通过环境变量进行认证。请确保已设置以下两个环境变量：
-    - `GITHUB_USERNAME`：你的 GitHub 用户名
-    - `GITHUB_TOKEN`：上一步创建的 PAT
+## 🛠️ 进阶技巧
 
-    关于创建 PAT 及配置认证的多种方法，请参阅 [GitHub 官方文档](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry#authenticating-to-github-packages)。
+除了核心的自动化流程，本模板还提供了一些额外的命令与选项，以应对特殊场景。
 
-> **💡 Visual Studio 用户提示**
-> 如果你使用 Visual Studio，也可以通过其内置的 NuGet 包管理器 UI 添加凭据，这可能更直接。
+### 🔄 修复或强制还原游戏库
 
-### 3️⃣ 自动恢复二进制依赖
+游戏库的版本与本仓库源码绑定。通常情况下，你无需手动干预。但如果本地的 `game-lib` 或 `upm` 目录因故损坏或缺失，你可以运行以下命令来强制重新下载和解压，以恢复它们：
 
-本项目会自动从 GitHub Releases 下载并解压游戏核心库 (`game-lib`) 和 UPM 依赖 (`upm`)。你 **不再需要** 手动复制任何文件。此过程默认从主仓库 `iplaylf2/lf2-taiwu-mods` 下载，fork 后可直接使用。若需指定私有仓库，请设置 `LF2_DEPS_REPO` 环境变量 (格式为 `owner/repo`)。
-
-这个过程会在你首次运行 `dotnet build` 或 `dotnet restore` 时自动执行。
-
-如果依赖文件损坏或需要强制更新，可以运行以下命令重新下载：
 ```bash
 dotnet build -t:LF2ForceRestoreBinaryDependencies
 ```
 
-### 4️⃣ 还原依赖与构建
+### 🍴 为 Fork 仓库配置依赖源
 
-完成以上步骤后，在项目根目录执行以下命令来还原 NuGet 包并构建所有 Mod：
+默认情况下，上述命令会从主仓库 `iplaylf2/lf2-taiwu-mods` 下载游戏库。如果你 Fork 了本项目并希望从你自己的仓库 Release 中下载依赖，你需要设置 `LF2_DEPS_REPO` 环境变量。
 
-```bash
-dotnet build
-```
+- **格式**: `owner/repo`
 
-构建产物将位于各个 Mod 项目的 `bin/` 目录下。
+### 📦 控制依赖内嵌
 
-## ✨ 新增 Mod 开发流程
+默认情况下，所有第三方依赖都会被合并到最终的 Mod 程序集中，以避免 DLL 冲突。如果你希望某个特定的引用**不被合并**，保持为独立文件，可以在 `.csproj` 文件中为对应的 `<Reference>` 或 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。
 
-得益于本框架的自动化配置，创建一个新的 Mod 项目非常简单。
-
-### 1. 创建目录和项目文件
-
-- 在 `projects/mods/` 目录下，为你的新 Mod 创建一个主文件夹，例如 `MyNewMod`。
-- 在 `MyNewMod` 文件夹内，根据你的需要创建项目文件夹，例如 `MyNewMod.Backend`。
-- 在 `MyNewMod.Backend` 文件夹中，创建一个名为 `MyNewMod.Backend.csproj` 的项目文件。
-
-### 2. 编辑项目文件
-
-一个最基础的项目文件仅需包含 Sdk 声明：
-
+**示例**:
 ```xml
-<Project Sdk="Microsoft.NET.Sdk">
-</Project>
+<ItemGroup>
+  <!-- This reference will NOT be merged into the main assembly. -->
+  <PackageReference Include="Some.Package" Version="1.2.3">
+    <LF2KeepItAsIs>true</LF2KeepItAsIs>
+  </PackageReference>
+</ItemGroup>
 ```
 
-**但这仅适用于不依赖任何 `common` 共享库的 Mod。**
+### 🔍 查阅构建变量
 
-在实际开发中，你很可能需要引用 `projects/common/` 目录下的各种辅助库。你可以通过添加 `<ProjectReference>` 来实现这一点。一个更典型的项目文件如下所示：
+本项目的自动化构建依赖于一系列在各级 `Directory.Build.props` 文件中定义的 MSBuild 变量（如 `LF2GameLibDir`, `LF2IsBackend` 等）。
 
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <!-- 引用此 Mod 自身的前后端共享项目 -->
-        <ProjectReference Include="$(LF2Mods)/MyNewMod/MyNewMod.Common/MyNewMod.Common.csproj" />
-        <!-- 引用 monorepo 中的公共辅助库 -->
-        <ProjectReference Include="$(LF2Common)/LF2.Kit/LF2.Kit.csproj" />
-        <ProjectReference Include="$(LF2Common)/LF2.Backend.Helper/LF2.Backend.Helper.csproj" />
-    </ItemGroup>
-</Project>
-```
+如果你需要进行深度定制（例如，在 `.csproj` 中添加自定义的构建逻辑），可以直接查阅这些 `.props` 文件来了解所有可用的变量。
 
-因为项目的文件路径和命名（例如以 `.Backend` 结尾）符合 `projects/mods/Directory.Build.props` 中定义的规则，构建系统会自动为你完成以下所有配置：
+### 🎯 关于二进制依赖的范围
 
-- **✅ 构建与打包**:
-  - 设置正确的 .NET TargetFramework (`net6.0` 或 `netstandard2.1`)。
-  - 配置 `ILRepack` 以便在构建时自动合并第三方依赖项。
-- **✅ 游戏与公共库引用**:
-  - 自动引用 `LF2.Transil` 等核心 NuGet 包。
-  - 添加对相应游戏核心程序集（前端或后端）的引用。
-  - 启用 `Publicizer` 来安全地访问游戏的内部 API。
-  - 自动包含 `LF2.Game.Helper` 的源码。
-- **✅ 代码质量与开发效率**:
-  - 自动启用最新的 C# 语言特性，鼓励使用现代语法。
-  - 默认开启一系列代码健壮性检查（如空引用分析）。
-  - 统一应用仓库的代码风格、格式化规则，并在构建时进行检查。
-  - 集成代码分析器，在开发过程中提供实时的辅助与重构建议。
+请注意，`game-lib` 中包含的游戏库是为适配当前仓库中的 Mod 而精心筛选的。如果你在开发自己的新 Mod 时，发现缺少某些游戏程序集的引用，你可能需要手动从游戏目录复制它们到 `game-lib` 中，并自行调整项目的 `<Reference>`。
 
-### 3. 后续步骤
+## 📚 参考资料
 
-1.  **添加到解决方案**: 在你的 IDE 中（或通过 `dotnet sln add` 命令）将这个新项目添加到解决方案，以便管理和编码。
-2.  **添加代码**: 在项目中创建你的 C# 代码文件（例如 `ModEntry.cs`）。
-3.  **开始开发**: 遵循游戏官方的 Mod 开发文档，即可开始编写你的 Mod 逻辑。
+### 📁 目录结构
 
+<details>
+<summary>点击展开推荐的目录结构</summary>
+<pre><code>.
+├── Directory.Build.props       # 自动化核心：定义全局构建属性
+├── Directory.Packages.props    # 统一管理所有项目的NuGet包版本
+├── game-lib/                   # (自动下载) 游戏核心程序集
+├── upm/                        # (自动下载) Unity核心程序集
+├── projects/
+│   ├── common/                 # 公共库项目，可供所有Mod复用
+│   └── mods/                   # 你的工作区：所有Mod项目都放在这里
+│       └── MyNewMod/
+│           ├── MyNewMod.Backend/   # Mod后端项目 (遵循.Backend命名约定)
+│           │   └── MyNewMod.Backend.csproj
+│           ├── MyNewMod.Frontend/  # Mod前端项目 (遵循.Frontend命名约定)
+│           │   └── MyNewMod.Frontend.csproj
+│           └── Config.Lua
+</code></pre>
+</details>
 
-## ⚙️ MSBuild 构建系统详解
+### 🔩 核心工具
 
-本仓库的强大之处在于其高度定制化的 MSBuild 构建流程。通过一系列 `*.props` 和 `*.targets` 文件，我们实现了开发与依赖管理的自动化。
+本模板的自动化功能主要由以下几个关键的开源工具驱动。感谢它们的开发者。
 
-### 🛠️ 核心构建工具
+- **[ILRepack.Lib.MSBuild.Task](https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task)**: 负责将项目引用的所有第三方 DLL 合并到最终生成的 Mod 程序集中，解决“DLL地狱”问题。
+- **[Publicizer](https://github.com/krafs/Publicizer)**: 此工具能够让 C# 编译器像访问 `public` 成员一样访问程序集中的 `private` 和 `internal` 成员，极大地提升了开发效率。
 
-- **[ILRepack.Lib.MSBuild.Task](https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task)**: 负责将项目引用的所有第三方 DLL（游戏自身的 DLL 除外）合并到最终生成的 Mod 程序集中。
-  - 如果你希望某个特定的引用 **不被合并**，可以在 `.csproj` 文件中为对应的 `<Reference>` 或 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。此逻辑在 `projects/mods/ILRepack.targets` 中实现。
+## 🤝 贡献与反馈
 
-- **[Publicizer](https://github.com/krafs/Publicizer)**: 此工具能够让 C# 编译器像访问 `public` 成员一样访问程序集中的 `private` 和 `internal` 成员。在 `projects/mods/Directory.Build.props` 中，它被配置为自动 Publicize 前后端的多个核心游戏程序集。
-
-### 🔍 关键 MSBuild 变量与逻辑
-
-这些逻辑主要定义在 `projects/mods/Directory.Build.props` 中，是整个自动化构建的基石。
-
-| 变量名 🏷️ | 触发条件 ⚡ | 作用 🎯 |
-| :--- | :--- | :--- |
-| `LF2IsBackend` | 项目名以 `.Backend` 结尾 | 1. 标识为后端项目。<br>2. 设置 `TargetFramework` 为 `net6.0`。<br>3. 自动引用 `game-lib/Backend/` 下的 DLL。 |
-| `LF2IsFrontend` | 项目名以 `.Frontend` 结尾 | 1. 标识为前端项目。<br>2. 设置 `TargetFramework` 为 `netstandard2.1`。<br>3. 自动引用 `game-lib/The Scroll of Taiwu_Data/Managed/` 和 `upm/UniTask/` 下的 DLL。 |
-| `LF2IsModEntry` | `LF2IsBackend` 或 `LF2IsFrontend` 为 `true` | 1. 标识为 Mod 入口项目。<br>2. 自动为项目添加 `ILRepack`、`Publicizer`、`LF2.Transil` 的包引用。<br>3. 自动包含 `LF2.Game.Helper` 的源码。 |
-| `LF2KeepItAsIs` | 在 `.csproj` 中为程序集引用添加的元数据 | 在 `ILRepack` 阶段，防止被标记的程序集被合并进主 DLL，使其保持为独立文件。 |
+欢迎通过提交 Issue 或 Pull Request 来为本项目做出贡献。
