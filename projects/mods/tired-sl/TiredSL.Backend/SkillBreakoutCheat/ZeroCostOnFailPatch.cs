@@ -1,8 +1,7 @@
-using System.Reflection.Emit;
 using GameData.Domains.Taiwu;
-using GameData.Utilities;
 using HarmonyLib;
 using LF2.Game.Helper;
+using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
 
