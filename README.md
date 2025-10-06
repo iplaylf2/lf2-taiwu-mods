@@ -4,7 +4,7 @@
 
 ## ✨ 核心特性
 
-- ✅ **自动化项目配置**: 创建项目并按约定命名，框架会自动处理目标平台、依赖引用等所有繁琐配置。
+- ✅ **自动化项目配置**: 创建项目并按约定命名，框架会自动**完成**目标平台、依赖引用等所有繁琐配置。
 - ✅ **依赖自动内嵌**: 告别“DLL冲突”，你的 Mod 发布时会是一个独立的纯净文件。
 - ✅ **完整智能提示**: 游戏私有 API 也拥有完整的代码提示，像调用官方函数一样顺滑。
 - ✅ **一键式环境准备**: 只需一个 `dotnet restore` 命令，即可自动备齐所有游戏库和开发库。
@@ -67,7 +67,6 @@ dotnet build -t:LF2ForceRestoreBinaryDependencies
 默认情况下，上述命令会从主仓库 `iplaylf2/lf2-taiwu-mods` 下载游戏库。如果你 Fork 了本项目并希望从你自己的仓库 Release 中下载依赖，你需要设置 `LF2_DEPS_REPO` 环境变量。
 
 - **格式**: `owner/repo`
-- **示例**: `export LF2_DEPS_REPO="MyGitHubUser/my-forked-repo"`
 
 ### 控制依赖内嵌
 
@@ -122,3 +121,7 @@ dotnet build -t:LF2ForceRestoreBinaryDependencies
 
 - **[ILRepack.Lib.MSBuild.Task](https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task)**: 负责将项目引用的所有第三方 DLL 合并到最终生成的 Mod 程序集中，解决“DLL地狱”问题。
 - **[Publicizer](https://github.com/krafs/Publicizer)**: 此工具能够让 C# 编译器像访问 `public` 成员一样访问程序集中的 `private` 和 `internal` 成员，极大地提升了开发效率。
+
+## 🤝 贡献与反馈
+
+欢迎通过提交 Issue 或 Pull Request 来为本项目做出贡献。
