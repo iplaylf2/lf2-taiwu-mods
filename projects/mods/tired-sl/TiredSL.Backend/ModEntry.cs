@@ -8,8 +8,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
-        HarmonyInstance.PatchAll(typeof(Random.RandomPatch));
-
         HarmonyInstance.PatchAll(typeof(Combat.CollapseCatchOdds));
         HarmonyInstance.PatchAll(typeof(Combat.MissMe));
         HarmonyInstance.PatchAll(typeof(Combat.FullCombatAI));
