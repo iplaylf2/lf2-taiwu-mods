@@ -2,35 +2,12 @@
 
 本仓库是一个为《太吾绘卷》Mod 开发打造的模板与示范项目，旨在通过现代化的工具链和高度自动化的构建系统，为开发者提供一个高效、稳定且易于协作的开发环境。
 
-## ✨ 设计理念
+## ✨ 核心特性
 
-这个项目不仅是一个 Mod 合集，更是一套精心设计的 **Mod 开发解决方案**，其核心在于：
-
-- **高度自动化**: 通过预设的构建流程，你只需按约定命名项目，即可自动完成依赖引用、API 解锁等繁琐配置，专注于 Mod 逻辑本身。
-- **告别冲突**: 所有必需的依赖库都会在构建时自动内嵌到你的 Mod 程序集中，从根本上避免了与其他 Mod 的“DLL 冲突”。
-- **强类型与智能提示**: 游戏内部 API 已被“公开化”，你可以直接、安全地调用，并享受完整的 IDE 智能提示和编译时检查，告别手写字符串和反射。
-- **依赖版本统一**: 所有项目的 NuGet 依赖版本由根目录的 `Directory.Packages.props` 文件集中管理，确保版本一致，易于维护。
-
-## 📁 目录结构
-
-项目的结构经过精心组织，以实现关注点分离和最大化的代码复用。
-
-```
-.
-├── Directory.Build.props           # MSBuild 全局属性，定义游戏库、UPM库等关键路径
-├── Directory.Packages.props        # 中央包管理 (CPM)，统一定义所有 NuGet 依赖的版本
-├── game-lib/                       # 存放游戏本体的程序集 (需手动复制)
-├── global.json                     # 定义项目使用的 .NET SDK 版本
-├── nuget.config                    # 配置额外的 NuGet 源 (本项目中为 GitHub Packages)
-├── projects
-│   ├── common/                     # 公共代码库，为所有 Mod 提供可复用的功能
-│   ├── mods/                       # 所有独立 Mod 的项目目录
-│   │   ├── roll-protagonist/       # 真实 Mod 示例：开局“Roll”点
-│   │   └── ...
-│   └── .editorconfig               # C# 代码风格配置
-├── upm/                            # 存放 UPM (Unity Package Manager) 依赖 (需手动复制)
-└── .vscode/                        # 推荐的 VSCode 开发配置
-```
+- ✅ **自动化项目配置**: 创建项目并按约定命名，框架会自动处理目标平台、依赖引用等所有繁琐配置。
+- ✅ **依赖自动内嵌**: 告别“DLL冲突”，你的 Mod 发布时会是一个独立的纯净文件。
+- ✅ **完整智能提示**: 游戏私有 API 也拥有完整的代码提示，像调用官方函数一样顺滑。
+- ✅ **一键式环境准备**: 只需一个 `dotnet restore` 命令，即可自动备齐所有游戏库和开发库。
 
 ## 🚀 快速上手
 
@@ -116,7 +93,30 @@ dotnet build -t:LF2ForceRestoreBinaryDependencies
 
 请注意，`game-lib` 中包含的游戏库是为适配当前仓库中的 Mod 而精心筛选的。如果你在开发自己的新 Mod 时，发现缺少某些游戏程序集的引用，你可能需要手动从游戏目录复制它们到 `game-lib` 中，并自行调整项目的 `<Reference>`。
 
-## 🔩 核心工具
+## 📚 参考资料
+
+### 📁 目录结构
+
+<details>
+<summary>点击展开推荐的目录结构</summary>
+<pre><code>.
+├── Directory.Build.props       # 自动化核心：定义全局构建属性
+├── Directory.Packages.props    # 统一管理所有项目的NuGet包版本
+├── game-lib/                   # (自动下载) 游戏核心程序集
+├── upm/                        # (自动下载) Unity核心程序集
+├── projects/
+│   ├── common/                 # 公共库项目，可供所有Mod复用
+│   └── mods/                   # 你的工作区：所有Mod项目都放在这里
+│       └── MyNewMod/
+│           ├── MyNewMod.Backend/   # Mod后端项目 (遵循.Backend命名约定)
+│           │   └── MyNewMod.Backend.csproj
+│           ├── MyNewMod.Frontend/  # Mod前端项目 (遵循.Frontend命名约定)
+│           │   └── MyNewMod.Frontend.csproj
+│           └── Config.Lua
+</code></pre>
+</details>
+
+### 🔩 核心工具
 
 本模板的自动化功能主要由以下几个关键的开源工具驱动。感谢它们的开发者。
 
