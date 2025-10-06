@@ -14,8 +14,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
         HarmonyInstance.PatchAll(typeof(GameOpeningCheat.AllGoodFeature));
         HarmonyInstance.PatchAll(typeof(GameOpeningCheat.CanMoveResource));
         HarmonyInstance.PatchAll(typeof(GameOpeningCheat.MyHobbyValue));
-        HarmonyInstance.PatchAll(typeof(SkillBreakout.BrightenUp));
-        HarmonyInstance.PatchAll(typeof(SkillBreakout.NoCostOnFailMove));
+        HarmonyInstance.PatchAll(typeof(SkillBreakoutCheat.BrightenUp));
+        HarmonyInstance.PatchAll(typeof(SkillBreakoutCheat.NoCostOnFailMove));
     }
 
     public override void OnModSettingUpdate()
@@ -72,23 +72,23 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             }
         }
         {
-            var enable = SkillBreakout.BrightenUp.Enabled;
+            var enable = SkillBreakoutCheat.BrightenUp.Enabled;
             if (
                 DomainManager.Mod.GetSetting(ModIdStr, "brightenUp", ref enable)
-                && SkillBreakout.BrightenUp.Enabled != enable
+                && SkillBreakoutCheat.BrightenUp.Enabled != enable
             )
             {
-                SkillBreakout.BrightenUp.Enabled = enable;
+                SkillBreakoutCheat.BrightenUp.Enabled = enable;
             }
         }
         {
-            var enable = SkillBreakout.NoCostOnFailMove.Enabled;
+            var enable = SkillBreakoutCheat.NoCostOnFailMove.Enabled;
             if (
                 DomainManager.Mod.GetSetting(ModIdStr, "noCostOnFailMove", ref enable)
-                && SkillBreakout.NoCostOnFailMove.Enabled != enable
+                && SkillBreakoutCheat.NoCostOnFailMove.Enabled != enable
             )
             {
-                SkillBreakout.NoCostOnFailMove.Enabled = enable;
+                SkillBreakoutCheat.NoCostOnFailMove.Enabled = enable;
             }
         }
     }
