@@ -18,7 +18,7 @@
 - **.NET SDK**: 版本需满足 `global.json` 文件中的定义。
 - **GitHub PAT**: 一个拥有 `read:packages` 权限的 [Personal Access Token](https://github.com/settings/tokens)。
 
-### 1. 环境配置
+### 1. ⚙️ 环境配置
 
 本项目的依赖（游戏核心库、NuGet 包）都托管在 GitHub 上，你需要先完成身份认证。
 
@@ -32,7 +32,7 @@
   > **💡 IDE 提示**
   > Visual Studio 会在打开解决方案时自动处理大部分依赖还原。你可能无需设置环境变量，只需在 `工具 > NuGet 包管理器 > 程序包管理器设置` 中添加 GitHub 包源并配置一次凭据即可。
 
-### 2. 创建你的第一个 Mod
+### 2. 🎮 创建你的第一个 Mod
 
 本框架遵循**约定优于配置**的理念。创建一个新 Mod 的过程被大大简化：
 
@@ -46,7 +46,7 @@
 
 完成！仅需遵循 `.Backend` 或 `.Frontend` 的命名约定，构建系统就会自动为你设定目标框架、引用所有游戏程序集、配置 `Publicizer` 与 `ILRepack` 等。你无需关心任何构建细节，可以立即开始编写 Mod 逻辑。
 
-### 3. 开始编码
+### 3. 💻 开始编码
 
 现在，在你的项目文件夹中添加 C# 代码（如 `ModEntry.cs`），并遵循游戏官方的 Mod 开发文档编写逻辑即可。
 
@@ -54,7 +54,7 @@
 
 除了核心的自动化流程，本模板还提供了一些额外的命令与选项，以应对特殊场景。
 
-### 修复或强制还原游戏库
+### 🔄 修复或强制还原游戏库
 
 游戏库的版本与本仓库源码绑定。通常情况下，你无需手动干预。但如果本地的 `game-lib` 或 `upm` 目录因故损坏或缺失，你可以运行以下命令来强制重新下载和解压，以恢复它们：
 
@@ -62,13 +62,13 @@
 dotnet build -t:LF2ForceRestoreBinaryDependencies
 ```
 
-### 为 Fork 仓库配置依赖源
+### 🍴 为 Fork 仓库配置依赖源
 
 默认情况下，上述命令会从主仓库 `iplaylf2/lf2-taiwu-mods` 下载游戏库。如果你 Fork 了本项目并希望从你自己的仓库 Release 中下载依赖，你需要设置 `LF2_DEPS_REPO` 环境变量。
 
 - **格式**: `owner/repo`
 
-### 控制依赖内嵌
+### 📦 控制依赖内嵌
 
 默认情况下，所有第三方依赖都会被合并到最终的 Mod 程序集中，以避免 DLL 冲突。如果你希望某个特定的引用**不被合并**，保持为独立文件，可以在 `.csproj` 文件中为对应的 `<Reference>` 或 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。
 
@@ -82,13 +82,13 @@ dotnet build -t:LF2ForceRestoreBinaryDependencies
 </ItemGroup>
 ```
 
-### 查阅构建变量
+### 🔍 查阅构建变量
 
 本项目的自动化构建依赖于一系列在各级 `Directory.Build.props` 文件中定义的 MSBuild 变量（如 `LF2GameLibDir`, `LF2IsBackend` 等）。
 
 如果你需要进行深度定制（例如，在 `.csproj` 中添加自定义的构建逻辑），可以直接查阅这些 `.props` 文件来了解所有可用的变量。
 
-### 关于二进制依赖的范围
+### 🎯 关于二进制依赖的范围
 
 请注意，`game-lib` 中包含的游戏库是为适配当前仓库中的 Mod 而精心筛选的。如果你在开发自己的新 Mod 时，发现缺少某些游戏程序集的引用，你可能需要手动从游戏目录复制它们到 `game-lib` 中，并自行调整项目的 `<Reference>`。
 
