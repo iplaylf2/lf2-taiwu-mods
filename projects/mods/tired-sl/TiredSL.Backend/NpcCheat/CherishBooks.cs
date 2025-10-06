@@ -16,7 +16,7 @@ internal static class CherishBooks
     private static sbyte HandleGetGrade
     (
         [ConsumeStackValue] sbyte itemType,
-        [ConsumeStackValue] sbyte templateId
+        [ConsumeStackValue] short templateId
     )
     {
         return Enabled && itemType == ItemType.SkillBook
