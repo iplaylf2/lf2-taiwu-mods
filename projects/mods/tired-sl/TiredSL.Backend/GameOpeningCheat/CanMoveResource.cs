@@ -8,7 +8,7 @@ using Transil.Attributes;
 using Transil.Operations;
 using LF2.Game.Helper;
 
-namespace TiredSL.Backend.InitialSetup;
+namespace TiredSL.Backend.GameOpeningCheat;
 
 internal static class CanMoveResource
 {

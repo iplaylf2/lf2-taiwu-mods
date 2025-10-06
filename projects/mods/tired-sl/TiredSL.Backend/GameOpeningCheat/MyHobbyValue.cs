@@ -11,7 +11,7 @@ using Transil.Operations;
 using Transil.Attributes;
 using LF2.Game.Helper;
 
-namespace TiredSL.Backend.InitialSetup;
+namespace TiredSL.Backend.GameOpeningCheat;
 
 internal static class MyHobbyValue
 {

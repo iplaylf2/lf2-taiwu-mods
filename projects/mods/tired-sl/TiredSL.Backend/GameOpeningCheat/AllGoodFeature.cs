@@ -8,7 +8,7 @@ using Transil.Operations;
 using LF2.Game.Helper;
 using GameData.Common;
 
-namespace TiredSL.Backend.InitialSetup;
+namespace TiredSL.Backend.GameOpeningCheat;
 
 internal static class AllGoodFeature
 {

@@ -11,9 +11,9 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
         HarmonyInstance.PatchAll(typeof(CombatCheat.CollapseCatchOdds));
         HarmonyInstance.PatchAll(typeof(CombatCheat.MissMe));
         HarmonyInstance.PatchAll(typeof(CombatCheat.FullCombatAI));
-        HarmonyInstance.PatchAll(typeof(InitialSetup.AllGoodFeature));
-        HarmonyInstance.PatchAll(typeof(InitialSetup.CanMoveResource));
-        HarmonyInstance.PatchAll(typeof(InitialSetup.MyHobbyValue));
+        HarmonyInstance.PatchAll(typeof(GameOpeningCheat.AllGoodFeature));
+        HarmonyInstance.PatchAll(typeof(GameOpeningCheat.CanMoveResource));
+        HarmonyInstance.PatchAll(typeof(GameOpeningCheat.MyHobbyValue));
         HarmonyInstance.PatchAll(typeof(SkillBreakout.BrightenUp));
         HarmonyInstance.PatchAll(typeof(SkillBreakout.NoCostOnFailMove));
     }
@@ -42,33 +42,33 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             }
         }
         {
-            var enable = InitialSetup.AllGoodFeature.Enabled;
+            var enable = GameOpeningCheat.AllGoodFeature.Enabled;
             if (
                 DomainManager.Mod.GetSetting(ModIdStr, "allGoodFeature", ref enable)
-                && InitialSetup.AllGoodFeature.Enabled != enable
+                && GameOpeningCheat.AllGoodFeature.Enabled != enable
             )
             {
-                InitialSetup.AllGoodFeature.Enabled = enable;
+                GameOpeningCheat.AllGoodFeature.Enabled = enable;
             }
         }
         {
-            var enable = InitialSetup.CanMoveResource.Enabled;
+            var enable = GameOpeningCheat.CanMoveResource.Enabled;
             if (
                 DomainManager.Mod.GetSetting(ModIdStr, "canMoveResource", ref enable)
-                && InitialSetup.CanMoveResource.Enabled != enable
+                && GameOpeningCheat.CanMoveResource.Enabled != enable
             )
             {
-                InitialSetup.CanMoveResource.Enabled = enable;
+                GameOpeningCheat.CanMoveResource.Enabled = enable;
             }
         }
         {
-            var enable = InitialSetup.MyHobbyValue.Enabled;
+            var enable = GameOpeningCheat.MyHobbyValue.Enabled;
             if (
                 DomainManager.Mod.GetSetting(ModIdStr, "myHobbyValue", ref enable)
-                && InitialSetup.MyHobbyValue.Enabled != enable
+                && GameOpeningCheat.MyHobbyValue.Enabled != enable
             )
             {
-                InitialSetup.MyHobbyValue.Enabled = enable;
+                GameOpeningCheat.MyHobbyValue.Enabled = enable;
             }
         }
         {
