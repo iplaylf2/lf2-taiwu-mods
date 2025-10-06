@@ -1,15 +1,15 @@
-using GameData.Domains.Character;
-using HarmonyLib;
-using GameData.Utilities;
-using System.Reflection.Emit;
-using System.Reflection;
-using OrganizationMember = Config.OrganizationMember;
-using GameData.Domains.Character.Creation;
 using GameData.Common;
-using TiredSL.Backend.Kit;
-using Transil.Operations;
-using Transil.Attributes;
+using GameData.Domains.Character;
+using GameData.Domains.Character.Creation;
+using GameData.Utilities;
+using HarmonyLib;
 using LF2.Game.Helper;
+using OrganizationMember = Config.OrganizationMember;
+using System.Reflection;
+using System.Reflection.Emit;
+using TiredSL.Backend.Kit;
+using Transil.Attributes;
+using Transil.Operations;
 
 namespace TiredSL.Backend.GameOpeningCheat;
 

@@ -1,12 +1,12 @@
-using HarmonyLib;
-using System.Reflection.Emit;
-using GameData.Domains.Building;
+using BuildingBlock = Config.BuildingBlock;
 using GameData.Domains;
-using Config;
+using GameData.Domains.Building;
 using GameData.Domains.Map;
+using HarmonyLib;
+using LF2.Game.Helper;
+using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
-using LF2.Game.Helper;
 
 namespace TiredSL.Backend.GameOpeningCheat;
 

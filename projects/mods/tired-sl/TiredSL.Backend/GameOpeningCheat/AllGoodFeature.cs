@@ -1,12 +1,12 @@
 using CharacterFeature = Config.CharacterFeature;
+using GameData.Common;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using HarmonyLib;
+using LF2.Game.Helper;
 using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
-using LF2.Game.Helper;
-using GameData.Common;
 
 namespace TiredSL.Backend.GameOpeningCheat;
 
