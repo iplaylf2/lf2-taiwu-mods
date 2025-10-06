@@ -19,6 +19,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(GameOpeningCheat.CanMoveResource),
             typeof(GameOpeningCheat.MyHobbyValue),
 
+            typeof(NpcCheat.CherishBooks),
+
             typeof(SkillBreakoutCheat.BrightenUp),
             typeof(SkillBreakoutCheat.NoCostOnFailMove),
         ]);
@@ -66,6 +68,13 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             if (DomainManager.Mod.GetSetting(ModIdStr, "myHobbyValue", ref enable))
             {
                 GameOpeningCheat.MyHobbyValue.Enabled = enable;
+            }
+        }
+        {
+            var enable = NpcCheat.CherishBooks.Enabled;
+            if (DomainManager.Mod.GetSetting(ModIdStr, "cherishBooks", ref enable))
+            {
+                NpcCheat.CherishBooks.Enabled = enable;
             }
         }
         {
