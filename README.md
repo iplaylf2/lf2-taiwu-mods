@@ -47,106 +47,65 @@
 
 ## 🚀 如何开始
 
-请跟随以下步骤配置你的开发环境。
+开发环境的配置主要包含 **安装 .NET SDK** 和 **还原项目依赖** 两个步骤。
 
-### 1️⃣ 安装 .NET SDK
+### 1. 安装 .NET SDK
 
-确保已安装 `global.json` 文件中指定的 .NET SDK 版本（当前为 `9.0.200` 或更高）。你可以使用 `dotnet --version` 命令检查当前版本。
+首先，请确保已安装 `global.json` 文件中指定的 .NET SDK 版本（当前为 `9.0.200` 或更高）。你可以在终端中运行 `dotnet --version` 来检查。
 
-### 2️⃣ 配置 GitHub 认证
+### 2. 还原项目依赖
 
-为了从 GitHub Packages 拉取 NuGet 依赖，你需要配置身份认证。这是 GitHub 的标准操作流程，即使对于公开仓库也是如此。配置好的凭据也会被用于下载二进制依赖。
+本项目的依赖分为两部分：从 GitHub Packages 下载的 **NuGet 包** 和存放于 GitHub Releases 的 **游戏核心库**。为了能顺利下载它们，你需要先配置 GitHub 身份认证。
 
-1.  **准备 Personal Access Token (PAT)**
-    你需要一个拥有 `read:packages` 权限的 [Personal Access Token (PAT)](https://github.com/settings/tokens)。
+1.  **配置 GitHub 认证**
+    -   创建一个拥有 `read:packages` 权限的 [Personal Access Token (PAT)](https://github.com/settings/tokens)。
+    -   将你的用户名和 PAT 配置为环境变量 `GITHUB_USERNAME` 和 `GITHUB_TOKEN`。
 
-2.  **配置环境变量**
-    本项目推荐通过环境变量进行认证。请确保已设置以下两个环境变量：
-    - `GITHUB_USERNAME`：你的 GitHub 用户名
-    - `GITHUB_TOKEN`：上一步创建的 PAT
+2.  **执行还原**
+    完成认证配置后，在项目根目录运行以下命令：
+    ```bash
+    dotnet restore
+    ```
+    此命令会自动执行以下操作：
+    -   **还原 NuGet 包**: 下载所有项目所需的 NuGet 包。
+    -   **恢复二进制依赖**: 自动从 GitHub Releases 下载并解压 `game-lib` (游戏核心库) 和 `upm` (Unity 库)。此过程默认从主仓库 `iplaylf2/lf2-taiwu-mods` 下载，若需指定私有仓库，请设置 `LF2_DEPS_REPO` 环境变量 (格式为 `owner/repo`)。如果需要强制更新，可以运行 `dotnet build -t:LF2ForceRestoreBinaryDependencies`。
 
-    关于创建 PAT 及配置认证的多种方法，请参阅 [GitHub 官方文档](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry#authenticating-to-github-packages)。
+完成以上步骤后，你的开发环境便已就绪。
 
 > **💡 Visual Studio 用户提示**
-> 如果你使用 Visual Studio，也可以通过其内置的 NuGet 包管理器 UI 添加凭据，这可能更直接。
-
-### 3️⃣ 自动恢复二进制依赖
-
-本项目会自动从 GitHub Releases 下载并解压游戏核心库 (`game-lib`) 和 UPM 依赖 (`upm`)。你 **不再需要** 手动复制任何文件。此过程默认从主仓库 `iplaylf2/lf2-taiwu-mods` 下载，fork 后可直接使用。若需指定私有仓库，请设置 `LF2_DEPS_REPO` 环境变量 (格式为 `owner/repo`)。
-
-这个过程会在你首次运行 `dotnet build` 或 `dotnet restore` 时自动执行。
-
-如果依赖文件损坏或需要强制更新，可以运行以下命令重新下载：
-```bash
-dotnet build -t:LF2ForceRestoreBinaryDependencies
-```
-
-### 4️⃣ 还原依赖与构建
-
-完成以上步骤后，在项目根目录执行以下命令来还原 NuGet 包并构建所有 Mod：
-
-```bash
-dotnet build
-```
-
-构建产物将位于各个 Mod 项目的 `bin/` 目录下。
+> 对于 Visual Studio 用户，大部分流程是自动化的：
+> - **依赖还原**: 打开 `lf2-taiwu-mods.slnx` 解决方案时，Visual Studio 会自动执行 `restore` 操作。
+> - **GitHub 认证**: 你可以在 `工具 > NuGet 包管理器 > 程序包管理器设置` 中添加 GitHub 包源并配置凭据，无需设置环境变量。
 
 ## ✨ 新增 Mod 开发流程
 
-得益于本框架的自动化配置，创建一个新的 Mod 项目非常简单。
+得益于本框架的自动化配置，创建一个新 Mod 的过程被大大简化。
 
-### 1. 创建目录和项目文件
+### 1. 创建项目
 
-- 在 `projects/mods/` 目录下，为你的新 Mod 创建一个主文件夹，例如 `MyNewMod`。
-- 在 `MyNewMod` 文件夹内，根据你的需要创建项目文件夹，例如 `MyNewMod.Backend`。
-- 在 `MyNewMod.Backend` 文件夹中，创建一个名为 `MyNewMod.Backend.csproj` 的项目文件。
+首先，在 `projects/mods/` 目录下为你的新 Mod 创建一个文件夹（如 `MyNewMod`），然后在其中创建对应的项目文件夹（如 `MyNewMod.Backend`）。
 
-### 2. 编辑项目文件
-
-一个最基础的项目文件仅需包含 Sdk 声明：
-
+在项目文件夹中，创建一个最简化的 C# 项目文件 `MyNewMod.Backend.csproj`：
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 </Project>
 ```
 
-**但这仅适用于不依赖任何 `common` 共享库的 Mod。**
+### 2. 理解自动化配置
 
-在实际开发中，你很可能需要引用 `projects/common/` 目录下的各种辅助库。你可以通过添加 `<ProjectReference>` 来实现这一点。一个更典型的项目文件如下所示：
+**你无需进行任何额外的配置。** 仅凭以上步骤，构建系统就能根据你的 **项目路径和命名** (例如，以 `.Backend` 结尾) 自动完成所有繁重工作，包括：
 
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <!-- 引用此 Mod 自身的前后端共享项目 -->
-        <ProjectReference Include="$(LF2Mods)/MyNewMod/MyNewMod.Common/MyNewMod.Common.csproj" />
-        <!-- 引用 monorepo 中的公共辅助库 -->
-        <ProjectReference Include="$(LF2Common)/LF2.Kit/LF2.Kit.csproj" />
-        <ProjectReference Include="$(LF2Common)/LF2.Backend.Helper/LF2.Backend.Helper.csproj" />
-    </ItemGroup>
-</Project>
-```
+-   设定正确的目标框架 (`net6.0` 或 `netstandard2.1`)。
+-   自动引用所有相关的游戏核心程序集。
+-   通过 **Publicizer** 启用对游戏内部 API 的强类型访问。
+-   自动引入 `LF2.Transil` (Harmony Patcher) 等核心工具库。
+-   将 `LF2.Game.Helper` 的源码作为共享文件包含进来。
+-   配置 **ILRepack** 以在构建时自动内嵌所有第三方依赖，确保 Mod 的独立与纯净。
+-   统一代码风格、启用空引用检查等，保障代码质量。
 
-因为项目的文件路径和命名（例如以 `.Backend` 结尾）符合 `projects/mods/Directory.Build.props` 中定义的规则，构建系统会自动为你完成以下所有配置：
+### 3. 开始编码
 
-- **✅ 构建与打包**:
-  - 设置正确的 .NET TargetFramework (`net6.0` 或 `netstandard2.1`)。
-  - 配置 `ILRepack` 以便在构建时自动合并第三方依赖项。
-- **✅ 游戏与公共库引用**:
-  - 自动引用 `LF2.Transil` 等核心 NuGet 包。
-  - 添加对相应游戏核心程序集（前端或后端）的引用。
-  - 启用 `Publicizer` 来安全地访问游戏的内部 API。
-  - 自动包含 `LF2.Game.Helper` 的源码。
-- **✅ 代码质量与开发效率**:
-  - 自动启用最新的 C# 语言特性，鼓励使用现代语法。
-  - 默认开启一系列代码健壮性检查（如空引用分析）。
-  - 统一应用仓库的代码风格、格式化规则，并在构建时进行检查。
-  - 集成代码分析器，在开发过程中提供实时的辅助与重构建议。
-
-### 3. 后续步骤
-
-1.  **添加到解决方案**: 在你的 IDE 中（或通过 `dotnet sln add` 命令）将这个新项目添加到解决方案，以便管理和编码。
-2.  **添加代码**: 在项目中创建你的 C# 代码文件（例如 `ModEntry.cs`）。
-3.  **开始开发**: 遵循游戏官方的 Mod 开发文档，即可开始编写你的 Mod 逻辑。
+现在，你可以开始在项目中添加 C# 代码（如 `ModEntry.cs`），并遵循游戏官方的 Mod 开发文档编写逻辑了。
 
 
 ## ⚙️ MSBuild 构建系统详解
