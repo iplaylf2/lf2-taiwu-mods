@@ -82,8 +82,8 @@ return {
     BackendPlugins = {
         [1] = "TiredSL.Backend.dll"
     },
-    Cover = "Cover.png",
-    WorkshopCover = "Cover.png",
+    Cover = "Cover.jpg",
+    WorkshopCover = "Cover.jpg",
     DetailImageList = {
         [1] = "DetailImage1.png"
     }
