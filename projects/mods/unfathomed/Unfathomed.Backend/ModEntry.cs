@@ -1,4 +1,5 @@
-﻿using TaiwuModdingLib.Core.Plugin;
+﻿using LF2.Game.Helper.Extensions;
+using TaiwuModdingLib.Core.Plugin;
 
 namespace Unfathomed.Backend;
 
@@ -7,8 +8,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
-        var patchers = new[]
-        {
+        HarmonyInstance.PatchArray
+        ([
             typeof(AgeCompletion.AiConditionPatcher),
             typeof(AgeCompletion.BuildingDomainPatcher),
             typeof(AgeCompletion.CharacterDomainPatcher),
@@ -31,11 +32,6 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(FertilityCompletion.PregnantStatePatcher),
 
             typeof(RandomCompletion.RedzenHelperPatcher),
-        };
-
-        foreach (var patcher in patchers)
-        {
-            HarmonyInstance.PatchAll(patcher);
-        }
+        ]);
     }
 }
