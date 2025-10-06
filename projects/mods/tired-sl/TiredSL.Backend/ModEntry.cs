@@ -8,9 +8,9 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
-        HarmonyInstance.PatchAll(typeof(Combat.CollapseCatchOdds));
-        HarmonyInstance.PatchAll(typeof(Combat.MissMe));
-        HarmonyInstance.PatchAll(typeof(Combat.FullCombatAI));
+        HarmonyInstance.PatchAll(typeof(CombatCheat.CollapseCatchOdds));
+        HarmonyInstance.PatchAll(typeof(CombatCheat.MissMe));
+        HarmonyInstance.PatchAll(typeof(CombatCheat.FullCombatAI));
         HarmonyInstance.PatchAll(typeof(InitialSetup.AllGoodFeature));
         HarmonyInstance.PatchAll(typeof(InitialSetup.CanMoveResource));
         HarmonyInstance.PatchAll(typeof(InitialSetup.MyHobbyValue));
@@ -21,33 +21,24 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
     public override void OnModSettingUpdate()
     {
         {
-            var enable = Combat.CollapseCatchOdds.Enabled;
-            if (
-                DomainManager.Mod.GetSetting(ModIdStr, "collapseCatchOdds", ref enable)
-                && Combat.CollapseCatchOdds.Enabled != enable
-            )
+            var enable = CombatCheat.CollapseCatchOdds.Enabled;
+            if (DomainManager.Mod.GetSetting(ModIdStr, "collapseCatchOdds", ref enable))
             {
-                Combat.CollapseCatchOdds.Enabled = enable;
+                CombatCheat.CollapseCatchOdds.Enabled = enable;
             }
         }
         {
-            var enable = Combat.FullCombatAI.Enabled;
-            if (
-                DomainManager.Mod.GetSetting(ModIdStr, "fullCombatAI", ref enable)
-                && Combat.FullCombatAI.Enabled != enable
-            )
+            var enable = CombatCheat.FullCombatAI.Enabled;
+            if (DomainManager.Mod.GetSetting(ModIdStr, "fullCombatAI", ref enable))
             {
-                Combat.FullCombatAI.Enabled = enable;
+                CombatCheat.FullCombatAI.Enabled = enable;
             }
         }
         {
-            var enable = Combat.MissMe.Enabled;
-            if (
-                DomainManager.Mod.GetSetting(ModIdStr, "missMe", ref enable)
-                && Combat.MissMe.Enabled != enable
-            )
+            var enable = CombatCheat.MissMe.Enabled;
+            if (DomainManager.Mod.GetSetting(ModIdStr, "missMe", ref enable))
             {
-                Combat.MissMe.Enabled = enable;
+                CombatCheat.MissMe.Enabled = enable;
             }
         }
         {
