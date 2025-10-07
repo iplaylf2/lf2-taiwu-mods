@@ -41,11 +41,7 @@ internal static class BuildingDomainPatcher
         );
 
         _ = matcher
-        .MatchForward
-        (
-            false,
-            new CodeMatch(OpCodes.Callvirt, targetMethod)
-        )
+        .MatchStartForward(new CodeMatch(OpCodes.Callvirt, targetMethod))
         .Repeat
         (
             (matcher) =>

@@ -44,11 +44,7 @@ internal static class CharacterPatcher
 
         _ = matcher
         .Start()
-        .MatchForward
-        (
-            false,
-            new CodeMatch(x => x.IsStarg(3))
-        )
+        .MatchStartForward(new CodeMatch(x => x.IsStarg(3)))
         .Repeat(
             (matcher) =>
             {

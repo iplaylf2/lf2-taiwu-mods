@@ -276,11 +276,7 @@ internal static class MyHobbyValue
 
             _ = matcher
             .Start()
-            .MatchForward
-            (
-                false,
-                new CodeMatch(OpCodes.Stfld)
-            )
+            .MatchStartForward(new CodeMatch(OpCodes.Stfld))
             .Repeat
             (
                 (matcher) =>
@@ -314,11 +310,7 @@ internal static class MyHobbyValue
 
             _ = matcher
             .Start()
-            .MatchForward
-            (
-                false,
-                new CodeMatch(OpCodes.Callvirt, targetMethod)
-            )
+            .MatchStartForward(new CodeMatch(OpCodes.Callvirt, targetMethod))
             .Repeat
             (
                 (matcher) =>

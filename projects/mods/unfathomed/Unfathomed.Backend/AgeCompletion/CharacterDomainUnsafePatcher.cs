@@ -75,11 +75,7 @@ internal static class CharacterDomainUnsafePatcher
 
         _ = matcher
         .Start()
-        .MatchForward
-        (
-            false,
-            new CodeMatch(OpCodes.Stloc_S, ageGroup2Loc)
-        )
+        .MatchStartForward(new CodeMatch(OpCodes.Stloc_S, ageGroup2Loc))
         .ThrowIfInvalid("Anchor no matched.")
         .Advance(1)
         .InsertAndAdvance

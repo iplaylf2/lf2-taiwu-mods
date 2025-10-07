@@ -40,11 +40,7 @@ internal static class CherishBooks
         );
 
         _ = matcher
-        .MatchForward
-        (
-            false,
-            new CodeMatch(OpCodes.Call, targetMethod)
-        )
+        .MatchStartForward(new CodeMatch(OpCodes.Call, targetMethod))
         .Repeat
         (
             (matcher) =>

@@ -51,11 +51,7 @@ internal static class CharacterMatcherHelperPatcher
         );
 
         _ = matcher
-        .MatchForward
-        (
-            false,
-            new CodeMatch(OpCodes.Call, targetMethod)
-        )
+        .MatchStartForward(new CodeMatch(OpCodes.Call, targetMethod))
         .Repeat(
             (matcher) =>
             {
