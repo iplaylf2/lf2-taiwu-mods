@@ -1,5 +1,6 @@
 using GameData.Domains.Character;
 using HarmonyLib;
+using LF2.Game.Helper;
 
 namespace Unfathomed.Backend.AgeCompletion;
 
@@ -24,6 +25,32 @@ internal static class CharacterDomainPatcher
     )
     {
         return ChildAsAdultHelper.ByFixGetAgeGroupResult(instructions);
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage
+    ("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")
+    ]
+    [HarmonyTranspiler]
+    [HarmonyPatch(nameof(CharacterDomain.GetPotentialRelatedCharactersInSet))]
+    private static IEnumerable<CodeInstruction> GetPotentialRelatedCharactersInSet
+    (
+        IEnumerable<CodeInstruction> instructions
+    )
+    {
+        try
+        {
+            var matcher = new CodeMatcher(instructions);
+
+            throw new NotImplementedException("todo: hardcode is all you need");
+
+            return matcher.InstructionEnumeration();
+        }
+        catch (Exception e)
+        {
+            StructuredLogger.Info("Target IL has changed.", new { e.Message });
+
+            return instructions;
+        }
     }
 
     [HarmonyTranspiler]
