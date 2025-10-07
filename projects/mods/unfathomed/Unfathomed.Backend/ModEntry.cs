@@ -13,6 +13,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(AgeCompletion.AiConditionPatcher),
             typeof(AgeCompletion.BuildingDomainPatcher),
             typeof(AgeCompletion.CharacterDomainPatcher),
+            typeof(AgeCompletion.CharacterMatcherHelperPatcher),
             typeof(AgeCompletion.CharacterPatcher),
             typeof(AgeCompletion.CharacterSortFilterPatcher),
             typeof(AgeCompletion.CombatDomainPatcher),

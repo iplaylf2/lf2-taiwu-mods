@@ -48,7 +48,8 @@ internal static class PregnantStatePatcher
 
         _ = matcher
         .Start()
-        .MatchForward(
+        .MatchForward
+        (
             false,
             new CodeMatch(OpCodes.Callvirt, targetMethod)
         )

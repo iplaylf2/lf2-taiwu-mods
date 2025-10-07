@@ -44,7 +44,8 @@ internal static class CharacterPatcher
 
         _ = matcher
         .Start()
-        .MatchForward(
+        .MatchForward
+        (
             false,
             new CodeMatch(OpCodes.Starg_S, (byte)3)
         )

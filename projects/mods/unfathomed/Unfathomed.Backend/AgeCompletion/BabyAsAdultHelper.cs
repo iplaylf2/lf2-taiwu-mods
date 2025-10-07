@@ -41,7 +41,8 @@ internal static class BabyAsAdultHelper
 
             _ = matcher
             .Start()
-            .MatchForward(
+            .MatchForward
+            (
                 false,
                 new CodeMatch(OpCodes.Call, targetMethod)
             )
@@ -57,7 +58,8 @@ internal static class BabyAsAdultHelper
 
             _ = matcher
             .Start()
-            .MatchForward(
+            .MatchForward
+            (
                 false,
                 new CodeMatch(OpCodes.Call, targetMethod)
             )
@@ -65,7 +67,8 @@ internal static class BabyAsAdultHelper
 
             _ = matcher
             .Start()
-            .MatchForward(
+            .MatchForward
+            (
                 false,
                 new CodeMatch(OpCodes.Callvirt, targetMethod)
             )

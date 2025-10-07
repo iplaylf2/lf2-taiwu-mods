@@ -41,11 +41,13 @@ internal static class BuildingDomainPatcher
         );
 
         _ = matcher
-        .MatchForward(
+        .MatchForward
+        (
             false,
             new CodeMatch(OpCodes.Callvirt, targetMethod)
         )
-        .Repeat(
+        .Repeat
+        (
             (matcher) =>
             {
                 ILManipulator.ApplyTransformation(matcher, FixSwapSoulCeremonyRemoveWhereArg);
