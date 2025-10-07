@@ -21,9 +21,14 @@ internal static class CharacterMatcherHelperPatcher
         [InjectArgumentValue(0)] CharacterMatcherItem matcherItem
     )
     {
+        var allowChild = new HashSet<CharacterMatcherItem>()
+        {
+            CharacterMatcher.DefValue.EmeiPotentialVictims
+        };
+
         return matcherItem switch
         {
-            var x when x == CharacterMatcher.DefValue.EmeiPotentialVictims
+            var x when allowChild.Contains(x)
                 => character.GetAgeGroup() != AgeGroup.Baby,
             _ => ageType.Match(character),
         };
