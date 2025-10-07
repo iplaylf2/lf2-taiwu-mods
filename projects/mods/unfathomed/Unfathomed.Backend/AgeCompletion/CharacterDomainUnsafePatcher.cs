@@ -2,10 +2,12 @@ using GameData.Domains.Character;
 using GameData.Domains.Character.Ai;
 using GameData.Domains.Character.Relation;
 using HarmonyLib;
+using LF2.Cecil.Helper.Extensions;
 using LF2.Game.Helper;
 using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
+using AgeGroupPair = (sbyte, sbyte);
 
 namespace Unfathomed.Backend.AgeCompletion;
 
@@ -13,7 +15,7 @@ namespace Unfathomed.Backend.AgeCompletion;
 internal static class CharacterDomainUnsafePatcher
 {
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    private static (sbyte, sbyte) FixAdoreAgeGroup
+    private static AgeGroupPair FixAdoreAgeGroup
     (
         [ConsumeStackValue] Character subject,
         [ConsumeStackValue] Character @object,
@@ -52,20 +54,23 @@ internal static class CharacterDomainUnsafePatcher
         var matcher = new CodeMatcher(instructions);
 
         const byte characterArg = 4;
-        const byte elementObjectsLoc = 11;
-        // const byte ageGroup1Loc = 2;
-        const byte ageGroup2Loc = 14;
 
-        var ageGroupTupleType = typeof(Tuple<sbyte, sbyte>);
-        var item1Property = AccessTools.Property
+        _ = instructions.TryGetLoc(11, out var elementObjectsLoc);
+
+        // const byte ageGroup1Loc = 2;
+
+        _ = instructions.TryGetLoc(14, out var ageGroup2Loc);
+
+        var ageGroupTupleType = typeof(AgeGroupPair);
+        var item1Field = AccessTools.Field
         (
             ageGroupTupleType,
-            nameof(Tuple<sbyte, sbyte>.Item1)
+            nameof(AgeGroupPair.Item1)
         );
-        var item2Property = AccessTools.Property
+        var item2Field = AccessTools.Field
         (
             ageGroupTupleType,
-            nameof(Tuple<sbyte, sbyte>.Item2)
+            nameof(AgeGroupPair.Item2)
         );
 
         _ = matcher
@@ -73,11 +78,7 @@ internal static class CharacterDomainUnsafePatcher
         .MatchForward
         (
             false,
-            new CodeMatch
-            (
-                x => x.opcode == OpCodes.Stloc_S
-                    && x.operand is LocalBuilder { LocalIndex: ageGroup2Loc }
-            )
+            new CodeMatch(OpCodes.Stloc_S, ageGroup2Loc)
         )
         .ThrowIfInvalid("Anchor no matched.")
         .Advance(1)
@@ -93,9 +94,9 @@ internal static class CharacterDomainUnsafePatcher
         .InsertAndAdvance
         ([
             new(OpCodes.Dup),
-            new(OpCodes.Ldfld, item1Property),
+            new(OpCodes.Ldfld, item1Field),
             new(OpCodes.Stloc_2),
-            new(OpCodes.Ldfld, item2Property),
+            new(OpCodes.Ldfld, item2Field),
             new(OpCodes.Stloc_S, ageGroup2Loc),
         ]);
 
