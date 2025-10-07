@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using GameData.Domains.Character;
 using HarmonyLib;
 using LF2.Game.Helper;
@@ -41,7 +42,42 @@ internal static class CharacterDomainPatcher
         {
             var matcher = new CodeMatcher(instructions);
 
-            throw new NotImplementedException("todo: hardcode is all you need");
+            const byte characterArg = 4;
+            const byte elementObjectsLoc = 11;
+            // const byte ageGroup1Loc = 2;
+            const byte ageGroup2Loc = 14;
+
+            var ageGroupTupleType = typeof(Tuple<sbyte, sbyte>);
+            var item1Field = AccessTools.Field
+            (
+                ageGroupTupleType,
+                nameof(Tuple<sbyte, sbyte>.Item1)
+            );
+            var item2Field = AccessTools.Field
+            (
+                ageGroupTupleType,
+                nameof(Tuple<sbyte, sbyte>.Item2)
+            );
+
+            _ = matcher
+            .Start()
+            .MatchForward
+            (
+                false,
+                new CodeMatch(OpCodes.Stloc_S, ageGroup2Loc)
+            )
+            .Advance(1)
+            .InsertAndAdvance
+            ([
+                new(OpCodes.Ldarg_S, characterArg),
+                new(OpCodes.Ldloc_S, elementObjectsLoc),
+                new(OpCodes.Call, "todo"),
+                new(OpCodes.Dup),
+                new(OpCodes.Ldfld, item1Field),
+                new(OpCodes.Stloc_2),
+                new(OpCodes.Ldfld, item2Field),
+                new(OpCodes.Stloc_S, ageGroup2Loc),
+            ]);
 
             return matcher.InstructionEnumeration();
         }
