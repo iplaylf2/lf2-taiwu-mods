@@ -22,6 +22,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(AgeCompletion.LegendaryBookDomainPatcher),
             typeof(AgeCompletion.MapDomainPatcher),
             typeof(AgeCompletion.OrganizationDomainPatcher),
+            typeof(AgeCompletion.PrioritizedActionPatcher),
             typeof(AgeCompletion.SectPatcher),
             typeof(AgeCompletion.SettlementPatcher),
             typeof(AgeCompletion.VillagerRoleHeadPatcher),

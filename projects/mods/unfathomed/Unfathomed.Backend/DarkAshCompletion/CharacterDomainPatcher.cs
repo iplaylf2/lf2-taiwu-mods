@@ -19,8 +19,8 @@ internal static class CharacterDomainPatcher
     {
         return AgeGroup.GetAgeGroup(original) switch
         {
-            AgeGroup.Baby => 70,
-            AgeGroup.Child => 40,
+            AgeGroup.Baby => GlobalConfig.AgeDarkAshVictim,
+            AgeGroup.Child => GlobalConfig.AgeDarkAsh,
             _ => original,
         };
     }
