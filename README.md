@@ -115,6 +115,8 @@ dotnet build -t:LF2ForceRestoreBinaryDependencies
 </code></pre>
 </details>
 
+本仓库的 `projects/mods/` 目录存放了本人开发的全部 Mod 作品。详细列表与介绍请参阅该目录下的 [**README**](./projects/mods/README.md)。
+
 ### 🔩 核心工具
 
 本模板的自动化功能主要由以下几个关键的开源工具驱动。感谢它们的开发者。
