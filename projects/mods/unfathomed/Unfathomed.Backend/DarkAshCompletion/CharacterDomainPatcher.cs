@@ -19,8 +19,8 @@ internal static class CharacterDomainPatcher
     {
         return AgeGroup.GetAgeGroup(original) switch
         {
-            AgeGroup.Baby => 70,
-            AgeGroup.Child => 40,
+            AgeGroup.Baby => GlobalConfig.AgeDarkAshVictim,
+            AgeGroup.Child => GlobalConfig.AgeDarkAsh,
             _ => original,
         };
     }
@@ -52,10 +52,7 @@ internal static class CharacterDomainPatcher
 
             _ = matcher
             .Start()
-            .MatchForward(
-                false,
-                new CodeMatch(OpCodes.Callvirt, targetMethod)
-            )
+            .MatchStartForward(new CodeMatch(OpCodes.Callvirt, targetMethod))
             .Repeat(
                 (matcher) =>
                 {
@@ -80,10 +77,7 @@ internal static class CharacterDomainPatcher
 
             _ = matcher
             .Start()
-            .MatchForward(
-                false,
-                new CodeMatch(OpCodes.Callvirt, targetMethod)
-            )
+            .MatchStartForward(new CodeMatch(OpCodes.Callvirt, targetMethod))
             .Repeat(
                 (matcher) =>
                 {

@@ -75,11 +75,7 @@ internal static class AllGoodFeature
 
         _ = matcher
         .Start()
-        .MatchForward
-        (
-            false,
-            new CodeMatch(OpCodes.Ldfld, targetField)
-        )
+        .MatchStartForward(new CodeMatch(OpCodes.Ldfld, targetField))
         .Repeat
         (
             (matcher) =>

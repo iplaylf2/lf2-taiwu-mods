@@ -41,10 +41,7 @@ internal static class ChildAsAdultHelper
 
             _ = matcher
             .Start()
-            .MatchForward(
-                false,
-                new CodeMatch(OpCodes.Call, targetMethod)
-            )
+            .MatchStartForward(new CodeMatch(OpCodes.Call, targetMethod))
             .Repeat(ApplyTransformation(callerMember));
         }
 
@@ -57,18 +54,12 @@ internal static class ChildAsAdultHelper
 
             _ = matcher
             .Start()
-            .MatchForward(
-                false,
-                new CodeMatch(OpCodes.Call, targetMethod)
-            )
+            .MatchStartForward(new CodeMatch(OpCodes.Call, targetMethod))
             .Repeat(ApplyTransformation(callerMember));
 
             _ = matcher
             .Start()
-            .MatchForward(
-                false,
-                new CodeMatch(OpCodes.Callvirt, targetMethod)
-            )
+            .MatchStartForward(new CodeMatch(OpCodes.Callvirt, targetMethod))
             .Repeat(ApplyTransformation(callerMember));
         }
 

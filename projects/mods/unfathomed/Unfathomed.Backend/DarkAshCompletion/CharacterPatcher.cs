@@ -26,7 +26,9 @@ internal static class CharacterPatcher
             return original;
         }
 
-        var leftTime = (16 * 12) - CharacterDomain.GetLivedMonths(age, instance.GetBirthMonth());
+        var leftTime =
+        (GlobalConfig.AgeAdult * 12)
+        - CharacterDomain.GetLivedMonths(age, instance.GetBirthMonth());
 
         return original + Math.Max(0, leftTime);
     }
@@ -42,10 +44,7 @@ internal static class CharacterPatcher
 
         _ = matcher
         .Start()
-        .MatchForward(
-            false,
-            new CodeMatch(OpCodes.Starg_S, (byte)3)
-        )
+        .MatchStartForward(new CodeMatch(x => x.IsStarg(3)))
         .Repeat(
             (matcher) =>
             {

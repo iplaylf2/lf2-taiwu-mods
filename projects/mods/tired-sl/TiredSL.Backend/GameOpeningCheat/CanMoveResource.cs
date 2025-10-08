@@ -69,11 +69,7 @@ internal static class CanMoveResource
         );
 
         _ = matcher
-        .MatchForward
-        (
-            false,
-            new CodeMatch(OpCodes.Newobj, targetCtor)
-        )
+        .MatchStartForward(new CodeMatch(OpCodes.Newobj, targetCtor))
         .Repeat
         (
             (matcher) =>
