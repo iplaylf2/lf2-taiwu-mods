@@ -5,8 +5,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
 
-        <Compile Include="$(LF2CommonDir)/LF2.Game.Helper/**/*.cs" />
-
         <Reference Include="$(LF2UpmDir)/UniTask/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
@@ -15,6 +13,8 @@
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
+
+        <ProjectReference Include="../LF2.Game.Helper/LF2.Game.Helper.csproj" />
 
         <Publicize Include="Assembly-CSharp" />
         <Publicize Include="GameData.Shared" />
