@@ -1,7 +1,7 @@
 using System.Reflection.Emit;
 using HarmonyLib;
 
-namespace LF2.Cecil.Helper.Debuggers;
+namespace LF2.Cecil.Helper;
 
 public static class CodeMatherDebugger
 {

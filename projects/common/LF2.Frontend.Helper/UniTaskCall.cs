@@ -1,9 +1,9 @@
-using System.Collections.Concurrent;
 using Cysharp.Threading.Tasks;
 using GameData.Domains.Mod;
 using GameData.GameDataBridge;
 using GameData.Serializer;
-using LF2.Game.Helper;
+using LF2.Game.Helper.Communication;
+using System.Collections.Concurrent;
 
 namespace LF2.Frontend.Helper;
 
@@ -24,7 +24,7 @@ public sealed class UniTaskCall
         try
         {
             _ = CallRegistry.TryAdd(callId, completionSource);
-            parameter.Set(CommonModConstants.CallIdKey, callId);
+            parameter.Set(CommunicationConstant.CallIdKey, callId);
 
             ModDomainMethod.Call.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
 
@@ -60,7 +60,7 @@ public sealed class UniTaskCall
 
             _ = Serializer.Deserialize(notification.DataPool, offset, ref modData);
 
-            _ = modData.Get(CommonModConstants.CallIdKey, out int callId);
+            _ = modData.Get(CommunicationConstant.CallIdKey, out int callId);
 
             _ = CallRegistry.TryGetValue(callId, out var completionSource);
 

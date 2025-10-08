@@ -1,4 +1,3 @@
-using System.Reflection;
 using GameData.Common;
 using GameData.Domains;
 using GameData.Domains.Character;
@@ -9,9 +8,10 @@ using GameData.Utilities;
 using HarmonyLib;
 using LF2.Backend.Helper;
 using LF2.Cecil.Helper;
-using LF2.Game.Helper;
+using LF2.Game.Helper.Communication;
 using MonoMod.Cil;
 using RollProtagonist.Common;
+using System.Reflection;
 
 namespace RollProtagonist.Backend;
 

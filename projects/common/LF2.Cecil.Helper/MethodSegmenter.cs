@@ -73,27 +73,23 @@ public static class MethodSegmenter
         ilContext = new ILContext(dynamicMethod.Definition);
     }
 
-    public static void GuardOriginalReturns(ILContext ilContext, MethodInfo prototype)
+    private static void GuardOriginalReturns(ILContext ilContext, MethodInfo prototype)
     {
         var ilCursor = new ILCursor(ilContext);
 
         ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
-        if (prototype.ReturnType == typeof(void))
+        Action @do = prototype.ReturnType switch
         {
-            PatchVoidReturns(retCursors);
-        }
-        else if (prototype.ReturnType.IsValueType)
-        {
-            PatchValueReturns(retCursors, prototype.ReturnType);
-        }
-        else
-        {
-            PatchObjectReturns(retCursors);
-        }
+            var x when x == typeof(void) => () => PatchVoidReturns(retCursors),
+            { IsValueType: true } => () => PatchValueReturns(retCursors, prototype.ReturnType),
+            _ => () => PatchObjectReturns(retCursors)
+        };
+
+        @do();
     }
 
-    public static void InjectSplitPoint(ILContext ilContext, Func<ILCursor, IEnumerable<Type>> injectSplitPoint)
+    private static void InjectSplitPoint(ILContext ilContext, Func<ILCursor, IEnumerable<Type>> injectSplitPoint)
     {
         var ilCursor = new ILCursor(ilContext);
         var stackValueTypes = injectSplitPoint(ilCursor);
@@ -108,7 +104,7 @@ public static class MethodSegmenter
         .Emit(OpCodes.Ret);
     }
 
-    public static ILLabel InjectContinuationPoint(ILContext ilContext, Action<ILCursor> injectContinuationPoint)
+    private static ILLabel InjectContinuationPoint(ILContext ilContext, Action<ILCursor> injectContinuationPoint)
     {
         var continuationLabel = ilContext.DefineLabel();
         var ilCursor = new ILCursor(ilContext);
@@ -122,7 +118,7 @@ public static class MethodSegmenter
         return continuationLabel;
     }
 
-    public static void RestoreExecutionContext(ILContext ilContext, ILLabel continuationLabel)
+    private static void RestoreExecutionContext(ILContext ilContext, ILLabel continuationLabel)
     {
         var ilCursor = new ILCursor(ilContext);
 
@@ -178,7 +174,7 @@ public static class MethodSegmenter
                 parameters
             );
 
-        return ExpressionHelper.CreateStaticMethod(lambda);
+        return ExpressionHelper.ToStaticMethod(lambda);
     }
 
     private static void PatchVoidReturns(ILCursor[] ilCursors)

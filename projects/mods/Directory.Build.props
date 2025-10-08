@@ -6,8 +6,8 @@
         <LF2IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</LF2IsFrontend>
         <LF2IsModEntry Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">true</LF2IsModEntry>
 
-        <TargetFramework Condition="'$(LF2IsBackend)' == 'true'">net6.0</TargetFramework>
-        <TargetFramework Condition="'$(LF2IsFrontend)' == 'true'">netstandard2.1</TargetFramework>
+        <TargetFramework Condition="'$(LF2IsBackend)' == 'true'">$(LF2BackendFramework)</TargetFramework>
+        <TargetFramework Condition="'$(LF2IsFrontend)' == 'true'">$(LF2FrontendTargetFramework)</TargetFramework>
 
         <ILRepackTargetsFile>$(MSBuildThisFileDirectory)ILRepack.targets</ILRepackTargetsFile>
     </PropertyGroup>
@@ -23,7 +23,7 @@
         </PackageReference>
         <PackageReference Include="LF2.Transil" />
 
-        <Compile Include="$(LF2CommonDir)/LF2.Game.Helper/**/*.cs" />
+        <ProjectReference Include="$(LF2CommonDir)/LF2.Game.Helper/LF2.Game.Helper.csproj" />
     </ItemGroup>
 
     <PropertyGroup>

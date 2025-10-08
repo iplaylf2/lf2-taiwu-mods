@@ -7,6 +7,12 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <LF2BackendFramework>net6.0</LF2BackendFramework>
+        <LF2FrontendTargetFramework>netstandard2.1</LF2FrontendTargetFramework>
+        <LF2CommonTargetFramework>netstandard2.1</LF2CommonTargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
