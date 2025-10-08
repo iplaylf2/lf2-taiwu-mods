@@ -24,7 +24,7 @@ public sealed class UniTaskCall
         try
         {
             _ = CallRegistry.TryAdd(callId, completionSource);
-            parameter.Set(CommonModConstants.CallIdKey, callId);
+            parameter.Set(ModConstants.CallIdKey, callId);
 
             ModDomainMethod.Call.CallModMethodWithParamAndRet(listenerId, modIdStr, methodName, parameter);
 
@@ -60,7 +60,7 @@ public sealed class UniTaskCall
 
             _ = Serializer.Deserialize(notification.DataPool, offset, ref modData);
 
-            _ = modData.Get(CommonModConstants.CallIdKey, out int callId);
+            _ = modData.Get(ModConstants.CallIdKey, out int callId);
 
             _ = CallRegistry.TryGetValue(callId, out var completionSource);
 

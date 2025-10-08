@@ -38,12 +38,12 @@ internal static class RollProtagonistBuilder
         TaskCall.AddModMethod
         (
             ModIdStr!,
-            nameof(ModConstants.Method.ExecuteInitial),
+            nameof(Common.ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
                 _ = data.Get
                 (
-                    ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
+                    Common.ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
                     out string infoString
                 );
                 var info = StringSerializer.Deserialize<ProtagonistCreationInfo>(infoString);
@@ -57,7 +57,7 @@ internal static class RollProtagonistBuilder
         TaskCall.AddModMethod
         (
             ModIdStr!,
-            nameof(ModConstants.Method.ExecuteRoll),
+            nameof(Common.ModConstants.Method.ExecuteRoll),
             (context, _) =>
             {
                 var character = creationFlow.ExecuteRoll();
@@ -66,7 +66,7 @@ internal static class RollProtagonistBuilder
 
                 serializableModData.Set
                 (
-                    ModConstants.Method.ExecuteRoll.ReturnValue.character,
+                    Common.ModConstants.Method.ExecuteRoll.ReturnValue.character,
                     BuildCharacterDisplayData(character, creationFlow.CreationInfo!, context)
                 );
 

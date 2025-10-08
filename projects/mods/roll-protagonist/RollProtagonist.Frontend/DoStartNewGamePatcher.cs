@@ -191,7 +191,7 @@ internal static class DoStartNewGamePatcher
         var data = new SerializableModData();
         data.Set
         (
-            ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
+            Common.ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
             StringSerializer.Serialize(creationInfo)
         );
 

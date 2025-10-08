@@ -22,8 +22,8 @@ public static class TaskCall
             {
                 var result = method(context, parameter);
 
-                _ = parameter.Get(CommonModConstants.CallIdKey, out int callId);
-                result.Set(CommonModConstants.CallIdKey, callId);
+                _ = parameter.Get(ModConstants.CallIdKey, out int callId);
+                result.Set(ModConstants.CallIdKey, callId);
 
                 return result;
             }
