@@ -7,7 +7,6 @@ using LF2.Game.Helper;
 using System.Reflection.Emit;
 using Transil.Attributes;
 using Transil.Operations;
-using AgeGroupPair = (sbyte, sbyte);
 
 namespace Unfathomed.Backend.AgeCompletion;
 
@@ -15,7 +14,7 @@ namespace Unfathomed.Backend.AgeCompletion;
 internal static class CharacterDomainUnsafePatcher
 {
     [ILHijackHandler(HijackStrategy.InsertAdditional)]
-    private static AgeGroupPair FixAdoreAgeGroup
+    private static (sbyte, sbyte) FixAdoreAgeGroup
     (
         [ConsumeStackValue] Character subject,
         [ConsumeStackValue] Character @object,
@@ -61,16 +60,16 @@ internal static class CharacterDomainUnsafePatcher
 
         _ = instructions.TryGetLoc(14, out var ageGroup2Loc);
 
-        var ageGroupTupleType = typeof(AgeGroupPair);
+        var ageGroupTupleType = typeof((sbyte, sbyte));
         var item1Field = AccessTools.Field
         (
             ageGroupTupleType,
-            nameof(AgeGroupPair.Item1)
+            nameof(ValueTuple<sbyte, sbyte>.Item1)
         );
         var item2Field = AccessTools.Field
         (
             ageGroupTupleType,
-            nameof(AgeGroupPair.Item2)
+            nameof(ValueTuple<sbyte, sbyte>.Item2)
         );
 
         _ = matcher
