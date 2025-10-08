@@ -8,7 +8,7 @@ namespace LF2.Cecil.Helper;
 
 public static class ExpressionHelper
 {
-    public static MethodInfo CreateStaticMethod(LambdaExpression lambda)
+    public static MethodInfo ToStaticMethod(LambdaExpression lambda)
     {
         var freshDelegate = lambda.Compile();
         var paramTypes = freshDelegate.Method
@@ -38,7 +38,7 @@ public static class ExpressionHelper
 
             DelegateCache[currentDelegateCounter] = freshDelegate;
 
-            var cacheField = AccessTools.Field(typeof(ExpressionHelper), "DelegateCache");
+            var cacheField = AccessTools.Field(typeof(ExpressionHelper), nameof(DelegateCache));
             var getMethod = AccessTools.Method(typeof(Dictionary<int, Delegate>), "get_Item");
 
             il.Emit(OpCodes.Ldsfld, cacheField);

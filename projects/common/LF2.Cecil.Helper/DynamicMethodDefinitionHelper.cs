@@ -6,15 +6,6 @@ namespace LF2.Cecil.Helper;
 
 public static class DynamicMethodDefinitionHelper
 {
-    public static Type[] ExtraParameters(MethodBase origin)
-    {
-        return
-        [
-            ..origin.IsStatic?[origin.GetThisParamType()]:(Type[])[],
-            ..origin.GetParameters().Select(x=>x.ParameterType)
-        ];
-    }
-
     public static DynamicMethodDefinition CreateFrom
     (
         MethodBase prototype,
