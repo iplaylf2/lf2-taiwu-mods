@@ -1,9 +1,9 @@
 using GameData.Serializer;
 using GameData.Utilities;
 
-namespace LF2.Game.Helper;
+namespace LF2.Game.Helper.Communication;
 
-internal static class StringSerializer
+public static class StringSerializer
 {
     private const int DefaultInitialCapacity = 1024;
 

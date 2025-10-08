@@ -1,7 +1,7 @@
 ﻿using GameData.Common;
 using GameData.Domains;
 using GameData.Domains.Mod;
-using LF2.Game.Helper;
+using LF2.Game.Helper.Communication;
 
 namespace LF2.Backend.Helper;
 
@@ -22,8 +22,8 @@ public static class TaskCall
             {
                 var result = method(context, parameter);
 
-                _ = parameter.Get(ModConstants.CallIdKey, out int callId);
-                result.Set(ModConstants.CallIdKey, callId);
+                _ = parameter.Get(CommunicationConstant.CallIdKey, out int callId);
+                result.Set(CommunicationConstant.CallIdKey, callId);
 
                 return result;
             }

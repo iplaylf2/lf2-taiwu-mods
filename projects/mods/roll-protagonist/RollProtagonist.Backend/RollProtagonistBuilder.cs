@@ -1,4 +1,3 @@
-using System.Reflection;
 using GameData.Common;
 using GameData.Domains;
 using GameData.Domains.Character;
@@ -9,9 +8,10 @@ using GameData.Utilities;
 using HarmonyLib;
 using LF2.Backend.Helper;
 using LF2.Cecil.Helper;
-using LF2.Game.Helper;
+using LF2.Game.Helper.Communication;
 using MonoMod.Cil;
 using RollProtagonist.Common;
+using System.Reflection;
 
 namespace RollProtagonist.Backend;
 
@@ -38,12 +38,12 @@ internal static class RollProtagonistBuilder
         TaskCall.AddModMethod
         (
             ModIdStr!,
-            nameof(Common.ModConstants.Method.ExecuteInitial),
+            nameof(ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
                 _ = data.Get
                 (
-                    Common.ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
+                    ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
                     out string infoString
                 );
                 var info = StringSerializer.Deserialize<ProtagonistCreationInfo>(infoString);
@@ -57,7 +57,7 @@ internal static class RollProtagonistBuilder
         TaskCall.AddModMethod
         (
             ModIdStr!,
-            nameof(Common.ModConstants.Method.ExecuteRoll),
+            nameof(ModConstants.Method.ExecuteRoll),
             (context, _) =>
             {
                 var character = creationFlow.ExecuteRoll();
@@ -66,7 +66,7 @@ internal static class RollProtagonistBuilder
 
                 serializableModData.Set
                 (
-                    Common.ModConstants.Method.ExecuteRoll.ReturnValue.character,
+                    ModConstants.Method.ExecuteRoll.ReturnValue.character,
                     BuildCharacterDisplayData(character, creationFlow.CreationInfo!, context)
                 );
 

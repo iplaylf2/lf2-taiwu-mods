@@ -1,17 +1,17 @@
-using HarmonyLib;
-using MonoMod.Cil;
-using System.Reflection;
-using GameData.Domains.Character;
-using GameData.Domains.Character.Creation;
-using LF2.Cecil.Helper;
-using GameData.Domains.Character.Display;
-using LF2.Frontend.Helper;
-using GameData.Domains.Mod;
-using RollProtagonist.Common;
 using Cysharp.Threading.Tasks;
 using FrameWork;
+using GameData.Domains.Character;
+using GameData.Domains.Character.Creation;
+using GameData.Domains.Character.Display;
+using GameData.Domains.Mod;
+using HarmonyLib;
+using LF2.Cecil.Helper;
+using LF2.Frontend.Helper;
+using LF2.Game.Helper.Communication;
 using LF2.Kit.Extensions;
-using LF2.Game.Helper;
+using MonoMod.Cil;
+using RollProtagonist.Common;
+using System.Reflection;
 
 namespace RollProtagonist.Frontend;
 
@@ -191,7 +191,7 @@ internal static class DoStartNewGamePatcher
         var data = new SerializableModData();
         data.Set
         (
-            Common.ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
+            ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
             StringSerializer.Serialize(creationInfo)
         );
 
