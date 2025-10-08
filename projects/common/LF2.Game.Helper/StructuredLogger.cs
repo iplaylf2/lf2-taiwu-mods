@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace LF2.Game.Helper;
 
-public static class StructuredLogger
+internal static class StructuredLogger
 {
     public static void Error
     (
