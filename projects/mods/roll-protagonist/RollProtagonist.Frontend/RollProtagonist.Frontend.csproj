@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="$(LF2ModsDir)/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj" />
+    <ProjectReference Include="../RollProtagonist.Common/RollProtagonist.Common.csproj" />
     <ProjectReference Include="$(LF2CommonDir)/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
     <ProjectReference Include="$(LF2CommonDir)/LF2.Frontend.Helper/LF2.Frontend.Helper.csproj" />
     <ProjectReference Include="$(LF2CommonDir)/LF2.Kit/LF2.Kit.csproj" />
