@@ -17,9 +17,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
       - name: Prepare Template Content
         run: |
-          find ${{ env.MODS_DIR }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+          find ${{ env.LF2_MODS_DIR }} -name "*.csproj" -print0 | xargs -0 -I {} dotnet sln remove {}
+          find ${{ env.LF2_MODS_DIR }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
           echo "" > README.md
 
       - name: Push to Template Branch
