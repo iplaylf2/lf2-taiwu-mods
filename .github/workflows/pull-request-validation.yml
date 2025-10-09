@@ -5,17 +5,17 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches: [master]
 
-env:
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  DOTNET_NOLOGO: true
-
 jobs:
-  pr-build-check:
+  build-check:
+    name: Build Check
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: read
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
