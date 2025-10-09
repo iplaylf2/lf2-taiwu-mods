@@ -26,7 +26,8 @@ jobs:
         run: |
           find ${{ env.LF2_MODS_DIR }} -name "*.csproj" -print0 | xargs -0 -I {} dotnet sln remove {}
           find ${{ env.LF2_MODS_DIR }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
-          echo "" > README.md
+          echo "" > ${{ env.LF2_MODS_DIR }}/README.md
+          echo "" > .cspell/project-words.txt
 
       - name: Push to Template Branch
         uses: stefanzweifel/git-auto-commit-action@v5
