@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFrameworks></TargetFrameworks>
     <TargetFramework>$(LF2BackendTargetFramework)</TargetFramework>
     <LF2NeedBackendReference>true</LF2NeedBackendReference>
   </PropertyGroup>

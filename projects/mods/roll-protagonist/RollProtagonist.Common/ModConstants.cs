@@ -1,7 +1,11 @@
 namespace RollProtagonist.Common;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage
+("Design", "CA1034:Nested types should not be visible", Justification = "<Pending>")
+]
 public static class ModConstants
 {
+
     public static class Method
     {
         public static class ExecuteInitial
