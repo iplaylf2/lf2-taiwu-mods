@@ -13,8 +13,8 @@ public static class DynamicMethodDefinitionHelper
         Type[] parameterTypes
     )
     {
-        var prototypeDMD = new DynamicMethodDefinition(prototype);
-        var prototypeContext = new ILContext(prototypeDMD.Definition);
+        using var prototypeDMD = new DynamicMethodDefinition(prototype);
+        using var prototypeContext = new ILContext(prototypeDMD.Definition);
 
         var result = new DynamicMethodDefinition
         (

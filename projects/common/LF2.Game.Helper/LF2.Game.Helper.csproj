@@ -1,7 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework></TargetFramework>
-        <TargetFrameworks>$(LF2BackendTargetFramework);$(LF2FrontendTargetFramework)</TargetFrameworks>
         <LF2NeedBackendReference Condition="'$(TargetFramework)' == '$(LF2BackendTargetFramework)'">true</LF2NeedBackendReference>
         <LF2NeedFrontendReference Condition="'$(TargetFramework)' == '$(LF2FrontendTargetFramework)'">true</LF2NeedFrontendReference>
     </PropertyGroup>

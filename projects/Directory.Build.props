@@ -7,7 +7,7 @@
 
         <LF2BackendTargetFramework>net6.0</LF2BackendTargetFramework>
         <LF2FrontendTargetFramework>netstandard2.1</LF2FrontendTargetFramework>
-        <LF2CommonTargetFramework>netstandard2.1</LF2CommonTargetFramework>
+        <LF2CommonTargetFrameworks>$(LF2BackendTargetFramework);$(LF2FrontendTargetFramework)</LF2CommonTargetFrameworks>
 
         <LF2GameBackendDir>$(LF2GameLibDir)/Backend</LF2GameBackendDir>
         <LF2GameManagedDir>$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed</LF2GameManagedDir>

@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>$(LF2CommonTargetFramework)</TargetFramework>
+        <TargetFrameworks>$(LF2CommonTargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 </Project>

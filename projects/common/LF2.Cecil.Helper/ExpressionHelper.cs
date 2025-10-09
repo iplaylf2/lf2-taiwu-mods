@@ -17,22 +17,18 @@ public static class ExpressionHelper
         .Select(p => p.ParameterType)
         .ToArray();
 
-        var dynamicMethod = new DynamicMethodDefinition
+        using var dynamicMethod = new DynamicMethodDefinition
         (
             freshDelegate.Method.Name,
             freshDelegate.Method.ReturnType,
             paramTypes
         );
 
-        var targetType = freshDelegate.Target.GetType();
         var il = dynamicMethod.GetILProcessor();
         var delegateType = freshDelegate.GetType();
+        var targetType = freshDelegate.Target?.GetType();
 
-        if
-        (
-            freshDelegate.Target != null
-            && targetType.GetFields().Any(f => !f.IsStatic)
-        )
+        if (targetType?.GetFields().Any(f => !f.IsStatic) ?? false)
         {
             var currentDelegateCounter = DelegateCounter++;
 
@@ -47,7 +43,7 @@ public static class ExpressionHelper
         }
         else
         {
-            if (freshDelegate.Target == null)
+            if (targetType == null)
             {
                 il.Emit(OpCodes.Ldnull);
             }
