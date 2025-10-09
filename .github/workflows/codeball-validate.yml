@@ -1,0 +1,20 @@
+name: Codeball Validate
+on:
+  pull_request: {}
+  pull_request_review_comment:
+    types: [created, edited]
+    branches: [master]
+
+jobs:
+  codeball-validate:
+    name: Codeball Validate
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Codeball action
+        uses: sturdy-dev/codeball-action@v2
+        with:
+          approvePullRequests: "true"
+          labelPullRequestsWhenApproved: "true"
+          labelPullRequestsWhenReviewNeeded: "true"
+          failJobsWhenReviewNeeded: "true"
