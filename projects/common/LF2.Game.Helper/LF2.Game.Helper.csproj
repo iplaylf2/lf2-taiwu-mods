@@ -1,32 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework></TargetFramework> 
-        <TargetFrameworks>$(LF2BackendFramework);$(LF2FrontendTargetFramework)</TargetFrameworks>
-
-        <LF2GameBackendDir>$(LF2GameLibDir)/Backend</LF2GameBackendDir>
-        <LF2GameManagedDir>$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed</LF2GameManagedDir>
+        <LF2NeedBackendReference Condition="'$(TargetFramework)' == '$(LF2BackendTargetFramework)'">true</LF2NeedBackendReference>
+        <LF2NeedFrontendReference Condition="'$(TargetFramework)' == '$(LF2FrontendTargetFramework)'">true</LF2NeedFrontendReference>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Krafs.Publicizer">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
-
-        <Publicize Include="GameData.Shared" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == '$(LF2BackendFramework)'">
-        <Reference Include="$(LF2GameBackendDir)/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == '$(LF2FrontendTargetFramework)'">
-        <Reference Include="$(LF2GameManagedDir)/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
 </Project>

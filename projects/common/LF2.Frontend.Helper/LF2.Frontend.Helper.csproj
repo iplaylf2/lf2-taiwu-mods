@@ -1,22 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <PackageReference Include="Krafs.Publicizer">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
+    <PropertyGroup>
+        <TargetFrameworks></TargetFrameworks>
+        <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
+        <LF2NeedFrontendReference>true</LF2NeedFrontendReference>
+    </PropertyGroup>
 
+    <ItemGroup>
         <Reference Include="$(LF2UpmDir)/UniTask/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-        <Reference Include="$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed/**/*.dll">
             <Private>false</Private>
             <SpecificVersion>false</SpecificVersion>
         </Reference>
 
         <ProjectReference Include="../LF2.Game.Helper/LF2.Game.Helper.csproj" />
-
-        <Publicize Include="Assembly-CSharp" />
-        <Publicize Include="GameData.Shared" />
     </ItemGroup>
 </Project>

@@ -4,12 +4,13 @@
     <PropertyGroup>
         <LF2CommonDir>$(MSBuildThisFileDirectory)/common</LF2CommonDir>
         <LF2ModsDir>$(MSBuildThisFileDirectory)/mods</LF2ModsDir>
-    </PropertyGroup>
 
-    <PropertyGroup>
-        <LF2BackendFramework>net6.0</LF2BackendFramework>
+        <LF2BackendTargetFramework>net6.0</LF2BackendTargetFramework>
         <LF2FrontendTargetFramework>netstandard2.1</LF2FrontendTargetFramework>
-        <LF2CommonTargetFramework>netstandard2.1</LF2CommonTargetFramework>
+        <LF2CommonTargetFrameworks>$(LF2BackendTargetFramework);$(LF2FrontendTargetFramework)</LF2CommonTargetFrameworks>
+
+        <LF2GameBackendDir>$(LF2GameLibDir)/Backend</LF2GameBackendDir>
+        <LF2GameManagedDir>$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed</LF2GameManagedDir>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -39,5 +40,50 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2NeedBackendReference)' == 'true'">
+        <Reference Include="$(LF2GameBackendDir)/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+
+        <PackageReference Include="Krafs.Publicizer">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+
+        <Publicize Include="GameData" />
+        <Publicize Include="GameData.Shared" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2NeedFrontendReference)' == 'true'">
+        <Reference Include="$(LF2GameManagedDir)/**/*.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+
+        <PackageReference Include="Krafs.Publicizer">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+
+        <Publicize Include="Assembly-CSharp" />
+        <Publicize Include="GameData.Shared" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2NeedPatchingReference)' == 'true'">
+        <Reference Include="$(LF2GameManagedDir)/0Harmony.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameManagedDir)/MonoMod.Utils.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
+        <Reference Include="$(LF2GameManagedDir)/Mono.Cecil.dll">
+            <Private>false</Private>
+            <SpecificVersion>false</SpecificVersion>
+        </Reference>
     </ItemGroup>
 </Project>

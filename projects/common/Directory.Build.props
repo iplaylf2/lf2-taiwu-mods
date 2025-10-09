@@ -2,6 +2,6 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
-        <TargetFramework>$(LF2CommonTargetFramework)</TargetFramework>
+        <TargetFrameworks>$(LF2CommonTargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 </Project>

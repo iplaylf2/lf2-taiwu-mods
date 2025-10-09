@@ -7,6 +7,9 @@ using MonoMod.Utils;
 
 namespace LF2.Cecil.Helper;
 
+[System.Diagnostics.CodeAnalysis.SuppressMessage
+("Design", "CA1034:Nested types should not be visible", Justification = "<Pending>")
+]
 public static class MethodSegmenter
 {
     public abstract class LeftConfig<T>(MethodInfo prototype) where T : Delegate
@@ -28,32 +31,40 @@ public static class MethodSegmenter
     {
         InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
 
-        ilContext.Invoke
-        (
-            ilContext =>
-            {
-                GuardOriginalReturns(ilContext, config.Prototype);
-                InjectSplitPoint(ilContext, config.InjectSplitPoint);
-            }
-        );
+        using (dynamicMethod)
+        using (ilContext)
+        {
+            ilContext.Invoke
+            (
+                ilContext =>
+                {
+                    GuardOriginalReturns(ilContext, config.Prototype);
+                    InjectSplitPoint(ilContext, config.InjectSplitPoint);
+                }
+            );
 
-        return dynamicMethod.Generate().CreateDelegate<T>();
+            return dynamicMethod.Generate().CreateDelegate<T>();
+        }
     }
 
     public static T CreateRightSegment<T>(RightConfig<T> config) where T : Delegate
     {
         InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
 
-        ilContext.Invoke
-        (
-            ilContext =>
-            {
-                var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
-                RestoreExecutionContext(ilContext, label);
-            }
-        );
+        using (dynamicMethod)
+        using (ilContext)
+        {
+            ilContext.Invoke
+            (
+                ilContext =>
+                {
+                    var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
+                    RestoreExecutionContext(ilContext, label);
+                }
+            );
 
-        return dynamicMethod.Generate().CreateDelegate<T>();
+            return dynamicMethod.Generate().CreateDelegate<T>();
+        }
     }
 
     private static void InitILContext<T>
@@ -63,7 +74,7 @@ public static class MethodSegmenter
         out ILContext ilContext
     ) where T : Delegate
     {
-        var delegateType = typeof(T).GetMethod("Invoke");
+        var delegateType = typeof(T).GetMethod("Invoke")!;
         dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom
         (
             prototype,
@@ -143,7 +154,7 @@ public static class MethodSegmenter
 
     private static MethodInfo CreateStatePacking(IEnumerable<Type> preservedStackTypes)
     {
-        var stackValueParams = preservedStackTypes.Select((x) => Expression.Parameter(x)).ToArray();
+        var stackValueParams = preservedStackTypes.Select(Expression.Parameter).ToArray();
         var isSplitReturnParam = Expression.Parameter(typeof(bool));
         var variablesParam = Expression.Parameter(typeof(object[]));
         ParameterExpression[] parameters = [.. stackValueParams, isSplitReturnParam, variablesParam];
