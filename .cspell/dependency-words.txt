@@ -25,6 +25,7 @@ pwsh
 raycaster
 redzen
 roslynator
+shellcheck
 softprops
 starg
 stefanzweifel
