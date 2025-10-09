@@ -1,0 +1,30 @@
+name: On Push Master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  update-template-branch:
+    name: Update Template Branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      LF2_MODS_DIR: "projects/mods"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Prepare Template Content
+        run: |
+          find ${{ env.MODS_DIR }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+          echo "" > README.md
+
+      - name: Push to Template Branch
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update template from master"
+          branch: template
+          push_options: "--force"
