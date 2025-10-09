@@ -1,21 +1,20 @@
-name: Release Mod
+name: On Push Mod Tag
 
 on:
   push:
     tags:
       - "mods/*/v*" # 匹配格式: mods/<mod-name>/v<version>
 
-env:
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  DOTNET_NOLOGO: true
-
 jobs:
   build-and-release:
+    name: Build And Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: read
-
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
