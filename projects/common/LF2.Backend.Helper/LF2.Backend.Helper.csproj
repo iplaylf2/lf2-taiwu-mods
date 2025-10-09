@@ -1,22 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(LF2BackendFramework)</TargetFramework>
+    <TargetFramework>$(LF2BackendTargetFramework)</TargetFramework>
+    <LF2NeedBackendReference>true</LF2NeedBackendReference>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Krafs.Publicizer">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-
-    <Reference Include="$(LF2GameLibDir)/Backend/**/*.dll">
-      <Private>false</Private>
-      <SpecificVersion>false</SpecificVersion>
-    </Reference>
-
     <ProjectReference Include="../LF2.Game.Helper/LF2.Game.Helper.csproj" />
-
-    <Publicize Include="GameData" />
-    <Publicize Include="GameData.Shared" />
   </ItemGroup>
 </Project>

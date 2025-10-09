@@ -4,5 +4,6 @@
         "*.slnx": "xml",
         "nuget.config": "xml"
     },
-    "xml.format.maxLineWidth": 0
+    "xml.format.maxLineWidth": 0,
+    "xml.validation.enabled": false,
 }

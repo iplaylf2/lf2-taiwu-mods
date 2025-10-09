@@ -1,20 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <LF2GameManagedDir>$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed</LF2GameManagedDir>
+        <LF2NeedPatchingReference>true</LF2NeedPatchingReference>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Reference Include="$(LF2GameManagedDir)/0Harmony.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-        <Reference Include="$(LF2GameManagedDir)/Mono.Cecil.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-        <Reference Include="$(LF2GameManagedDir)/MonoMod.Utils.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
 </Project>
