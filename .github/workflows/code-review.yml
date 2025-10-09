@@ -13,7 +13,7 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     steps:
-      - name: Codeball action
+      - name: Codeball Action
         uses: sturdy-dev/codeball-action@v2
         with:
           approvePullRequests: "true"

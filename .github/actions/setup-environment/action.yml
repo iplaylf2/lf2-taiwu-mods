@@ -12,14 +12,14 @@ runs:
       with:
         dotnet-version: 9.0.x
 
-    - name: Cache game-lib
+    - name: Cache Game-Lib
       id: cache-game-lib
       uses: actions/cache@v4
       with:
         path: game-lib
         key: ${{ runner.os }}-game-lib-${{ hashFiles('game-lib/version.workflow.info') }}
 
-    - name: Cache upm
+    - name: Cache UPM
       id: cache-upm
       uses: actions/cache@v4
       with:
@@ -33,7 +33,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.token }}
       run: dotnet build --no-restore -t:LF2RestoreBinaryDependencies
 
-    - name: Setup NuGet authentication
+    - name: Setup NuGet Authentication
       shell: bash
       run: |
         echo "GITHUB_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
