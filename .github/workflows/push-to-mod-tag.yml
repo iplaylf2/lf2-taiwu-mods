@@ -1,23 +1,22 @@
-name: Release Mod
+name: On Push to Mod Tag
 
 on:
   push:
     tags:
       - "mods/*/v*" # 匹配格式: mods/<mod-name>/v<version>
 
-env:
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  DOTNET_NOLOGO: true
-
 jobs:
   build-and-release:
+    name: Build and Release
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: read
-
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Environment
@@ -25,7 +24,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Parse tag and set variables
+      - name: Parse Tag and Set Variables
         id: parse-tag
         run: |
           set -euo pipefail
@@ -52,7 +51,7 @@ jobs:
           echo "full_tag=$FULL_TAG" >> $GITHUB_ENV
           echo "MOD_DIR=$MOD_DIR" >> $GITHUB_ENV
 
-      - name: Read build configuration
+      - name: Read Build Configuration
         id: read-config
         run: |
           set -euo pipefail
@@ -72,7 +71,7 @@ jobs:
 
           echo "PROJECTS=$PROJECTS" >> $GITHUB_ENV
 
-      - name: Build projects
+      - name: Build Projects
         run: |
           set -euo pipefail
           IFS=',' read -ra PROJECT_ARRAY <<< "${{ env.PROJECTS }}"
@@ -101,7 +100,7 @@ jobs:
           echo -e "$BUILD_SUMMARY" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-      - name: Prepare artifacts
+      - name: Prepare Artifacts
         run: |
           set -euo pipefail
           mkdir -p combined-artifacts

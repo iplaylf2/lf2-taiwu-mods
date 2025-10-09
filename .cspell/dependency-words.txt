@@ -1,6 +1,7 @@
 behaviour
 callvirt
 castclass
+codeball
 contentfiles
 cysharp
 iplaylf2
@@ -24,8 +25,10 @@ pwsh
 raycaster
 redzen
 roslynator
+shellcheck
 softprops
 starg
+stefanzweifel
 stelem
 stfld
 stloc

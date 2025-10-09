@@ -1,0 +1,37 @@
+name: On Push to Master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  update-template-branch:
+    name: Update Template Branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      LF2_MODS_DIR: "projects/mods"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Prepare Template Content
+        run: |
+          find ${{ env.LF2_MODS_DIR }} -name "*.csproj" -print0 | xargs -0 -I {} dotnet sln remove {}
+          find ${{ env.LF2_MODS_DIR }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+          echo "" > ${{ env.LF2_MODS_DIR }}/README.md
+          echo "" > .cspell/project-words.txt
+
+      - name: Push to Template Branch
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update template from master"
+          branch: template
+          push_options: "--force"

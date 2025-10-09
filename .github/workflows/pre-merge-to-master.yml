@@ -1,23 +1,23 @@
-name: PR Build Check
+name: On Pre-Merge to Master
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches: [master]
 
-env:
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  DOTNET_NOLOGO: true
-
 jobs:
-  pr-build-check:
+  build-check:
+    name: Build Check
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: read
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Environment
@@ -25,10 +25,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build solution
+      - name: Build Solution
         run: dotnet build -c Release
 
-      - name: Upload mod build artifacts
+      - name: Upload Mod Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: mod-build-artifacts-pr-${{ github.event.pull_request.number }}
