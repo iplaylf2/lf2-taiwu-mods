@@ -1,7 +1,7 @@
 <Project>
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
-    <PropertyGroup>
-        <DevelopmentDependency>true</DevelopmentDependency>
-    </PropertyGroup>
+    <ItemGroup>
+        <TfmSpecificPackageFile Include="lib/**/*.*" Pack="true" PackagePath="ref/$(TargetFramework)/" />
+    </ItemGroup>
 </Project>
