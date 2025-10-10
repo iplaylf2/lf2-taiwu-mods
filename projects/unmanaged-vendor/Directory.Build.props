@@ -1,0 +1,13 @@
+<Project>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+    <PropertyGroup>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <PackageOutputPath>$(LF2NupkgDir)</PackageOutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="lib/**/*.*" Pack="true" PackagePath="lib/$(TargetFramework)/" />
+    </ItemGroup>
+</Project>

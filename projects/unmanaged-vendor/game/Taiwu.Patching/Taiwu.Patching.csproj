@@ -1,13 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <PackageId>LF2.Taiwu.Patching</PackageId>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
         <TargetFrameworks>$(LF2CommonTargetFrameworks)</TargetFrameworks>
         <Version>0.0.1-0.0.79.47-test</Version>
-        <PackageOutputPath>$(LF2NupkgDir)</PackageOutputPath>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Content Include="lib/**/*.*" Pack="true" PackagePath="lib/$(TargetFramework)/" />
-    </ItemGroup>
 </Project>

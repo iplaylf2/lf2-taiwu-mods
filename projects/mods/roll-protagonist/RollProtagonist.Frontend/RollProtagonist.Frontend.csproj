@@ -4,5 +4,9 @@
     <ProjectReference Include="$(LF2CommonDir)/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
     <ProjectReference Include="$(LF2CommonDir)/LF2.Frontend.Helper/LF2.Frontend.Helper.csproj" />
     <ProjectReference Include="$(LF2CommonDir)/LF2.Kit/LF2.Kit.csproj" />
+
+    <PackageReference Include="LF2.UniTask">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>
