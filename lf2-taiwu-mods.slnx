@@ -30,6 +30,13 @@
   <Folder Name="/projects/mods/uni-task-support/">
     <Project Path="projects/mods/uni-task-support/UniTaskSupport.Frontend/UniTaskSupport.Frontend.csproj" />
   </Folder>
+  <Folder Name="/projects/unmanaged-vendor/" />
+  <Folder Name="/projects/unmanaged-vendor/game/">
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Backend/Taiwu.Backend.csproj" />
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Frontend/Taiwu.Frontend.csproj" />
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Modding/Taiwu.Modding.csproj" />
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Patching/Taiwu.Patching.csproj" />
+  </Folder>
   <Folder Name="/projects/unmanaged-vendor/upm/">
     <Project Path="projects/unmanaged-vendor/upm/UniTask/UniTask.csproj" />
   </Folder>

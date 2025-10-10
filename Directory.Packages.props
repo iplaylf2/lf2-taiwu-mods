@@ -12,5 +12,10 @@
         <PackageVersion Include="LF2.Transil" Version="0.0.2" />
 
         <PackageVersion Include="LF2.UniTask" Version="2.5.10-2022.3.14f" />
+
+        <PackageVersion Include="LF2.Taiwu.Backend" Version="0.0.1-0.0.79.47-test" />
+        <PackageVersion Include="LF2.Taiwu.Frontend" Version="0.0.1-0.0.79.47-test" />
+        <PackageVersion Include="LF2.Taiwu.Modding" Version="0.0.1-0.0.79.47-test" />
+        <PackageVersion Include="LF2.Taiwu.Patching" Version="0.0.1-0.0.79.47-test" />
     </ItemGroup>
 </Project>

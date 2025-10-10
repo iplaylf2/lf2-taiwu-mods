@@ -24,6 +24,13 @@
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
+        <PackageReference Include="LF2.Taiwu.Modding">
+            <Private>false</Private>
+        </PackageReference>
+        <PackageReference Include="LF2.Taiwu.Patching">
+            <Private>false</Private>
+        </PackageReference>
+
         <PackageReference Include="ILRepack.Lib.MSBuild.Task">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -31,12 +38,5 @@
         <PackageReference Include="LF2.Transil" />
 
         <ProjectReference Include="$(LF2CommonDir)/LF2.Game.Helper/LF2.Game.Helper.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
-        <Reference Include="$(LF2GameManagedDir)/TaiwuModdingLib.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
     </ItemGroup>
 </Project>
