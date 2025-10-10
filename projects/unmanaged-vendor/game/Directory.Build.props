@@ -2,11 +2,6 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <PackageOutputPath>$(LF2NupkgDir)</PackageOutputPath>
+        <DevelopmentDependency>true</DevelopmentDependency>
     </PropertyGroup>
-
-    <ItemGroup>
-        <TfmSpecificPackageFile Include="lib/**/*.*" Pack="true" PackagePath="lib/$(TargetFramework)/" />
-    </ItemGroup>
 </Project>
