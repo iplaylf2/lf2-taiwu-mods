@@ -1,11 +1,11 @@
-name: "Setup Environment"
-description: "Sets up .NET and restores all binary dependencies, with caching."
+name: Setup Environment
+description: Sets up .NET and restores all binary dependencies, with caching.
 inputs:
   token:
-    description: "GitHub token for downloading release artifacts and NuGet auth."
+    description: GitHub token for downloading release artifacts and NuGet auth.
     required: true
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
