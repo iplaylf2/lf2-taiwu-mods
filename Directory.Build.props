@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
         <LF2GameLibDir>$(MSBuildThisFileDirectory)game-lib</LF2GameLibDir>
-        <LF2UpmDir>$(MSBuildThisFileDirectory)upm</LF2UpmDir>
+        <LF2NupkgDir>$(MSBuildThisFileDirectory)nupkg</LF2NupkgDir>
     </PropertyGroup>
 
     <PropertyGroup>

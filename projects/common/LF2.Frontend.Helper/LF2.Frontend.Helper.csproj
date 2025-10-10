@@ -6,10 +6,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="$(LF2UpmDir)/UniTask/**/*.dll">
+        <PackageReference Include="LF2.UniTask">
             <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
+        </PackageReference>
 
         <ProjectReference Include="../LF2.Game.Helper/LF2.Game.Helper.csproj" />
     </ItemGroup>

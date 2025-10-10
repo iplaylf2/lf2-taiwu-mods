@@ -39,11 +39,4 @@
             <SpecificVersion>false</SpecificVersion>
         </Reference>
     </ItemGroup>
-
-    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
-        <Reference Include="$(LF2UpmDir)/UniTask/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
 </Project>

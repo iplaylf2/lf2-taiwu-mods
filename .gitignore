@@ -3,3 +3,5 @@ game-lib/*
 
 upm/*
 !upm/version.workflow.info
+
+/nupkg
