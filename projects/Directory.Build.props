@@ -41,7 +41,7 @@
 
     <ItemGroup Condition="'$(LF2NeedBackendReference)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Backend">
-            <Private>false</Private>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
 
         <PackageReference Include="Krafs.Publicizer">
@@ -55,7 +55,7 @@
 
     <ItemGroup Condition="'$(LF2NeedFrontendReference)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Frontend">
-            <Private>false</Private>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
 
         <PackageReference Include="Krafs.Publicizer">
@@ -65,11 +65,5 @@
 
         <Publicize Include="Assembly-CSharp" />
         <Publicize Include="GameData.Shared" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(LF2NeedPatchingReference)' == 'true'">
-        <PackageReference Include="LF2.Taiwu.Patching">
-            <Private>false</Private>
-        </PackageReference>
     </ItemGroup>
 </Project>

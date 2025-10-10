@@ -11,31 +11,30 @@
 
     <PropertyGroup Condition="'$(LF2IsBackend)' == 'true'">
         <TargetFramework>$(LF2BackendTargetFramework)</TargetFramework>
-        
+
         <LF2NeedBackendReference>true</LF2NeedBackendReference>
-        <LF2NeedPatchingReference>true</LF2NeedPatchingReference>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(LF2IsFrontend)' == 'true'">
         <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
-        
+
         <LF2NeedFrontendReference>true</LF2NeedFrontendReference>
-        <LF2NeedPatchingReference>true</LF2NeedPatchingReference>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Modding">
-            <Private>false</Private>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="LF2.Taiwu.Patching">
-            <Private>false</Private>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+
+        <PackageReference Include="LF2.Transil" />
 
         <PackageReference Include="ILRepack.Lib.MSBuild.Task">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="LF2.Transil" />
 
         <ProjectReference Include="$(LF2CommonDir)/LF2.Game.Helper/LF2.Game.Helper.csproj" />
     </ItemGroup>

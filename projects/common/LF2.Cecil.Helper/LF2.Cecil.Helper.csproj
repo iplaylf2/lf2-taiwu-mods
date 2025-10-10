@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <LF2NeedPatchingReference>true</LF2NeedPatchingReference>
-    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="LF2.Taiwu.Patching">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>

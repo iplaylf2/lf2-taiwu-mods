@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <PackageReference Include="LF2.UniTask">
-            <Private>false</Private>
+            <PrivateAssets>all</PrivateAssets>
         </PackageReference>
 
         <ProjectReference Include="../LF2.Game.Helper/LF2.Game.Helper.csproj" />
