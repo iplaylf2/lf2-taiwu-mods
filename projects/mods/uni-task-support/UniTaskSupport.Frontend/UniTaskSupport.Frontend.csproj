@@ -3,6 +3,7 @@
     <PackageReference Remove="LF2.Transil" />
     <PackageReference Include="LF2.UniTask">
       <LF2KeepItAsIs>true</LF2KeepItAsIs>
+      <GeneratePathProperty>true</GeneratePathProperty>
     </PackageReference>
   </ItemGroup>
 </Project>

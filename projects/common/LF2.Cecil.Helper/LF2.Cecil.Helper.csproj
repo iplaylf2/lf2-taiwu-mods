@@ -1,7 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <PackageReference Include="LF2.Taiwu.Patching">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
+        <PackageReference Include="LF2.Taiwu.Patching" />
     </ItemGroup>
 </Project>

@@ -2,6 +2,6 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <ItemGroup>
-        <TfmSpecificPackageFile Include="lib/**/*.*" Pack="true" PackagePath="ref/$(TargetFramework)/" />
+        <TfmSpecificPackageFile Include="lib/*.*" Pack="true" PackagePath="ref/$(TargetFramework)/" />
     </ItemGroup>
 </Project>

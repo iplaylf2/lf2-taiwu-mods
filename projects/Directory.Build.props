@@ -40,9 +40,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2NeedBackendReference)' == 'true'">
-        <PackageReference Include="LF2.Taiwu.Backend">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
+        <PackageReference Include="LF2.Taiwu.Backend" />
 
         <PackageReference Include="Krafs.Publicizer">
             <PrivateAssets>all</PrivateAssets>
@@ -54,9 +52,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2NeedFrontendReference)' == 'true'">
-        <PackageReference Include="LF2.Taiwu.Frontend">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
+        <PackageReference Include="LF2.Taiwu.Frontend" />
 
         <PackageReference Include="Krafs.Publicizer">
             <PrivateAssets>all</PrivateAssets>
