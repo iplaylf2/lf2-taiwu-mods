@@ -3,9 +3,9 @@
         <ItemGroup>
             <_KeepPackageRef Include="@(PackageReference)" Condition="'%(PackageReference.LF2KeepItAsIs)' == 'true'" />
 
-            <_KeepPathRef Include="@(_KeepPackageRef->Replace('.', '_'))" />
+            <_KeepPackageName Include="@(_KeepPackageRef->Replace('.', '_'))" />
 
-            <_AllSourceFilesToKeep Include="$(Pkg%(_KeepPathRef.Identity))\lib\*\*.dll" />
+            <_AllSourceFilesToKeep Include="$(Pkg%(_KeepPackageName.Identity))\lib\*\*.dll" />
             <_AllSourceFilesToKeep Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true')->'%(FullPath)')" />
 
             <_DistinctSourceFilesToKeep Remove="@(_DistinctSourceFilesToKeep)" />
@@ -16,7 +16,7 @@
             <LF2KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).xml')" />
         </ItemGroup>
 
-        <Message Text="Found files to keep in output folder: @(LF2KeepFiles->'%0a- %(Identity)')" Importance="high" />
+        <Message Text="Files that will be retained in output: @(LF2KeepFiles->'%0a- %(Identity)')" Importance="high" />
     </Target>
 
     <Target Name="LF2RepackRun" AfterTargets="LF2RepackPrepare" Condition="'$(LF2IsModEntry)' == 'true'">
