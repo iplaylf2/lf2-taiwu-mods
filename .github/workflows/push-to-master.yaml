@@ -34,4 +34,5 @@ jobs:
         with:
           message: "chore: update template from master"
           new_branch: template
-          push: "--force"
+          fetch: false
+          push: origin ${new_branch input} --force
