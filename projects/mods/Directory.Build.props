@@ -3,6 +3,7 @@
 
     <PropertyGroup>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
 
         <LF2IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</LF2IsBackend>
         <LF2IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</LF2IsFrontend>
