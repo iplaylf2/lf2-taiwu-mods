@@ -16,6 +16,7 @@ jobs:
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_NOLOGO: true
+      LF2_ARTIFACTS_PATH: projects/mods/**/bin/Release
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -32,5 +33,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mod-build-artifacts-pr-${{ github.event.pull_request.number }}
-          path: "projects/mods/**/bin/Release"
+          path: ${{ env.LF2_ARTIFACTS_PATH }}
           retention-days: 7
