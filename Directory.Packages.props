@@ -1,21 +1,23 @@
 <Project>
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+        <LF2RoslynatorVersion>4.14.1</LF2RoslynatorVersion>
     </PropertyGroup>
     <ItemGroup>
         <PackageVersion Include="PolySharp" Version="1.15.0" />
-        <PackageVersion Include="Roslynator.Analyzers" Version="4.14.1" />
-        <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="4.14.1" />
-        <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.14.1" />
+        <PackageVersion Include="Roslynator.Analyzers" Version="$(LF2RoslynatorVersion)" />
+        <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="$(LF2RoslynatorVersion)" />
+        <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="$(LF2RoslynatorVersion)" />
         <PackageVersion Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44" />
         <PackageVersion Include="Krafs.Publicizer" Version="2.3.0" />
         <PackageVersion Include="LF2.Transil" Version="0.0.2" />
 
-        <PackageVersion Include="LF2.UniTask" Version="2.5.10-2022.3.14f" />
+        <PackageVersion Include="LF2.UniTask" Version="$(LF2UniTaskVersion)-$(LF2TaiwuUnityVersion)" />
 
-        <PackageVersion Include="LF2.Taiwu.Backend" Version="0.0.1-0.0.79.47-test" />
-        <PackageVersion Include="LF2.Taiwu.Frontend" Version="0.0.1-0.0.79.47-test" />
-        <PackageVersion Include="LF2.Taiwu.Modding" Version="0.0.1-0.0.79.47-test" />
-        <PackageVersion Include="LF2.Taiwu.Patching" Version="0.0.1-0.0.79.47-test" />
+        <PackageVersion Include="LF2.Taiwu.Backend" Version="$(LF2TaiwuVersion)" />
+        <PackageVersion Include="LF2.Taiwu.Frontend" Version="$(LF2TaiwuVersion)" />
+        <PackageVersion Include="LF2.Taiwu.Modding" Version="$(LF2TaiwuVersion)" />
+        <PackageVersion Include="LF2.Taiwu.Patching" Version="$(LF2TaiwuVersion)" />
     </ItemGroup>
 </Project>

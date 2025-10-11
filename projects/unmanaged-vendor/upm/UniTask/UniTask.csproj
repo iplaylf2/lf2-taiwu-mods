@@ -2,6 +2,6 @@
     <PropertyGroup>
         <PackageId>LF2.UniTask</PackageId>
         <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
-        <Version>2.5.10-2022.3.14f</Version>
+        <Version>$(LF2UniTaskVersion)-$(LF2TaiwuUnityVersion)</Version>
     </PropertyGroup>
 </Project>

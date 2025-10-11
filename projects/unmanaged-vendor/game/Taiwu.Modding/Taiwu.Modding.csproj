@@ -2,6 +2,5 @@
     <PropertyGroup>
         <PackageId>LF2.Taiwu.Modding</PackageId>
         <TargetFrameworks>$(LF2CommonTargetFrameworks)</TargetFrameworks>
-        <Version>0.0.1-0.0.79.47-test</Version>
     </PropertyGroup>
 </Project>

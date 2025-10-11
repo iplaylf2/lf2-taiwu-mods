@@ -2,6 +2,5 @@
     <PropertyGroup>
         <PackageId>LF2.Taiwu.Backend</PackageId>
         <TargetFramework>$(LF2BackendTargetFramework)</TargetFramework>
-        <Version>0.0.1-0.0.79.47-test</Version>
     </PropertyGroup>
 </Project>
