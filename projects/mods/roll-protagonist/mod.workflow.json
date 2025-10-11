@@ -1,6 +1,0 @@
-{
-    "buildProjects": [
-        "RollProtagonist.Backend",
-        "RollProtagonist.Frontend"
-    ]
-}
