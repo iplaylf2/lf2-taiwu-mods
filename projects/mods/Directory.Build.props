@@ -24,6 +24,11 @@
         <LF2NeedFrontendReference>true</LF2NeedFrontendReference>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true'">
+        <IsPublishable>true</IsPublishable>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
+    </PropertyGroup>
+
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Modding" />
         <PackageReference Include="LF2.Taiwu.Patching" />

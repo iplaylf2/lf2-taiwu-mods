@@ -18,6 +18,7 @@
         <AnalysisMode>all</AnalysisMode>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <IsPublishable>false</IsPublishable>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
