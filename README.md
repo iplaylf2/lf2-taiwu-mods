@@ -93,7 +93,7 @@
 
 本模板所需的部分游戏核心库与第三方库未发布至官方 NuGet 源，我们通过 `projects/unmanaged-vendor` 目录下的项目手动将其打包。
 
-关于此过程的详细说明、实现方式以及其中涉及的重要风险，请参阅该目录下的 [**详细文档**](./projects/unmanaged-vendor/README.md)。
+关于此目录的打包策略、设计缘由以及其中涉及的重要风险，请参阅其 [**详细文档**](./projects/unmanaged-vendor/README.md)。
 
 ## 📚 参考资料
 
