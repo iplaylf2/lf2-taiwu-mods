@@ -5,6 +5,7 @@ codeball
 contentfiles
 cysharp
 iplaylf2
+kawai
 krafs
 ldarg
 ldelem
@@ -34,3 +35,4 @@ stfld
 stloc
 storer
 transil
+yoshifumi
