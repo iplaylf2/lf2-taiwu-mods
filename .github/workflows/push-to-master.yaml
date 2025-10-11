@@ -37,4 +37,4 @@ jobs:
           new_branch: ${{ env.LF2_TEMPLATE_BRANCH }}
           message: ${{ env.LF2_COMMIT_MESSAGE }}
           fetch: false
-          push: origin ${new_branch input} --force
+          push: origin ${{ env.LF2_TEMPLATE_BRANCH }} --force

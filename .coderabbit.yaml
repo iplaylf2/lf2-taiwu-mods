@@ -6,6 +6,7 @@ reviews:
     Format: <type>(<scope>): <subject>
     <scope> is optional
     Type: chore, docs, feat, fix, refactor, style, or test.
+  fail_commit_status: true
   sequence_diagrams: false
   suggested_reviewers: false
   poem: false
