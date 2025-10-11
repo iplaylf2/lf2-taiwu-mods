@@ -32,6 +32,6 @@ jobs:
       - name: Push to Template Branch
         uses: EndBug/add-and-commit@v9
         with:
-          commit_message: "chore: update template from master"
+          message: "chore: update template from master"
           new_branch: template
           push: "--force"
