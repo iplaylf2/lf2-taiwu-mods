@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <PackageId>LF2.UniTask</PackageId>
+        <Authors>Cysharp</Authors>
+        <PackageProjectUrl>https://github.com/Cysharp/UniTask</PackageProjectUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageDescription>A NuGet repackage of Cysharp's UniTask library, provided for modding purposes. This package contains the original, unmodified assemblies from the official UPM release.</PackageDescription>
+        <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
+        <Version>$(LF2UniTaskVersion)-$(LF2TaiwuUnityVersion)</Version>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
+</Project>

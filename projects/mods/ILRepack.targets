@@ -1,9 +1,22 @@
 <Project>
     <Target Name="LF2RepackPrepare" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
-            <_LF2KeepRef Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true'))" />
-            <LF2KeepFiles Include="@(_LF2KeepRef->'$(OutputPath)%(Filename).*')" />
+            <_KeepPackageRef Include="@(PackageReference)" Condition="'%(PackageReference.LF2KeepItAsIs)' == 'true'" />
+
+            <_KeepPackageName Include="@(_KeepPackageRef->Replace('.', '_'))" />
+
+            <_AllSourceFilesToKeep Include="$(Pkg%(_KeepPackageName.Identity))\lib\*\*.dll" />
+            <_AllSourceFilesToKeep Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true')->'%(FullPath)')" />
+
+            <_DistinctSourceFilesToKeep Remove="@(_DistinctSourceFilesToKeep)" />
+            <_DistinctSourceFilesToKeep Include="@(_AllSourceFilesToKeep)" />
+
+            <LF2KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename)%(Extension)')" />
+            <LF2KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).pdb')" />
+            <LF2KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).xml')" />
         </ItemGroup>
+
+        <Message Text="Files that will be retained in output: @(LF2KeepFiles->'%0a- %(Identity)')" Importance="high" />
     </Target>
 
     <Target Name="LF2RepackRun" AfterTargets="LF2RepackPrepare" Condition="'$(LF2IsModEntry)' == 'true'">

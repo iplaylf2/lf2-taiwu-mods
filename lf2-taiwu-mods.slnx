@@ -9,7 +9,7 @@
     <Project Path="projects/common/LF2.Backend.Helper/LF2.Backend.Helper.csproj" />
     <Project Path="projects/common/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
     <Project Path="projects/common/LF2.Frontend.Helper/LF2.Frontend.Helper.csproj" />
-      <Project Path="projects/common/LF2.Game.Helper/LF2.Game.Helper.csproj" />
+    <Project Path="projects/common/LF2.Game.Helper/LF2.Game.Helper.csproj" />
     <Project Path="projects/common/LF2.Kit/LF2.Kit.csproj" />
   </Folder>
   <Folder Name="/projects/mods/">
@@ -29,6 +29,16 @@
   </Folder>
   <Folder Name="/projects/mods/uni-task-support/">
     <Project Path="projects/mods/uni-task-support/UniTaskSupport.Frontend/UniTaskSupport.Frontend.csproj" />
+  </Folder>
+  <Folder Name="/projects/unmanaged-vendor/" />
+  <Folder Name="/projects/unmanaged-vendor/game/">
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Backend/Taiwu.Backend.csproj" />
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Frontend/Taiwu.Frontend.csproj" />
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Modding/Taiwu.Modding.csproj" />
+    <Project Path="projects/unmanaged-vendor/game/Taiwu.Patching/Taiwu.Patching.csproj" />
+  </Folder>
+  <Folder Name="/projects/unmanaged-vendor/upm/">
+    <Project Path="projects/unmanaged-vendor/upm/UniTask/UniTask.csproj" />
   </Folder>
   <File Path="Directory.Build.props" />
   <File Path="Directory.Packages.props" />

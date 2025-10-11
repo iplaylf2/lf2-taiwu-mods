@@ -1,5 +1,5 @@
 name: Setup Environment
-description: Sets up .NET and restores all binary dependencies, with caching.
+description: Sets up .NET and restore
 inputs:
   token:
     description: GitHub token for downloading release artifacts and NuGet auth.
@@ -9,30 +9,13 @@ runs:
   steps:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
-
-    - name: Cache Game-Lib
-      id: cache-game-lib
-      uses: actions/cache@v4
       with:
-        path: game-lib
-        key: ${{ runner.os }}-game-lib-${{ hashFiles('game-lib/version.workflow.info') }}
+        cache: true
+        cache-dependency-path: projects/mods/**/packages.lock.json
 
-    - name: Cache UPM
-      id: cache-upm
-      uses: actions/cache@v4
-      with:
-        path: upm
-        key: ${{ runner.os }}-upm-${{ hashFiles('upm/version.workflow.info') }}
-
-    - name: Restore Binary Dependencies
-      if: steps.cache-game-lib.outputs.cache-hit != 'true' || steps.cache-upm.outputs.cache-hit != 'true'
-      shell: bash
+    - name: Restore Nuget packages
       env:
+        GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ inputs.token }}
-      run: dotnet build --no-restore -t:LF2RestoreBinaryDependencies
-
-    - name: Setup NuGet Authentication
       shell: bash
-      run: |
-        echo "GITHUB_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-        echo "GITHUB_TOKEN=${{ inputs.token }}" >> $GITHUB_ENV
+      run: dotnet restore --locked-mode

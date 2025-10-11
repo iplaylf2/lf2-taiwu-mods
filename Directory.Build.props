@@ -1,10 +1,12 @@
 <Project>
     <PropertyGroup>
-        <LF2GameLibDir>$(MSBuildThisFileDirectory)game-lib</LF2GameLibDir>
-        <LF2UpmDir>$(MSBuildThisFileDirectory)upm</LF2UpmDir>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <NoWarn>$(NoWarn);NU1507</NoWarn>
+
+        <LF2NupkgDir>$(MSBuildThisFileDirectory)nupkg</LF2NupkgDir>
+
+        <LF2TaiwuVersion>0.0.1-0.0.79.47-test</LF2TaiwuVersion>
+
+        <LF2TaiwuUnityVersion>2022.3.14f</LF2TaiwuUnityVersion>
+        <LF2UniTaskVersion>2.5.10</LF2UniTaskVersion>
     </PropertyGroup>
 </Project>

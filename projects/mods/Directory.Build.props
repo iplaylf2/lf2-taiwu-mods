@@ -2,6 +2,9 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+
         <LF2IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</LF2IsBackend>
         <LF2IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</LF2IsFrontend>
         <LF2IsModEntry Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">true</LF2IsModEntry>
@@ -11,39 +14,27 @@
 
     <PropertyGroup Condition="'$(LF2IsBackend)' == 'true'">
         <TargetFramework>$(LF2BackendTargetFramework)</TargetFramework>
-        
+
         <LF2NeedBackendReference>true</LF2NeedBackendReference>
-        <LF2NeedPatchingReference>true</LF2NeedPatchingReference>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(LF2IsFrontend)' == 'true'">
         <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
-        
+
         <LF2NeedFrontendReference>true</LF2NeedFrontendReference>
-        <LF2NeedPatchingReference>true</LF2NeedPatchingReference>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
+        <PackageReference Include="LF2.Taiwu.Modding" />
+        <PackageReference Include="LF2.Taiwu.Patching" />
+
+        <PackageReference Include="LF2.Transil" />
+
         <PackageReference Include="ILRepack.Lib.MSBuild.Task">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="LF2.Transil" />
 
         <ProjectReference Include="$(LF2CommonDir)/LF2.Game.Helper/LF2.Game.Helper.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(LF2IsBackend)' == 'true'">
-        <Reference Include="$(LF2GameManagedDir)/TaiwuModdingLib.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
-        <Reference Include="$(LF2UpmDir)/UniTask/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
     </ItemGroup>
 </Project>

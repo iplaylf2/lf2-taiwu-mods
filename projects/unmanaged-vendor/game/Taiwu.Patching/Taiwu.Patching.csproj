@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <PackageId>LF2.Taiwu.Patching</PackageId>
+        <TargetFrameworks>$(LF2CommonTargetFrameworks)</TargetFrameworks>
+    </PropertyGroup>
+</Project>

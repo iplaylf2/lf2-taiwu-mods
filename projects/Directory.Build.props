@@ -8,9 +8,6 @@
         <LF2BackendTargetFramework>net6.0</LF2BackendTargetFramework>
         <LF2FrontendTargetFramework>netstandard2.1</LF2FrontendTargetFramework>
         <LF2CommonTargetFrameworks>$(LF2BackendTargetFramework);$(LF2FrontendTargetFramework)</LF2CommonTargetFrameworks>
-
-        <LF2GameBackendDir>$(LF2GameLibDir)/Backend</LF2GameBackendDir>
-        <LF2GameManagedDir>$(LF2GameLibDir)/The Scroll of Taiwu_Data/Managed</LF2GameManagedDir>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -21,6 +18,7 @@
         <AnalysisMode>all</AnalysisMode>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -43,10 +41,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2NeedBackendReference)' == 'true'">
-        <Reference Include="$(LF2GameBackendDir)/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
+        <PackageReference Include="LF2.Taiwu.Backend" />
 
         <PackageReference Include="Krafs.Publicizer">
             <PrivateAssets>all</PrivateAssets>
@@ -58,10 +53,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2NeedFrontendReference)' == 'true'">
-        <Reference Include="$(LF2GameManagedDir)/**/*.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
+        <PackageReference Include="LF2.Taiwu.Frontend" />
 
         <PackageReference Include="Krafs.Publicizer">
             <PrivateAssets>all</PrivateAssets>
@@ -70,20 +62,5 @@
 
         <Publicize Include="Assembly-CSharp" />
         <Publicize Include="GameData.Shared" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(LF2NeedPatchingReference)' == 'true'">
-        <Reference Include="$(LF2GameManagedDir)/0Harmony.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-        <Reference Include="$(LF2GameManagedDir)/MonoMod.Utils.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
-        <Reference Include="$(LF2GameManagedDir)/Mono.Cecil.dll">
-            <Private>false</Private>
-            <SpecificVersion>false</SpecificVersion>
-        </Reference>
     </ItemGroup>
 </Project>

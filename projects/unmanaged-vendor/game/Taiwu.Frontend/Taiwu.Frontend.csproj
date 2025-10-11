@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <PackageId>LF2.Taiwu.Frontend</PackageId>
+        <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
+    </PropertyGroup>
+</Project>
