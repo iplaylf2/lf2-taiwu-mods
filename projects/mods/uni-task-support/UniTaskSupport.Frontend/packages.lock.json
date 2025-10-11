@@ -18,25 +18,25 @@
         "type": "Direct",
         "requested": "[0.0.1-0.0.79.47-test, )",
         "resolved": "0.0.1-0.0.79.47-test",
-        "contentHash": "+mzI/f+OHvD5Uao3HGKy2h6QdAfGAu3YqvHkoOzhjSYBYy93cf7U5bESX25liObcIxPBUtmTCkJDbbb5lUnhkQ=="
+        "contentHash": "DfrqMchmxVvldQimZSKrjufEGh13L0/HykpfNtyzlOwsaQskwOsTgTfvuumelQff30Z3DiGmGh62gXen5AsOeQ=="
       },
       "LF2.Taiwu.Modding": {
         "type": "Direct",
         "requested": "[0.0.1-0.0.79.47-test, )",
         "resolved": "0.0.1-0.0.79.47-test",
-        "contentHash": "1XleRD3IkNy61JqTcLGXdZFXK1K1tbCUkjSPudWlqlNHZEyW9fOxXyfBi3/OZoFKnZZAFYjb1weWy+PNTTLSsw=="
+        "contentHash": "0gGfJ6/phtSU8YjcryDBYraan8n5xqz30T7QKkwDOMEEw9CsE0kVteP0af3ti4lCsyznAxnwGvhfFHDAyBwdlQ=="
       },
       "LF2.Taiwu.Patching": {
         "type": "Direct",
         "requested": "[0.0.1-0.0.79.47-test, )",
         "resolved": "0.0.1-0.0.79.47-test",
-        "contentHash": "Q7nQ1X3Uc5Fa5GUBfQAt04OxG+vv4QeUFHAqGJdDxSwEpBTXptF0k4zNCJwDUiVgzoMm9yOBE951r0Pl4m47FA=="
+        "contentHash": "V5d/bLqWjNL54euM+V/GSpdCXwiL5DDOCrX1xGE+8VTvOHE+ikqe4jvWH52i5z1+WgttTJ8P2q34H32zdd7XLw=="
       },
       "LF2.UniTask": {
         "type": "Direct",
         "requested": "[2.5.10-2022.3.14f, )",
         "resolved": "2.5.10-2022.3.14f",
-        "contentHash": "kVOLePA4HLEMxYyNhPlftoyLXZC9kojF9qB2EI2ZB/Avc3CZa+Y049advcsw39Br9hH7HRP5sCirjWZjcZqwjA=="
+        "contentHash": "ulJp2hqfN4W9eIK245FHVPoM/zG9/MnMd6AERUdljwmaaIDydNW/2D5d6JHv8s7FNWYoGSgcLY8iK3Srch/Q4w=="
       },
       "PolySharp": {
         "type": "Direct",
