@@ -4,6 +4,7 @@ castclass
 codeball
 contentfiles
 cysharp
+docstrings
 iplaylf2
 kawai
 krafs

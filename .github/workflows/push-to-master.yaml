@@ -12,12 +12,12 @@ jobs:
     permissions:
       contents: write
     env:
-      LF2_MODS_DIR: "projects/mods"
+      LF2_MODS_DIR: projects/mods
+      LF2_TEMPLATE_BRANCH: template
+      LF2_COMMIT_MESSAGE: "chore: update template from master"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
@@ -32,6 +32,7 @@ jobs:
       - name: Push to Template Branch
         uses: EndBug/add-and-commit@v9
         with:
-          message: "chore: update template from master"
-          new_branch: template
-          push: "--force"
+          new_branch: ${{ env.LF2_TEMPLATE_BRANCH }}
+          message: ${{ env.LF2_COMMIT_MESSAGE }}
+          fetch: false
+          push: origin ${{ env.LF2_TEMPLATE_BRANCH }} --force
