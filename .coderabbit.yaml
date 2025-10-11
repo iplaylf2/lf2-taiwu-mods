@@ -1,12 +1,21 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-# Configuration for development teams
-language: "en-US"
+
 reviews:
   profile: "assertive"
-  high_level_summary: true
-  auto_review:
-    enabled: true
-    drafts: false
+  auto_title_instructions: |
+    Format: <type>(<scope>): <subject>
+    <scope> is optional
+    Type: chore, docs, feat, fix, refactor, style, or test.
+  sequence_diagrams: false
+  suggested_reviewers: false
+  poem: false
+  path_filters:
+    - "!**/packages.lock.json"
+  pre_merge_checks:
+    docstrings:
+      mode: off
+    title:
+      mode: off
   tools:
     pmd:
       enabled: true
@@ -14,8 +23,4 @@ reviews:
       enabled: true
     shellcheck:
       enabled: true
-chat:
-  auto_reply: true
-knowledge_base:
-  code_guidelines:
-    enabled: true
+language: "en-US"
