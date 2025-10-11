@@ -37,6 +37,7 @@
 1.  在 `projects/mods/` 目录下为你的新 Mod 创建一个文件夹，例如 `MyNewMod`。
 2.  在其中创建对应的项目文件夹，并遵循命名约定，例如 `MyNewMod.Backend`。
 3.  在项目文件夹中，创建一个最简化的 C# 项目文件 `MyNewMod.Backend.csproj`：
+
     ```xml
     <Project Sdk="Microsoft.NET.Sdk">
     </Project>
@@ -60,6 +61,7 @@
   在 `.csproj` 文件中为对应的 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>` 和 `<GeneratePathProperty>true</GeneratePathProperty>`。
 
   **示例**:
+
   ```xml
   <!-- This package will NOT be merged into the main assembly. -->
   <PackageReference Include="LF2.UniTask" Version="*">
@@ -72,6 +74,7 @@
   在 `.csproj` 文件中为对应的 `<Reference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。
 
   **示例**:
+
   ```xml
   <!-- This reference will NOT be merged into the main assembly. -->
   <Reference Include="path/to/your/library.dll">
