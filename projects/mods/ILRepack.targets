@@ -1,5 +1,9 @@
 <Project>
-    <Target Name="LF2RepackPrepare" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
+    <Target Name="RepackForBuild" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
+        <CallTarget Targets="_RepackRun" />
+    </Target>
+
+    <Target Name="_RepackPrepare">
         <ItemGroup>
             <_KeepPackageRef Include="@(PackageReference)" Condition="'%(PackageReference.LF2KeepItAsIs)' == 'true'" />
 
@@ -19,7 +23,7 @@
         <Message Text="Files that will be retained in output: @(KeepFiles->'%0a- %(Identity)')" Importance="high" />
     </Target>
 
-    <Target Name="LF2RepackRun" AfterTargets="LF2RepackPrepare" Condition="'$(LF2IsModEntry)' == 'true'">
+    <Target Name="_RepackRun" DependsOnTargets="_RepackPrepare">
         <ItemGroup>
             <_InternalizeExclude Include="$(TargetName)" />
             <_InputAssemblies Include="$(OutputPath)*.dll" Exclude="@(KeepFiles)" />
@@ -39,7 +43,7 @@
         />
     </Target>
 
-    <Target Name="LF2RepackClean" AfterTargets="LF2RepackRun" Condition="'$(LF2IsModEntry)' == 'true'">
+    <Target Name="_RepackClean" AfterTargets="_RepackRun">
         <ItemGroup>
             <_FilesToDelete Include="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" Exclude="@(KeepFiles)"></_FilesToDelete>
         </ItemGroup>
