@@ -2,9 +2,6 @@
     <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
     <PropertyGroup>
-        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
-
         <LF2IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</LF2IsBackend>
         <LF2IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</LF2IsFrontend>
         <LF2IsModEntry Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">true</LF2IsModEntry>
@@ -25,6 +22,9 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true'">
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+
         <IsPublishable>true</IsPublishable>
         <UseArtifactsOutput>true</UseArtifactsOutput>
     </PropertyGroup>
