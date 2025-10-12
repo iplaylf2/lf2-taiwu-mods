@@ -1,0 +1,13 @@
+<Project>
+    <Import Project="$(MSBuildThisFileDirectory)Directory.Build.props" />
+
+    <ItemGroup>
+        <_Projects
+            Include="$(LF2ModsDir)/$(LF2Mod)/**/*.csproj"
+        />
+    </ItemGroup>
+
+    <Target Name="LF2PublishMod">
+        <MSBuild Projects="@(_Projects)" Targets="Build" Properties="LF2PublishModTo=$(LF2Mod)" />
+    </Target>
+</Project>

@@ -31,6 +31,8 @@
         <IsPublishable>true</IsPublishable>
     </PropertyGroup>
 
+    <Import Project="$(MSBuildThisFileDirectory)ModEntry.targets" Condition="'$(LF2IsModEntry)' == 'true'" />
+
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Modding" />
         <PackageReference Include="LF2.Taiwu.Patching" />

@@ -1,0 +1,22 @@
+<Project>
+    <PropertyGroup>
+        <_PublishDir>$(LF2PublishDir)/$(LF2PublishModTo)</_PublishDir>
+    </PropertyGroup>
+
+    <Target
+        Name="PublishMod"
+        AfterTargets="RepackForBuild"
+        Condition="'$(LF2PublishModTo)' != ''"
+    >
+        <ItemGroup>
+            <_FilesToMove Include="$(OutputPath)/**/*.*" />
+        </ItemGroup>
+
+        <RemoveDir Directories="$(_PublishDir)" />
+
+        <Move
+            SourceFiles="@(_FilesToMove)"
+            DestinationFiles="@(_FilesToMove -> '$(_PublishDir)/Plugins/%(RecursiveDir)%(Filename)%(Extension)')"
+        />
+    </Target>
+</Project>
