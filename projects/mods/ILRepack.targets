@@ -45,13 +45,18 @@
 
     <Target Name="_RepackClean" AfterTargets="_RepackRun">
         <ItemGroup>
-            <_FilesToDelete Include="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" Exclude="@(KeepFiles)"></_FilesToDelete>
+            <_FilesToDelete
+                Include="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')"
+                Exclude="@(KeepFiles)"
+            />
         </ItemGroup>
 
         <Delete Files="@(_FilesToDelete)" />
 
         <ItemGroup>
-            <_Directories Include="$([System.IO.Directory]::GetDirectories('$(OutDir)%(DestinationSubDirectory)', '*', System.IO.SearchOption.AllDirectories))" />
+            <_Directories
+                Include="$([System.IO.Directory]::GetDirectories('$(OutDir)%(DestinationSubDirectory)', '*', System.IO.SearchOption.AllDirectories))"
+            />
             <_Directories>
                 <Files>$([System.IO.Directory]::GetFiles("%(_Directories.Identity)", "*", System.IO.SearchOption.AllDirectories).get_Length())</Files>
             </_Directories>
