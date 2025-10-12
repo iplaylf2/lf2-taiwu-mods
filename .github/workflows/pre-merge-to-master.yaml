@@ -16,7 +16,7 @@ jobs:
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
       DOTNET_NOLOGO: true
-      LF2_ARTIFACTS_PATH: projects/mods/**/bin/Release
+      LF2_ARTIFACTS_PATH: projects/mods/artifacts/bin/*/release
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
