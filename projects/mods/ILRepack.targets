@@ -5,24 +5,24 @@
 
             <_KeepPackageName Include="@(_KeepPackageRef->Replace('.', '_'))" />
 
-            <_AllSourceFilesToKeep Include="$(Pkg%(_KeepPackageName.Identity))\lib\*\*.dll" />
+            <_AllSourceFilesToKeep Include="$(Pkg%(_KeepPackageName.Identity))/lib/*/*.dll" />
             <_AllSourceFilesToKeep Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true')->'%(FullPath)')" />
 
             <_DistinctSourceFilesToKeep Remove="@(_DistinctSourceFilesToKeep)" />
             <_DistinctSourceFilesToKeep Include="@(_AllSourceFilesToKeep)" />
 
-            <LF2KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename)%(Extension)')" />
-            <LF2KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).pdb')" />
-            <LF2KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).xml')" />
+            <KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename)%(Extension)')" />
+            <KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).pdb')" />
+            <KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).xml')" />
         </ItemGroup>
 
-        <Message Text="Files that will be retained in output: @(LF2KeepFiles->'%0a- %(Identity)')" Importance="high" />
+        <Message Text="Files that will be retained in output: @(KeepFiles->'%0a- %(Identity)')" Importance="high" />
     </Target>
 
     <Target Name="LF2RepackRun" AfterTargets="LF2RepackPrepare" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
             <_InternalizeExclude Include="$(TargetName)" />
-            <_InputAssemblies Include="$(OutputPath)**\*.dll" Exclude="@(LF2KeepFiles)" />
+            <_InputAssemblies Include="$(OutputPath)*.dll" Exclude="@(KeepFiles)" />
             <_LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
         </ItemGroup>
 
@@ -41,11 +41,18 @@
 
     <Target Name="LF2RepackClean" AfterTargets="LF2RepackRun" Condition="'$(LF2IsModEntry)' == 'true'">
         <ItemGroup>
-            <_AllFilesInOutput Include="$(OutputPath)**\*" />
-            <_FinalMerged Include="$(OutputPath)$(TargetName).*" />
-            <_FilesToDelete Include="@(_AllFilesInOutput)" Exclude="@(_FinalMerged);@(LF2KeepFiles)" />
+            <_FilesToDelete Include="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" Exclude="@(KeepFiles)"></_FilesToDelete>
         </ItemGroup>
 
         <Delete Files="@(_FilesToDelete)" />
+
+        <ItemGroup>
+            <_Directories Include="$([System.IO.Directory]::GetDirectories('$(OutDir)%(DestinationSubDirectory)', '*', System.IO.SearchOption.AllDirectories))" />
+            <_Directories>
+                <Files>$([System.IO.Directory]::GetFiles("%(_Directories.Identity)", "*", System.IO.SearchOption.AllDirectories).get_Length())</Files>
+            </_Directories>
+        </ItemGroup>
+
+        <RemoveDir Directories="@(_Directories)" Condition="%(Files)=='0'" />
     </Target>
 </Project>
