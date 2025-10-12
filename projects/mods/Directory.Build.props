@@ -29,6 +29,7 @@
         <ILRepackTargetsFile>$(MSBuildThisFileDirectory)ILRepack.targets</ILRepackTargetsFile>
 
         <IsPublishable>true</IsPublishable>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
