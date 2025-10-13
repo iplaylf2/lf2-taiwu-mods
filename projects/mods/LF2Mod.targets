@@ -5,21 +5,20 @@
         <_PublishDir>$(LF2PublishDir)/$(LF2Mod)</_PublishDir>
     </PropertyGroup>
 
-    <Target Name="_CheckModDirExists">
-        <Error
-            Text="The Mod directory '$(_ModDir)' does not exist.. "
-            Condition="!Exists('$(_ModDir)')" />
-    </Target>
+    <Target Name="LF2PublishMod">
+        <ItemGroup Condition="'$(LF2Mod)' != ''">
+            <_Projects Include="$(_ModDir)/**/*.csproj" />
+        </ItemGroup>
 
-    <Target Name="LF2PublishMod" DependsOnTargets="_CheckModDirExists">
+        <Error
+            Text="No Projects found under '$(_ModDir)'. Ensure LF2Mod is set correctly (e.g., /p:LF2Mod=MyMod)."
+            Condition="'@(_Projects)' == ''"
+        />
+
         <Message Text="Cleaning previous publish directory: $(_PublishDir)" Importance="high" />
         <RemoveDir Directories="$(_PublishDir)" />
         <MakeDir Directories="$(_PublishDir)" />
         <MakeDir Directories="$(_PublishDir)/Plugins" />
-
-        <ItemGroup>
-            <_Projects Include="$(_ModDir)/**/*.csproj" />
-        </ItemGroup>
 
         <ItemGroup>
             <_SourceCodeDirsToExclude Include="@(_Projects->'%(RootDir)%(Directory)')" />
