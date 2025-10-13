@@ -1,0 +1,72 @@
+<Project>
+    <PropertyGroup>
+        <_ModDir>$(MSBuildThisFileDirectory)$(LF2Mod)</_ModDir>
+        <_ArtifactsDir>$(MSBuildThisFileDirectory)artifacts</_ArtifactsDir>
+        <_PublishDir>$(LF2PublishDir)/$(LF2Mod)</_PublishDir>
+    </PropertyGroup>
+
+    <Target Name="LF2PublishMod">
+        <ItemGroup Condition="'$(LF2Mod)' != ''">
+            <_Projects Include="$(_ModDir)/**/*.csproj" />
+        </ItemGroup>
+
+        <Error
+            Text="No Projects found under '$(_ModDir)'. Ensure LF2Mod is set correctly (e.g., /p:LF2Mod=MyMod)."
+            Condition="'@(_Projects)' == ''"
+        />
+
+        <Message Text="Cleaning previous publish directory: $(_PublishDir)" Importance="high" />
+        <RemoveDir Directories="$(_PublishDir)" />
+        <MakeDir Directories="$(_PublishDir)" />
+        <MakeDir Directories="$(_PublishDir)/Plugins" />
+
+        <ItemGroup>
+            <_SourceCodeDirsToExclude Include="@(_Projects->'%(RootDir)%(Directory)')" />
+        </ItemGroup>
+
+        <Message Text="Copying mod resources from $(_ModDir) to $(_PublishDir)..." Importance="high" />
+        <ItemGroup>
+            <_ModResources
+                Include="$(_ModDir)/**/*.*"
+                Exclude="@(_SourceCodeDirsToExclude->'%(Identity)**/*.*')"
+            />
+        </ItemGroup>
+
+        <Copy
+            SourceFiles="@(_ModResources)"
+            DestinationFolder="$(_PublishDir)/%(RecursiveDir)"
+        />
+
+        <Message Text="Building projects for Release configuration..." Importance="high" />
+        <MSBuild
+            Projects="@(_Projects)"
+            Targets="Build"
+            Properties="Configuration=Release"
+        />
+
+        <ItemGroup>
+            <_ProjectNames Include="@(_Projects->'%(Filename)')" />
+
+            <_ModReleaseSet
+                Include="@(_ProjectNames->'$(_ArtifactsDir)/bin/%(Identity)/release/**/*.*')"
+                Condition="Exists('$(_ArtifactsDir)/bin/%(Identity)/release')"
+            />
+        </ItemGroup>
+
+        <CreateItem Include="@(_ModReleaseSet)">
+            <Output
+                TaskParameter="Include"
+                ItemName="_ModRelease"
+            />
+        </CreateItem>
+
+        <Message Text="Found @(_ModRelease->Count()) plugin files to copy from matched projects." Importance="high" />
+
+        <Copy
+            SourceFiles="@(_ModRelease)"
+            DestinationFolder="$(_PublishDir)/Plugins/%(RecursiveDir)"
+        />
+
+        <Message Text="Mod '$(LF2Mod)' has been successfully published to '$(_PublishDir)'" Importance="high" />
+    </Target>
+</Project>

@@ -4,6 +4,7 @@
         "*.slnx": "xml",
         "nuget.config": "xml"
     },
+    "xml.format.emptyElements": "collapse",
     "xml.format.maxLineWidth": 0,
     "xml.validation.enabled": false,
 }

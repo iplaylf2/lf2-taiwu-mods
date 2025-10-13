@@ -1,9 +1,11 @@
 <Project>
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+    <Import
+        Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+        Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+    />
 
     <PropertyGroup>
         <LF2CommonDir>$(MSBuildThisFileDirectory)/common</LF2CommonDir>
-        <LF2ModsDir>$(MSBuildThisFileDirectory)/mods</LF2ModsDir>
 
         <LF2BackendTargetFramework>net6.0</LF2BackendTargetFramework>
         <LF2FrontendTargetFramework>netstandard2.1</LF2FrontendTargetFramework>
@@ -18,6 +20,7 @@
         <AnalysisMode>all</AnalysisMode>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <IsPublishable>false</IsPublishable>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 

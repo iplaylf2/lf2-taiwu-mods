@@ -2,7 +2,9 @@
     <PropertyGroup>
         <NoWarn>$(NoWarn);NU1507</NoWarn>
 
-        <LF2NupkgDir>$(MSBuildThisFileDirectory)nupkg</LF2NupkgDir>
+        <LF2ModsDir>$(MSBuildThisFileDirectory)/projects/mods</LF2ModsDir>
+        <LF2NupkgDir>$(MSBuildThisFileDirectory).lf2.nupkg</LF2NupkgDir>
+        <LF2PublishDir>$(MSBuildThisFileDirectory).lf2.publish</LF2PublishDir>
 
         <LF2TaiwuVersion>0.0.1-0.0.79.47-test</LF2TaiwuVersion>
 

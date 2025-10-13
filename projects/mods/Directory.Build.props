@@ -1,15 +1,13 @@
 <Project>
-    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+    <Import
+        Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+        Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+    />
 
     <PropertyGroup>
-        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
-
         <LF2IsBackend Condition="$(MSBuildProjectName.EndsWith('.Backend'))">true</LF2IsBackend>
         <LF2IsFrontend Condition="$(MSBuildProjectName.EndsWith('.Frontend'))">true</LF2IsFrontend>
         <LF2IsModEntry Condition="'$(LF2IsFrontend)' == 'true' or '$(LF2IsBackend)' == 'true'">true</LF2IsModEntry>
-
-        <ILRepackTargetsFile>$(MSBuildThisFileDirectory)ILRepack.targets</ILRepackTargetsFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(LF2IsBackend)' == 'true'">
@@ -22,6 +20,16 @@
         <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
 
         <LF2NeedFrontendReference>true</LF2NeedFrontendReference>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true'">
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+
+        <ILRepackTargetsFile>$(MSBuildThisFileDirectory)ILRepack.targets</ILRepackTargetsFile>
+
+        <IsPublishable>true</IsPublishable>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
