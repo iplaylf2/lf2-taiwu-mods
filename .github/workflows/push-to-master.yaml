@@ -15,6 +15,7 @@ jobs:
       LF2_MODS_DIR: projects/mods
       LF2_TEMPLATE_BRANCH: template
       LF2_COMMIT_MESSAGE: "chore: update template from master"
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

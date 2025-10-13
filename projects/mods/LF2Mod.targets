@@ -1,8 +1,13 @@
 <Project>
     <PropertyGroup>
+        <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+        <Version Condition="'$(Version)' == ''">0.0.1</Version>
+
         <_ModDir>$(MSBuildThisFileDirectory)$(LF2Mod)</_ModDir>
         <_ArtifactsDir>$(MSBuildThisFileDirectory)artifacts</_ArtifactsDir>
         <_PublishDir>$(LF2PublishDir)/$(LF2Mod)</_PublishDir>
+
+        <_cfg>$(Configuration.ToLowerInvariant())</_cfg>
     </PropertyGroup>
 
     <Target Name="LF2PublishMod">
@@ -20,12 +25,9 @@
         <MakeDir Directories="$(_PublishDir)" />
         <MakeDir Directories="$(_PublishDir)/Plugins" />
 
-        <ItemGroup>
-            <_SourceCodeDirsToExclude Include="@(_Projects->'%(RootDir)%(Directory)')" />
-        </ItemGroup>
-
         <Message Text="Copying mod resources from $(_ModDir) to $(_PublishDir)..." Importance="high" />
         <ItemGroup>
+            <_SourceCodeDirsToExclude Include="@(_Projects->'%(RootDir)%(Directory)')" />
             <_ModResources
                 Include="$(_ModDir)/**/*.*"
                 Exclude="@(_SourceCodeDirsToExclude->'%(Identity)**/*.*')"
@@ -37,33 +39,43 @@
             DestinationFolder="$(_PublishDir)/%(RecursiveDir)"
         />
 
-        <Message Text="Building projects for Release configuration..." Importance="high" />
+        <ItemGroup>
+            <_Properties
+                Include="Configuration=$(Configuration);Version=$(Version)"
+            />
+        </ItemGroup>
+
+        <Message
+            Text="Properties: @(_Properties)%0aBuilding projects ..."
+            Importance="high"
+        />
+
         <MSBuild
             Projects="@(_Projects)"
             Targets="Build"
-            Properties="Configuration=Release"
+            Properties="@(_Properties)"
         />
 
         <ItemGroup>
             <_ProjectNames Include="@(_Projects->'%(Filename)')" />
 
-            <_ModReleaseSet
-                Include="@(_ProjectNames->'$(_ArtifactsDir)/bin/%(Identity)/release/**/*.*')"
-                Condition="Exists('$(_ArtifactsDir)/bin/%(Identity)/release')"
+            <_ModOutputSet
+                Include="@(_ProjectNames->'$(_ArtifactsDir)/bin/%(Identity)/$(_cfg)/**/*.*')"
+                Condition="Exists('$(_ArtifactsDir)/bin/%(Identity)/$(_cfg)')"
             />
         </ItemGroup>
 
-        <CreateItem Include="@(_ModReleaseSet)">
+        <CreateItem Include="@(_ModOutputSet)">
             <Output
                 TaskParameter="Include"
-                ItemName="_ModRelease"
+                ItemName="_ModOutput"
             />
         </CreateItem>
 
-        <Message Text="Found @(_ModRelease->Count()) plugin files to copy from matched projects." Importance="high" />
+        <Message Text="Found @(_ModOutput->Count()) plugin files to copy from matched projects." Importance="high" />
 
         <Copy
-            SourceFiles="@(_ModRelease)"
+            SourceFiles="@(_ModOutput)"
             DestinationFolder="$(_PublishDir)/Plugins/%(RecursiveDir)"
         />
 
