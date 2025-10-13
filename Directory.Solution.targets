@@ -1,34 +1,4 @@
 <Project>
     <Import Project="$(MSBuildThisFileDirectory)Directory.Build.props" />
-
-    <PropertyGroup>
-        <_ModDir>$(LF2ModsDir)/$(LF2Mod)</_ModDir>
-        <_PublishDir>$(LF2PublishDir)/$(LF2Mod)</_PublishDir>
-        <_ArtifactsDir>$(LF2ModsDir)/artifacts</_ArtifactsDir>
-    </PropertyGroup>
-
-    <Target Name="LF2PublishMod">
-        <!-- todo: list resource -->
-
-        <!-- copy resource from _ModDir -->
-
-        <ItemGroup>
-            <_Projects
-                Include="$(_ModDir)/**/*.csproj"
-            />
-        </ItemGroup>
-
-        <!-- -c Release -->
-        <MSBuild Projects="@(_Projects)" Targets="Build" />
-
-        <ItemGroup>
-            <_ModBin
-                Include="$(_ArtifactsDir)/bin/*"
-            />
-
-            <!-- Find the intersection -->
-        </ItemGroup>
-
-        <!-- Copy bin/release/** to $(_PublishDir)/Plugins -->
-    </Target>
+    <Import Project="$(LF2ModsDir)/LF2Mod.targets" />
 </Project>
