@@ -1,0 +1,100 @@
+name: Pack and Publish Game Libraries
+
+on:
+  workflow_dispatch:
+    inputs:
+      download_url:
+        description: "Download URL for the game library zip package."
+        required: true
+      version:
+        description: "The version for the NuGet packages (e.g., 1.0.0)."
+        required: true
+      source:
+        description: "The NuGet source URL."
+        required: false
+        default: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+jobs:
+  pack-and-publish:
+    name: Pack and Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: Set Configuration
+        id: config
+        run: |
+          echo "property_source_project=projects/unmanaged-vendor/game/Taiwu.Backend" >> $GITHUB_OUTPUT
+          echo "relative_game_dir=game" >> $GITHUB_OUTPUT
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Resolve MSBuild Properties
+        id: props
+        run: |
+          set -euo pipefail
+          source_project="${{ steps.config.outputs.property_source_project }}"
+          relative_game_dir="${{ steps.config.outputs.relative_game_dir }}"
+
+          unmanaged_vendor_dir=$(dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir)
+          nupkg_dir=$(dotnet msbuild "$source_project" -getProperty:LF2NupkgDir)
+
+          if [ -z "$unmanaged_vendor_dir" ] || [ -z "$nupkg_dir" ]; then
+            echo "::error::Failed to retrieve MSBuild properties (LF2UnmanagedVendorDir or LF2NupkgDir)."
+            exit 1
+          fi
+
+          game_dir="$unmanaged_vendor_dir/$relative_game_dir"
+
+          echo "unmanaged_vendor_dir=$unmanaged_vendor_dir" >> $GITHUB_OUTPUT
+          echo "game_dir=$game_dir" >> $GITHUB_OUTPUT
+          echo "nupkg_dir=$nupkg_dir" >> $GITHUB_OUTPUT
+
+      - name: Download and Extract Game Libraries
+        run: |
+          set -euo pipefail
+          target_dir="${{ steps.props.outputs.game_dir }}"
+          download_zip_name="game-libs.zip"
+          
+          echo "Downloading from ${{ github.event.inputs.download_url }}..."
+          wget -O "$download_zip_name" "${{ github.event.inputs.download_url }}"
+          
+          echo "Extracting to $target_dir..."
+          unzip -o "$download_zip_name" -d "$target_dir"
+
+      - name: Pack Libraries
+        run: |
+          set -euo pipefail
+          game_dir="${{ steps.props.outputs.game_dir }}"
+          version="${{ github.event.inputs.version }}"
+
+          echo "Packing projects in $game_dir..."
+          find "$game_dir" -name "*.csproj" -print0 | while IFS= read -r -d $'\0' project_file; do
+            dotnet pack "$project_file" \
+              -c Release \
+              -p:Version="$version" \
+              -p:PackageVersion="$version"
+          done
+
+      - name: Publish to GitHub Packages
+        run: |
+          set -euo pipefail
+          nupkg_dir="${{ steps.props.outputs.nupkg_dir }}"
+          source_url="${{ github.event.inputs.source }}"
+
+          echo "Publishing packages from $nupkg_dir to $source_url..."
+          find "$nupkg_dir" -name "*.nupkg" -print0 | while IFS= read -r -d $'\0' nupkg_file; do
+            dotnet nuget push "$nupkg_file" \
+              --api-key "${{ secrets.GITHUB_TOKEN }}" \
+              --source "$source_url" \
+              --skip-duplicate
+          done
