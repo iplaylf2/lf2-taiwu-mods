@@ -1,4 +1,4 @@
-### Quick Note
+# Quick Note
 
 - **Title**: Set the PR title to `@coderabbitai` to have the bot generate one for you.
 
