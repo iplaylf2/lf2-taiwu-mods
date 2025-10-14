@@ -30,10 +30,12 @@ jobs:
 
       - name: Prepare Template Content
         run: |
+          set -euo pipefail
+
           dotnet sln list \
             | grep "\.csproj$" \
             | grep "^${{ steps.config.outputs.mods_dir }}/" \
-            | xargs -I {} dotnet sln remove "{}"
+            | xargs -r -I {} dotnet sln remove "{}"
           find ${{ steps.config.outputs.mods_dir }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
           rm -f .github/workflows/push-to-master.yaml
           echo "" > ${{ steps.config.outputs.mods_dir }}/README.md

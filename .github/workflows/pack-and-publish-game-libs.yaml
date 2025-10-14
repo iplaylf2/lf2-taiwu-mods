@@ -67,7 +67,7 @@ jobs:
           dotnet sln list \
             | grep "\.csproj$" \
             | grep -v "^$game_dir/" \
-            | xargs -I {} dotnet sln remove "{}"
+            | xargs -r -I {} dotnet sln remove "{}"
 
       - name: Download and Extract Game Libraries
         run: |
