@@ -27,6 +27,7 @@ pipefail
 publicizer
 pwsh
 raycaster
+realpath
 redzen
 roslynator
 shellcheck

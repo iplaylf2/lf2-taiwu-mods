@@ -3,9 +3,6 @@ name: Pack and Publish Game Libraries
 on:
   workflow_dispatch:
     inputs:
-      download_url:
-        description: Download URL for the game library zip package.
-        required: true
       version:
         description: The version for the NuGet packages (e.g., 1.0.0).
         required: true
@@ -36,6 +33,8 @@ jobs:
 
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
+        with:
+          restore: false
 
       - name: Resolve MSBuild Properties
         id: props
@@ -44,31 +43,50 @@ jobs:
           source_project="${{ steps.config.outputs.property_source_project }}"
           relative_game_dir="${{ steps.config.outputs.relative_game_dir }}"
 
-          unmanaged_vendor_dir=$(dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir)
-          nupkg_dir=$(dotnet msbuild "$source_project" -getProperty:LF2NupkgDir)
+          unmanaged_vendor_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir)
+          nupkg_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2NupkgDir)
 
-          if [ -z "$unmanaged_vendor_dir" ] || [ -z "$nupkg_dir" ]; then
+          if [ -z "$unmanaged_vendor_dir_abs" ] || [ -z "$nupkg_dir_abs" ]; then
             echo "::error::Failed to retrieve MSBuild properties (LF2UnmanagedVendorDir or LF2NupkgDir)."
             exit 1
           fi
 
-          game_dir="$unmanaged_vendor_dir/$relative_game_dir"
+          unmanaged_vendor_dir_rel=$(realpath --relative-to=. "$unmanaged_vendor_dir_abs")
+          nupkg_dir_rel=$(realpath --relative-to=. "$nupkg_dir_abs")
+          game_dir_rel="$unmanaged_vendor_dir_rel/$relative_game_dir"
 
-          echo "unmanaged_vendor_dir=$unmanaged_vendor_dir" >> $GITHUB_OUTPUT
-          echo "game_dir=$game_dir" >> $GITHUB_OUTPUT
-          echo "nupkg_dir=$nupkg_dir" >> $GITHUB_OUTPUT
+          echo "game_dir=$game_dir_rel" >> $GITHUB_OUTPUT
+          echo "nupkg_dir=$nupkg_dir_rel" >> $GITHUB_OUTPUT
+
+      - name: Unload Other Projects
+        run: |
+          set -euo pipefail
+          game_dir="${{ steps.props.outputs.game_dir }}"
+
+          echo "Unloading projects outside of $game_dir..."
+          dotnet sln list \
+            | grep "\.csproj$" \
+            | grep -v "^$game_dir/" \
+            | xargs -r -I {} dotnet sln remove "{}"
 
       - name: Download and Extract Game Libraries
         run: |
           set -euo pipefail
+
+          download_url="${{ secrets.LF2_GAME_LIBS_URL }}"
+          if [[ -z "$download_url" ]]; then
+            echo "::error::Secret 'LF2_GAME_LIBS_URL' is not set. Please add it to your repository secrets."
+            exit 1
+          fi
+
           target_dir="${{ steps.props.outputs.game_dir }}"
           download_zip_name="game-libs.zip"
 
-          echo "Downloading from ${{ github.event.inputs.download_url }}..."
-          wget -O "$download_zip_name" "${{ github.event.inputs.download_url }}"
+          echo "Downloading from configured URL..."
+          wget -q -O "$download_zip_name" "$download_url"
 
           echo "Extracting to $target_dir..."
-          unzip -o "$download_zip_name" -d "$target_dir"
+          unzip -q -o "$download_zip_name" -d "$target_dir"
 
       - name: Pack Libraries
         run: |
@@ -77,12 +95,15 @@ jobs:
           version="${{ github.event.inputs.version }}"
 
           echo "Packing projects in $game_dir..."
-          find "$game_dir" -name "*.csproj" -print0 | while IFS= read -r -d $'\0' project_file; do
-            dotnet pack "$project_file" \
-              -c Release \
-              -p:Version="$version" \
-              -p:PackageVersion="$version"
-          done
+          dotnet sln list \
+            | grep "\.csproj$" \
+            | grep "^$game_dir/" \
+            | while IFS= read -r project_file; do
+                dotnet pack "$project_file" \
+                  -c Release \
+                  -p:Version="$version" \
+                  -p:PackageVersion="$version"
+              done
 
       - name: Publish to NuGet Source
         run: |
@@ -102,9 +123,13 @@ jobs:
           nupkg_dir="${{ steps.props.outputs.nupkg_dir }}"
 
           echo "Publishing packages from $nupkg_dir to $source_url..."
-          find "$nupkg_dir" -name "*.nupkg" -print0 | while IFS= read -r -d $'\0' nupkg_file; do
-            dotnet nuget push "$nupkg_file" \
-              --api-key "$api_key" \
-              --source "$source_url" \
-              --skip-duplicate
-          done
+          find "$nupkg_dir" \
+            -name "*.nupkg" \
+            -type f \
+            -print0 \
+          | while IFS= read -r -d $'\0' nupkg_file; do
+              dotnet nuget push "$nupkg_file" \
+                --api-key "$api_key" \
+                --source "$source_url" \
+                --skip-duplicate
+            done
