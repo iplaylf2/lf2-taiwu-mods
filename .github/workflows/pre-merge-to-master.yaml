@@ -24,8 +24,6 @@ jobs:
 
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Solution
         run: dotnet build -c Release

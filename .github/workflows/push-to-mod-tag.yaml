@@ -22,8 +22,6 @@ jobs:
 
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Parse Tag and Set Variables
         run: |
@@ -89,5 +87,3 @@ jobs:
           files: ${{ env.RELEASE_ARCHIVE }}
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
