@@ -55,15 +55,17 @@ jobs:
           source_project="${{ steps.config.outputs.property_source_project }}"
 
           game_version=$(dotnet msbuild "$source_project" -getProperty:LF2TaiwuVersion)
-          publish_base_dir=$(dotnet msbuild "$source_project" -getProperty:LF2PublishDir)
+          publish_base_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2PublishDir)
 
-          if [ -z "$game_version" ] || [ -z "$publish_base_dir" ]; then
+          if [ -z "$game_version" ] || [ -z "$publish_base_dir_abs" ]; then
             echo "::error::Failed to retrieve MSBuild properties (LF2TaiwuVersion or LF2PublishDir)."
             exit 1
           fi
 
+          publish_base_dir_rel=$(realpath --relative-to=. "$publish_base_dir_abs")
+
           echo "game_version=$game_version" >> $GITHUB_OUTPUT
-          echo "publish_base_dir=$publish_base_dir" >> $GITHUB_OUTPUT
+          echo "publish_base_dir=$publish_base_dir_rel" >> $GITHUB_OUTPUT
 
       - name: Build and Publish Mod
         run: |
