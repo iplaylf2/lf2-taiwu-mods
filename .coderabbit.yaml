@@ -14,7 +14,7 @@ reviews:
     - "!**/packages.lock.json"
   auto_review:
     labels:
-      - "!no-bot-reviewer"
+      - "!no bot reviewer"
   pre_merge_checks:
     docstrings:
       mode: off
