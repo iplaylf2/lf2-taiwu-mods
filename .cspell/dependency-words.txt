@@ -2,6 +2,7 @@ behaviour
 callvirt
 castclass
 codeball
+coderabbitai
 contentfiles
 cysharp
 docstrings

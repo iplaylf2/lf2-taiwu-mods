@@ -12,6 +12,9 @@ reviews:
   poem: false
   path_filters:
     - "!**/packages.lock.json"
+  auto_review:
+    labels:
+      - "!no-bot-reviewer"
   pre_merge_checks:
     docstrings:
       mode: off
