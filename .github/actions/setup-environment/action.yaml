@@ -1,10 +1,16 @@
 name: Setup Environment
+description: Sets up .NET and optionally restores NuGet packages.
 
-description: Sets up .NET and restore
 inputs:
   token:
-    description: GitHub token for downloading release artifacts and NuGet auth.
-    required: true
+    description: GitHub token for NuGet auth. Defaults to the GITHUB_TOKEN.
+    required: false
+    default: ${{ github.token }}
+  restore:
+    description: Set to "false" to skip the dotnet restore step.
+    required: false
+    default: "true"
+
 runs:
   using: composite
 
@@ -16,6 +22,7 @@ runs:
         cache-dependency-path: projects/mods/**/packages.lock.json
 
     - name: Restore Nuget packages
+      if: inputs.restore == 'true'
       env:
         GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ inputs.token }}

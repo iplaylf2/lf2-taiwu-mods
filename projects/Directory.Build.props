@@ -5,7 +5,8 @@
     />
 
     <PropertyGroup>
-        <LF2CommonDir>$(MSBuildThisFileDirectory)/common</LF2CommonDir>
+        <LF2CommonDir>$(MSBuildThisFileDirectory)common</LF2CommonDir>
+        <LF2UnmanagedVendorDir>$(MSBuildThisFileDirectory)unmanaged-vendor</LF2UnmanagedVendorDir>
 
         <LF2BackendTargetFramework>net6.0</LF2BackendTargetFramework>
         <LF2FrontendTargetFramework>netstandard2.1</LF2FrontendTargetFramework>

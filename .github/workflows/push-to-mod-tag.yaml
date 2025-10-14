@@ -17,77 +17,83 @@ jobs:
       DOTNET_NOLOGO: true
 
     steps:
+      - name: Set Configuration
+        id: config
+        run: |
+          echo "property_source_project=projects/unmanaged-vendor/game/Taiwu.Backend" >> $GITHUB_OUTPUT
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Parse Tag and Set Variables
+      - name: Parse Tag Information
+        id: parse-tag
         run: |
           set -euo pipefail
-          FULL_TAG="${GITHUB_REF#refs/tags/}"
+          full_tag="${GITHUB_REF#refs/tags/}"
 
-          if [[ ! "$FULL_TAG" =~ ^mods/[^/]+/v[^/]+$ ]]; then
+          if [[ ! "$full_tag" =~ ^mods/[^/]+/v[^/]+$ ]]; then
             echo "::error::Invalid tag format. Expected 'mods/<mod-name>/v<version>'"
             exit 1
           fi
 
-          MOD_NAME="${FULL_TAG#mods/}"
-          MOD_NAME="${MOD_NAME%%/*}"
-          VERSION="${FULL_TAG##*/}"
-          VERSION="${VERSION#v}"
+          mod_name="${full_tag#mods/}"
+          mod_name="${mod_name%%/*}"
+          version="${full_tag##*/}"
+          version="${version#v}"
 
-          echo "MOD_NAME=$MOD_NAME" >> $GITHUB_ENV
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "FULL_TAG=$FULL_TAG" >> $GITHUB_ENV
+          echo "full_tag=$full_tag" >> $GITHUB_OUTPUT
+          echo "mod_name=$mod_name" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Get MSBuild Properties
+      - name: Resolve Release Properties
+        id: release-props
         run: |
           set -euo pipefail
-          GAME_VERSION=$(dotnet msbuild projects/unmanaged-vendor/game/Taiwu.Backend -getProperty:LF2TaiwuVersion)
-          PUBLISH_BASE_DIR=$(dotnet msbuild projects/unmanaged-vendor/game/Taiwu.Backend -getProperty:LF2PublishDir)
+          source_project="${{ steps.config.outputs.property_source_project }}"
 
-          if [ -z "$GAME_VERSION" ] || [ -z "$PUBLISH_BASE_DIR" ]; then
+          game_version=$(dotnet msbuild "$source_project" -getProperty:LF2TaiwuVersion)
+          publish_base_dir=$(dotnet msbuild "$source_project" -getProperty:LF2PublishDir)
+
+          if [ -z "$game_version" ] || [ -z "$publish_base_dir" ]; then
             echo "::error::Failed to retrieve MSBuild properties (LF2TaiwuVersion or LF2PublishDir)."
             exit 1
           fi
 
-          echo "GAME_VERSION=$GAME_VERSION" >> $GITHUB_ENV
-          echo "PUBLISH_BASE_DIR=$PUBLISH_BASE_DIR" >> $GITHUB_ENV
+          echo "game_version=$game_version" >> $GITHUB_OUTPUT
+          echo "publish_base_dir=$publish_base_dir" >> $GITHUB_OUTPUT
 
       - name: Build and Publish Mod
         run: |
           dotnet build -t:LF2PublishMod -c Release \
-            -p:LF2Mod=${{ env.MOD_NAME }} \
-            -p:Version=${{ env.VERSION }}
+            -p:LF2Mod=${{ steps.parse-tag.outputs.mod_name }} \
+            -p:Version=${{ steps.parse-tag.outputs.version }}
 
       - name: Package Artifact for Release
+        id: package
         run: |
           set -euo pipefail
-          MOD_PUBLISH_DIR="${{ env.PUBLISH_BASE_DIR }}/${{ env.MOD_NAME }}"
-          RELEASE_ARCHIVE="${{ env.MOD_NAME }}_v${{ env.VERSION }}.zip"
-          BUILD_DATE_READABLE=$(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          mod_publish_dir="${{ steps.release-props.outputs.publish_base_dir }}/${{ steps.parse-tag.outputs.mod_name }}"
+          archive_path="${{ steps.parse-tag.outputs.mod_name }}_v${{ steps.parse-tag.outputs.version }}.zip"
+          build_date_readable=$(date -u +'%Y-%m-%d %H:%M:%S UTC')
 
-          (cd "$MOD_PUBLISH_DIR" && zip -r "../../${RELEASE_ARCHIVE}" .)
+          (cd "$mod_publish_dir" && zip -r "../../${archive_path}" .)
 
-          echo "RELEASE_ARCHIVE=$RELEASE_ARCHIVE" >> $GITHUB_ENV
-          echo "BUILD_DATE_READABLE=$BUILD_DATE_READABLE" >> $GITHUB_ENV
+          echo "archive_path=$archive_path" >> $GITHUB_OUTPUT
+          echo "build_date=$build_date_readable" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.FULL_TAG }}
-          name: ${{ env.MOD_NAME }} v${{ env.VERSION }}
+          tag_name: ${{ steps.parse-tag.outputs.full_tag }}
+          name: ${{ steps.parse-tag.outputs.mod_name }} v${{ steps.parse-tag.outputs.version }}
           body: |
-            ## Mod Release: ${{ env.MOD_NAME }}
-            **Version**: ${{ env.VERSION }}
-            **Game Version**: ${{ env.GAME_VERSION }}
-            **Build Date**: ${{ env.BUILD_DATE_READABLE }}
-          files: ${{ env.RELEASE_ARCHIVE }}
+            ## Mod Release: ${{ steps.parse-tag.outputs.mod_name }}
+            **Version**: ${{ steps.parse-tag.outputs.version }}
+            **Game Version**: ${{ steps.release-props.outputs.game_version }}
+            **Build Date**: ${{ steps.package.outputs.build_date }}
+          files: ${{ steps.package.outputs.archive_path }}
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
