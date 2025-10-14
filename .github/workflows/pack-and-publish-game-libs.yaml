@@ -4,15 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       download_url:
-        description: "Download URL for the game library zip package."
+        description: Download URL for the game library zip package.
         required: true
       version:
-        description: "The version for the NuGet packages (e.g., 1.0.0)."
+        description: The version for the NuGet packages (e.g., 1.0.0).
         required: true
       source:
-        description: "The NuGet source URL."
+        description: The NuGet source URL. Defaults to owner's GitHub Packages.
         required: false
-        default: "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
 
 jobs:
   pack-and-publish:
@@ -64,10 +63,10 @@ jobs:
           set -euo pipefail
           target_dir="${{ steps.props.outputs.game_dir }}"
           download_zip_name="game-libs.zip"
-          
+
           echo "Downloading from ${{ github.event.inputs.download_url }}..."
           wget -O "$download_zip_name" "${{ github.event.inputs.download_url }}"
-          
+
           echo "Extracting to $target_dir..."
           unzip -o "$download_zip_name" -d "$target_dir"
 
@@ -85,16 +84,27 @@ jobs:
               -p:PackageVersion="$version"
           done
 
-      - name: Publish to GitHub Packages
+      - name: Publish to NuGet Source
         run: |
           set -euo pipefail
+          if [[ -n "${{ github.event.inputs.source }}" ]]; then
+            source_url="${{ github.event.inputs.source }}"
+          else
+            source_url="https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          fi
+
+          if [[ -n "${{ secrets.LF2_NUGET_API_KEY }}" ]]; then
+            api_key="${{ secrets.LF2_NUGET_API_KEY }}"
+          else
+            api_key="${{ github.token }}"
+          fi
+
           nupkg_dir="${{ steps.props.outputs.nupkg_dir }}"
-          source_url="${{ github.event.inputs.source }}"
 
           echo "Publishing packages from $nupkg_dir to $source_url..."
           find "$nupkg_dir" -name "*.nupkg" -print0 | while IFS= read -r -d $'\0' nupkg_file; do
             dotnet nuget push "$nupkg_file" \
-              --api-key "${{ secrets.GITHUB_TOKEN }}" \
+              --api-key "$api_key" \
               --source "$source_url" \
               --skip-duplicate
           done
