@@ -22,13 +22,13 @@
 
 本项目的依赖分为两部分：一部分来自官方 NuGet 源的标准库，另一部分是托管在 GitHub Packages 上的项目特有库。因此，你需要配置凭据以访问 GitHub Packages。
 
-- **VS Code / 命令行用户**:
-  1.  将你的 GitHub 用户名和 PAT 配置为环境变量 `GITHUB_USERNAME` 和 `GITHUB_TOKEN`。
-  2.  在项目根目录运行 `dotnet restore`。此命令将拉取所有必需的依赖。
+**VS Code / 命令行用户**:
 
-- **Visual Studio 用户**:
-  > [!TIP]
-  > Visual Studio 会在打开解决方案时自动处理大部分依赖还原。你可能无需设置环境变量，只需在 `工具 > NuGet 包管理器 > 程序包管理器设置` 中添加 GitHub 包源并配置一次凭据即可。
+1. 将你的 GitHub 用户名和 PAT 配置为环境变量 `GITHUB_USERNAME` 和 `GITHUB_TOKEN`。
+2. 在项目根目录运行 `dotnet restore`。此命令将拉取所有必需的依赖。
+
+> [!TIP]
+> **Visual Studio 用户**: Visual Studio 会在打开解决方案时自动处理大部分依赖还原。你可能无需设置环境变量，只需在 `工具 > NuGet 包管理器 > 程序包管理器设置` 中添加 GitHub 包源并配置一次凭据即可。
 
 > [!WARNING]
 > 理想情况下，`dotnet restore` 能一键拉取所有依赖。但由于分发游戏文件存在法律风险，**本模板并未包含游戏核心库的在线包**。因此，在首次配置环境时，你可能会遇到 `NU1101` 等“包找不到”的错误。要解决此问题，你需要将这些缺失的依赖打包并推送至开发者私有的 NuGet 源。具体方法请参阅[管理非托管依赖](#-管理非托管依赖)章节。
@@ -37,9 +37,9 @@
 
 本框架遵循**约定优于配置**的理念，将创建新 Mod 的流程极大简化：
 
-1.  在 `projects/mods/` 目录下为你的新 Mod 创建一个文件夹，例如 `MyNewMod`。
-2.  在其中创建对应的项目文件夹，并遵循命名约定，例如 `MyNewMod.Backend`。
-3.  在项目文件夹中，创建一个最简化的 C# 项目文件 `MyNewMod.Backend.csproj`：
+1. 在 `projects/mods/` 目录下为你的新 Mod 创建一个文件夹，例如 `MyNewMod`。
+2. 在其中创建对应的项目文件夹，并遵循命名约定，例如 `MyNewMod.Backend`。
+3. 在项目文件夹中，创建一个最简化的 C# 项目文件 `MyNewMod.Backend.csproj`：
 
     ```xml
     <Project Sdk="Microsoft.NET.Sdk">
@@ -60,8 +60,7 @@
 
 默认情况下，所有第三方依赖都会被内嵌到最终的 Mod 程序集中，以避免 DLL 冲突。但有时，你可能希望某个依赖**不被内嵌**，而是作为独立的 DLL 文件随 Mod 一同发布。在这种情况下，可以按以下方式操作：
 
-- **对于 `<PackageReference>`**:
-  在 `.csproj` 文件中为对应的 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>` 和 `<GeneratePathProperty>true</GeneratePathProperty>`。
+- **对于 `<PackageReference>`**: 在 `.csproj` 文件中为对应的 `<PackageReference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>` 和 `<GeneratePathProperty>true</GeneratePathProperty>`。
 
   **示例**:
 
@@ -73,8 +72,7 @@
   </PackageReference>
   ```
 
-- **对于 `<Reference>`**:
-  在 `.csproj` 文件中为对应的 `<Reference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。
+- **对于 `<Reference>`**: 在 `.csproj` 文件中为对应的 `<Reference>` 添加元数据 `<LF2KeepItAsIs>true</LF2KeepItAsIs>`。
 
   **示例**:
 
