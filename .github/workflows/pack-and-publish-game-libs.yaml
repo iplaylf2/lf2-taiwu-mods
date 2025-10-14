@@ -60,12 +60,13 @@ jobs:
       - name: Unload Other Projects
         run: |
           set -euo pipefail
-          unmanaged_vendor_dir="${{ steps.props.outputs.unmanaged_vendor_dir }}"
+          game_dir_abs="${{ steps.props.outputs.game_dir }}"
+          game_dir_rel=$(realpath --relative-to=. "$game_dir_abs")
 
-          echo "Unloading projects outside of $unmanaged_vendor_dir..."
+          echo "Unloading projects outside of $game_dir_rel..."
           dotnet sln list \
             | grep "\.csproj$" \
-            | grep -v "^$unmanaged_vendor_dir/" \
+            | grep -v "^$game_dir_rel/" \
             | xargs -I {} dotnet sln remove "{}"
 
       - name: Download and Extract Game Libraries
