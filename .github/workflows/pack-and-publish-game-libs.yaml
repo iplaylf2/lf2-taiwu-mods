@@ -33,6 +33,8 @@ jobs:
 
       - name: Setup Environment
         uses: ./.github/actions/setup-environment
+        with:
+          restore: false
 
       - name: Resolve MSBuild Properties
         id: props
@@ -54,6 +56,17 @@ jobs:
           echo "unmanaged_vendor_dir=$unmanaged_vendor_dir" >> $GITHUB_OUTPUT
           echo "game_dir=$game_dir" >> $GITHUB_OUTPUT
           echo "nupkg_dir=$nupkg_dir" >> $GITHUB_OUTPUT
+
+      - name: Unload Other Projects
+        run: |
+          set -euo pipefail
+          unmanaged_vendor_dir="${{ steps.props.outputs.unmanaged_vendor_dir }}"
+
+          echo "Unloading projects outside of $unmanaged_vendor_dir..."
+          dotnet sln list \
+            | grep "\.csproj$" \
+            | grep -v "^$unmanaged_vendor_dir/" \
+            | xargs -I {} dotnet sln remove "{}"
 
       - name: Download and Extract Game Libraries
         run: |
@@ -81,12 +94,15 @@ jobs:
           version="${{ github.event.inputs.version }}"
 
           echo "Packing projects in $game_dir..."
-          find "$game_dir" -name "*.csproj" -print0 | while IFS= read -r -d $'\0' project_file; do
-            dotnet pack "$project_file" \
-              -c Release \
-              -p:Version="$version" \
-              -p:PackageVersion="$version"
-          done
+          dotnet sln list \
+            | grep "\.csproj$" \
+            | grep "^$game_dir/" \
+            | while IFS= read -r project_file; do
+                dotnet pack "$project_file" \
+                  -c Release \
+                  -p:Version="$version" \
+                  -p:PackageVersion="$version"
+              done
 
       - name: Publish to NuGet Source
         run: |
