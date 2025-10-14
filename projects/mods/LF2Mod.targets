@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
-        <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-        <Version Condition="'$(Version)' == ''">0.0.1</Version>
+        <Configuration>Debug</Configuration>
+        <Version>0.0.0</Version>
 
         <_ModDir>$(MSBuildThisFileDirectory)$(LF2Mod)</_ModDir>
         <_ArtifactsDir>$(MSBuildThisFileDirectory)artifacts</_ArtifactsDir>
