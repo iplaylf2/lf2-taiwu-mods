@@ -11,12 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      LF2_MODS_DIR: projects/mods
-      LF2_TEMPLATE_BRANCH: template
-      LF2_COMMIT_MESSAGE: "chore: update template from master"
 
     steps:
+      - name: Set Configuration
+        id: config
+        run: |
+          echo "mods_dir=projects/mods" >> $GITHUB_OUTPUT
+          echo "template_branch=template" >> $GITHUB_OUTPUT
+          echo "commit_message=chore: update template from master" >> $GITHUB_OUTPUT
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -27,16 +30,16 @@ jobs:
 
       - name: Prepare Template Content
         run: |
-          find ${{ env.LF2_MODS_DIR }} -name "*.csproj" -print0 | xargs -0 -I {} dotnet sln remove {}
-          find ${{ env.LF2_MODS_DIR }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+          find ${{ steps.config.outputs.mods_dir }} -name "*.csproj" -print0 | xargs -0 -I {} dotnet sln remove {}
+          find ${{ steps.config.outputs.mods_dir }} -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
           rm -f .github/workflows/push-to-master.yaml
-          echo "" > ${{ env.LF2_MODS_DIR }}/README.md
+          echo "" > ${{ steps.config.outputs.mods_dir }}/README.md
           echo "" > .cspell/project-words.txt
 
       - name: Push to Template Branch
         uses: EndBug/add-and-commit@v9
         with:
-          new_branch: ${{ env.LF2_TEMPLATE_BRANCH }}
-          message: ${{ env.LF2_COMMIT_MESSAGE }}
+          new_branch: ${{ steps.config.outputs.template_branch }}
+          message: ${{ steps.config.outputs.commit_message }}
           fetch: false
-          push: origin ${{ env.LF2_TEMPLATE_BRANCH }} --force
+          push: origin ${{ steps.config.outputs.template_branch }} --force
