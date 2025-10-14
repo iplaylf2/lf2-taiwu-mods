@@ -3,9 +3,6 @@ name: Pack and Publish Game Libraries
 on:
   workflow_dispatch:
     inputs:
-      download_url:
-        description: Download URL for the game library zip package.
-        required: true
       version:
         description: The version for the NuGet packages (e.g., 1.0.0).
         required: true
@@ -61,11 +58,18 @@ jobs:
       - name: Download and Extract Game Libraries
         run: |
           set -euo pipefail
+
+          download_url="${{ secrets.LF2_GAME_LIBS_URL }}"
+          if [[ -z "$download_url" ]]; then
+            echo "::error::Secret 'LF2_GAME_LIBS_URL' is not set. Please add it to your repository secrets."
+            exit 1
+          fi
+
           target_dir="${{ steps.props.outputs.game_dir }}"
           download_zip_name="game-libs.zip"
 
-          echo "Downloading from ${{ github.event.inputs.download_url }}..."
-          wget -O "$download_zip_name" "${{ github.event.inputs.download_url }}"
+          echo "Downloading from configured URL..."
+          wget -O "$download_zip_name" "$download_url"
 
           echo "Extracting to $target_dir..."
           unzip -o "$download_zip_name" -d "$target_dir"
