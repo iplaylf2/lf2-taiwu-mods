@@ -91,13 +91,14 @@ jobs:
       - name: Pack Libraries
         run: |
           set -euo pipefail
-          game_dir="${{ steps.props.outputs.game_dir }}"
+          game_dir_abs="${{ steps.props.outputs.game_dir }}"
+          game_dir_rel=$(realpath --relative-to=. "$game_dir_abs")
           version="${{ github.event.inputs.version }}"
 
-          echo "Packing projects in $game_dir..."
+          echo "Packing projects in $game_dir_rel..."
           dotnet sln list \
             | grep "\.csproj$" \
-            | grep "^$game_dir/" \
+            | grep "^$game_dir_rel/" \
             | while IFS= read -r project_file; do
                 dotnet pack "$project_file" \
                   -c Release \
