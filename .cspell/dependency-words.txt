@@ -15,6 +15,7 @@ ldftn
 ldloc
 ldnull
 ldsfld
+msbuild
 netstandard
 newarr
 newobj
