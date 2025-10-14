@@ -69,10 +69,10 @@ jobs:
           download_zip_name="game-libs.zip"
 
           echo "Downloading from configured URL..."
-          wget -O "$download_zip_name" "$download_url"
+          wget -q -O "$download_zip_name" "$download_url"
 
           echo "Extracting to $target_dir..."
-          unzip -o "$download_zip_name" -d "$target_dir"
+          unzip -q -o "$download_zip_name" -d "$target_dir"
 
       - name: Pack Libraries
         run: |
