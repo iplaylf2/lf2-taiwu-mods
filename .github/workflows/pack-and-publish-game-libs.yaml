@@ -88,6 +88,25 @@ jobs:
           echo "Extracting to $target_dir..."
           unzip -q -o "$download_zip_name" -d "$target_dir"
 
+      - name: Remove FallbackContent.txt from Non-Empty Lib Dirs
+        run: |
+          set -euo pipefail
+          game_dir="${{ steps.props.outputs.game_dir }}"
+
+          echo "Searching for lib directories in '$game_dir' and cleaning up FallbackContent.txt..."
+
+          find "$game_dir" -type d -name "lib" -print0 | while IFS= read -r -d '' lib_dir; do
+            fallback_file="$lib_dir/FallbackContent.txt"
+            if [ -f "$fallback_file" ]; then
+              if find "$lib_dir" -maxdepth 1 -type f ! -name "FallbackContent.txt" -print -quit | grep -q .; then
+                echo "Removing '$fallback_file' as other files exist in the directory."
+                rm -f "$fallback_file"
+              else
+                echo "Skipping '$lib_dir' as it only contains FallbackContent.txt or is empty."
+              fi
+            fi
+          done
+
       - name: Pack Libraries
         run: |
           set -euo pipefail

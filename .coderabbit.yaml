@@ -12,6 +12,7 @@ reviews:
   poem: false
   path_filters:
     - "!**/packages.lock.json"
+    - "!**/Config.lua"
   auto_review:
     labels:
       - "!no bot reviewer"
