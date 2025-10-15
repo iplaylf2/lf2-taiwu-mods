@@ -1,0 +1,1 @@
+Ensures 'dotnet pack' produces a non-empty package. Remove if other content exists.
