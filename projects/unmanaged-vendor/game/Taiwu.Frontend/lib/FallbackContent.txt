@@ -1,1 +1,1 @@
-Fallback content to ensure a non-empty package for 'dotnet pack'. Unnecessary if other content exists.
+Ensures 'dotnet pack' produces a non-empty package. Remove if other content exists.
