@@ -48,6 +48,10 @@
 2. **运行工作流**: 在你的仓库 `Actions` 页面找到 `Pack and Publish Game Libraries` 工作流。
 3. **提供参数并执行**: 根据工作流的提示，提供游戏库压缩包的下载地址和版本号。此压缩包的基础结构应包含所有需要打包的DLL，并遵循 `projects/unmanaged-vendor/game` 的目录结构放置在对应的 `lib/` 文件夹中。
 
+> [!NOTE]
+> **工作流可能不会立即显示**
+> 由于 [GitHub 的一个已知问题](https://github.com/orgs/community/discussions/25219)，基于模板创建的仓库，其工作流（Workflows）可能不会自动出现在 `Actions` 页面。如果 `Pack and Publish Game Libraries` 工作流没有显示，你可能需要对工作流文件（例如，在 `.github/workflows/` 目录下）进行一次重命名（或任意修改）并提交，才能触发 GitHub Actions 的识别。
+
 > [!TIP]
 > 在第 3 步中，工作流打包前的文件覆盖行为可用于实现深度定制。详情请参阅本章末尾的“通过物料覆盖进行深度定制”小节。
 
