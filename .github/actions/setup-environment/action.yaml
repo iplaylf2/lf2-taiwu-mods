@@ -18,7 +18,7 @@ runs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        cache: true
+        cache: ${{ inputs.restore == 'true' }}
         cache-dependency-path: projects/mods/**/packages.lock.json
 
     - name: Restore Nuget packages

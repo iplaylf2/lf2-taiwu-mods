@@ -16,21 +16,21 @@
       },
       "LF2.Taiwu.Frontend": {
         "type": "Direct",
-        "requested": "[0.0.1-0.0.79.47-test, )",
-        "resolved": "0.0.1-0.0.79.47-test",
-        "contentHash": "gljKLG1cirJZbZjCAaPA6/IZnB90UKIbMUlwZWWoZM4TS3YnJxeFXem7F+5IuyUezlUwsGJqL3y5nW2uXEn22A=="
+        "requested": "[0.0.79.50-test, )",
+        "resolved": "0.0.79.50-test",
+        "contentHash": "xy+tM9X4DeKF7v3bKDyZElhiKiWOW5LKJSOvnn/7PtasDlsu+GRsS3Kb/BNKzeS1LueiSFO82JQOfzx4xqDsQA=="
       },
       "LF2.Taiwu.Modding": {
         "type": "Direct",
-        "requested": "[0.0.1-0.0.79.47-test, )",
-        "resolved": "0.0.1-0.0.79.47-test",
-        "contentHash": "ZxbaNVXaSxqNFYU5ENp+lcchwbolSoOpfHGkjIup3cGjI93ayf3ZCkwG4I0pdOZI4A/XCgywdHaGDdjig8w2dQ=="
+        "requested": "[0.0.79.50-test, )",
+        "resolved": "0.0.79.50-test",
+        "contentHash": "XTU+d2Kum7Wpd55Ex3A8k57btzcmO+7h+tIWUNLDout56Cqs/Sy3z0fBWjBKAbeUXcCqMM+ph+9Pa8zWEHbqNQ=="
       },
       "LF2.Taiwu.Patching": {
         "type": "Direct",
-        "requested": "[0.0.1-0.0.79.47-test, )",
-        "resolved": "0.0.1-0.0.79.47-test",
-        "contentHash": "rcaVgLVQcXldP3D6FQOYxnBLjq002G0APhvZPmFs2el5NFQ8vRVHPQmxWuAkU6XSC0YCk8jU3VRzIrySui+zuw=="
+        "requested": "[0.0.79.50-test, )",
+        "resolved": "0.0.79.50-test",
+        "contentHash": "a0rwWeSNRMxl4IJjIrsL2zp12qUMz1qjeg9rqqjHwTzRlftxkZg7JnxsF9mGOZFX2OV8VmNasVcPczz03Ep9fg=="
       },
       "LF2.UniTask": {
         "type": "Direct",
@@ -65,7 +65,7 @@
       "lf2.game.helper": {
         "type": "Project",
         "dependencies": {
-          "LF2.Taiwu.Frontend": "[0.0.1-0.0.79.47-test, )"
+          "LF2.Taiwu.Frontend": "[0.0.79.50-test, )"
         }
       }
     }
