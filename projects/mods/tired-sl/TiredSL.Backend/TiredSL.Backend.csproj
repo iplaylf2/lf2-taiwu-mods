@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="$(LF2CommonDir)/LF2.Cecil.Helper/LF2.Cecil.Helper.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="$(LF2CommonDir)/LF2.Kit/LF2.Kit.csproj" />
-    </ItemGroup>
-</Project>
