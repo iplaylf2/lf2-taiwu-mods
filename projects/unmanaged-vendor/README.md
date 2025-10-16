@@ -1,4 +1,4 @@
-# 非托管供应商依赖 (Unmanaged Vendor Dependencies)
+# 非托管供应商依赖：Unmanaged Vendor Dependencies
 
 此目录旨在解决部分第三方依赖项无法通过公共 NuGet 源获取的问题。你可以通过手动或自动化的方式，将这些依赖打包成 NuGet 包，以供项目恢复。
 

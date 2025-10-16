@@ -31,7 +31,7 @@
 
 ## 打包第三方库（以 UPM 为例）
 
-部分库（尤其是为 Unity UPM 设计的库）没有官方 NuGet 包，但你的 Mod 在运行时又需要它们。对于这类库，你可以将它们打包为标准的 NuGet 包，使其 DLL 文件作为运行时依赖随 Mod 一同发布。
+部分库，尤其是为 Unity UPM 设计的库，没有官方 NuGet 包，但你的 Mod 在运行时又需要它们。对于这类库，你可以将它们打包为标准的 NuGet 包，使其 DLL 文件作为运行时依赖随 Mod 一同发布。
 
 - **目录示例**：`unmanaged-vendor/upm/UniTask/lib/`
 - **依赖示例**：`UniTask.dll`
