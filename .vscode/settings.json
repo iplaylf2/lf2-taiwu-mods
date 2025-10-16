@@ -1,5 +1,4 @@
 {
-    "dotnet.defaultSolution": "lf2-taiwu-mods.slnx",
     "files.associations": {
         "*.slnx": "xml",
         "nuget.config": "xml"

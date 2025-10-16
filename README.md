@@ -52,28 +52,10 @@
 
 现在，在你的项目文件夹中添加 C# 代码（如 `ModEntry.cs`），并遵循游戏官方的 Mod 开发文档编写逻辑即可。
 
-## 📚 参考资料与进阶阅读
+## 📚 深入资料
 
-- **[仓库内 Mod 导览](./projects/mods/README.md)**：查阅本项目中包含的 Mod 及其功能介绍。
-- **[实用技巧集 (Cookbook)](./docs/cookbook.md)**：查阅如何控制依赖内嵌、打包第三方库等具体操作方法。
-- **[参考手册 (Reference)](./docs/reference.md)**：查阅本项目的核心工具、构建变量等参考信息。
-- **[本地依赖打包指南](./docs/local-deps-packaging-guide.md)**：学习如何将依赖打包为本地 NuGet 包，作为私有源方案的备选项。
-
-<details>
-<summary>点击展开推荐的目录结构</summary>
-<pre><code>.
-├── docs/                     # 项目文档
-├── Directory.Packages.props    # 全局 NuGet 包版本管理
-├── projects/
-│   ├── common/                 # 可供所有 Mod 复用的公共库
-│   ├── mods/                   # 你的工作区：所有 Mod 项目都放在这里
-│   │   └── MyNewMod/
-│   │       ├── MyNewMod.Backend/
-│   │       ├── MyNewMod.Frontend/
-│   │       └── Config.Lua          # Mod 官方配置文件，建议纳入版本控制
-│   └── unmanaged-vendor/       # 未托管资源的管理与打包配置
-</code></pre>
-</details>
+- **[文档索引](./docs/README.md)**：浏览完整的文档分类，按需跳转到操作指南与参考资料。
+- **[仓库内 Mod 导览](./projects/mods/README.md)**：查看目前包含的 Mod 列表、状态与源码路径。
 
 ## 🤝 贡献与反馈
 
