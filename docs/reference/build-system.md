@@ -16,5 +16,5 @@
 
 本模板的自动化功能主要由以下几个关键的开源工具驱动。感谢它们的开发者。
 
-- **[ILRepack.Lib.MSBuild.Task](https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task)**: 负责将项目引用的所有第三方 DLL 合并到最终生成的 Mod 程序集中，解决“DLL地狱”问题。
-- **[Publicizer](https://github.com/krafs/Publicizer)**: 此工具能够让 C# 编译器像访问 `public` 成员一样访问程序集中的 `private` 和 `internal` 成员，极大地提升了开发效率。
+- **[ILRepack.Lib.MSBuild.Task](https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task)**：负责将项目引用的所有第三方 DLL 合并到最终生成的 Mod 程序集中，解决“DLL 地狱”问题。
+- **[Publicizer](https://github.com/krafs/Publicizer)**：此工具能够让 C# 编译器像访问 `public` 成员一样访问程序集中的 `private` 和 `internal` 成员，极大地提升了开发效率。
