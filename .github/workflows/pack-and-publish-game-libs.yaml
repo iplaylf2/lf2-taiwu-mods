@@ -110,19 +110,13 @@ jobs:
       - name: Pack Libraries
         run: |
           set -euo pipefail
-          game_dir="${{ steps.props.outputs.game_dir }}"
           version="${{ github.event.inputs.version }}"
 
-          echo "Packing projects in $game_dir..."
-          dotnet sln list \
-            | grep "\.csproj$" \
-            | grep "^$game_dir/" \
-            | while IFS= read -r project_file; do
-                dotnet pack "$project_file" \
-                  -c Release \
-                  -p:Version="$version" \
-                  -p:PackageVersion="$version"
-              done
+          echo "Packing unmanaged vendor projects..."
+          dotnet pack \
+            -c Release \
+            -p:Version="$version" \
+            -p:PackageVersion="$version"
 
       - name: Publish to NuGet Source
         run: |
