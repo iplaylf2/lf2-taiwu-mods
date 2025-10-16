@@ -34,7 +34,7 @@ projects/unmanaged-vendor/
 3. **运行工作流**：在 GitHub `Actions` 页面手动触发 `Pack and Publish Game Libraries`，填写目标版本号及压缩包地址。
 4. **等待发布完成**：工作流会自动完成解压、打包与推送，仅针对 `projects/unmanaged-vendor/` 下标记为可打包的工程生成 NuGet 包。
 
-完成后，只需在本地 `nuget.config` 中添加对应的私有源，即可通过 `dotnet restore` 获得这些依赖。
+完成后，在仓库根目录的 `nuget.config` 中新增（或启用）一个指向你私有包源的 `<add>` 条目，并为其配置凭据。请保留默认的 `iplaylf2` 源，它被用于访问公开的仓库依赖。随后即可直接通过 `dotnet restore` 获取依赖。
 
 ---
 
@@ -48,10 +48,7 @@ dotnet pack --no-restore -c Release
 
 - `--no-restore` 可避免在没有网络的情况下触发额外的包还原。
 - 若需要自定义包版本，可追加 `-p:Version=<your-version>`。
-- 输出的 `.nupkg` 默认写入仓库根目录的 `.lf2.nupkg/`。这是模板预先配置的本地产物目录，便于通过 `dotnet nuget add source "$(pwd)/.lf2.nupkg" -n LF2Local` 快速启用本地源。
-
-> [!NOTE]
-> 如果后续切换到远程私有源，可使用 `dotnet nuget disable source LF2Local` 或 `dotnet nuget remove source LF2Local` 避免意外引用旧版本。
+- 输出的 `.nupkg` 默认写入仓库根目录的 `.lf2.nupkg/`。该目录已在 `nuget.config` 中以 `local` 源名预注册，默认处于禁用状态；需要时执行 `dotnet nuget enable source local` 启用，使用完后可用 `dotnet nuget disable source local` 关闭。
 
 ---
 

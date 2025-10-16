@@ -20,10 +20,10 @@
 
 1. **准备文件**：将需要打包的程序集（DLL 文件）放入对应 `unmanaged-vendor` 项目下的 `lib/` 目录中。关于游戏核心程序集的目录结构，请参阅 `projects/unmanaged-vendor/README.md` 中的“必要目录结构”一节。
 2. **打包**：在**仓库根目录**下运行 `dotnet pack --no-restore -c Release`。此命令会将 `unmanaged-vendor` 目录下的所有项目打包至 `.lf2.nupkg/` 文件夹，并避免在离线环境中触发额外的还原请求。
-3. **启用本地源**：在**仓库根目录**下运行 `dotnet nuget enable source local`。由于本地源默认禁用，此步骤是**必需的**。
+3. **启用本地源**：在**仓库根目录**下运行 `dotnet nuget enable source local`。仓库自带的 `nuget.config` 已预置名为 `local` 的源，默认禁用，启用后即可供恢复使用。
 4. **恢复**：在**仓库根目录**下运行 `dotnet restore`。NuGet 会自动找到本地包并完成依赖恢复。
 
 > [!TIP]
 > `dotnet pack` 命令会一次性处理所有 `unmanaged-vendor` 项目。`lib` 目录为空的项目也会被正常打包成一个空包，以确保 `dotnet restore` 能够顺利执行。
 
-完成上述步骤后，依赖恢复流程与远程私有源完全一致：执行 `dotnet restore` 即可编译 Mod。若需要切换回远程源，只需禁用本地源并重新启用私有源，无须额外清理本地包。
+完成上述步骤后，依赖恢复流程与远程私有源完全一致：执行 `dotnet restore` 即可编译 Mod。若需要切换回远程源，只需运行 `dotnet nuget disable source local` 禁用本地源，并重新启用私有源，无须额外清理本地包。

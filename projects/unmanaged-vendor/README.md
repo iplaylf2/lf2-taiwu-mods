@@ -49,17 +49,17 @@
 
 ### 必要目录结构：游戏核心程序集
 
-确保压缩包中的目录层级与 `game/<PackageId>/lib/` 一致。这样生成的 NuGet 包会将 DLL 作为仅编译时引用，避免在发布 Mod 时重复分发游戏文件。完整示例与校验方法同样可在[指南](../../docs/how-to/game-lib-packaging.md#目录结构约定)中找到。
+确保压缩包中的目录层级与 `game/<PackageId>/lib/` 一致。这样生成的 NuGet 包会将 DLL 作为仅编译时引用，避免在发布 Mod 时重复分发游戏文件。完整示例与校验方法同样可在[指南](../../docs/how-to/game-lib-packaging.md#准备目录结构)中找到。
 
 ### 配置开发环境以使用私有源
 
 当你的私有源上已经有打包好的游戏依赖后，你和其他团队成员便需要配置本地环境来使用它。
 
-这通常只需要在根目录的 `nuget.config` 文件中，**新增**一个指向你个人 GitHub Packages 的包源即可。
+这通常只需要在根目录的 `nuget.config` 文件中，为你的私有包源新增一个 `<add>` 条目，并配置对应的凭据。请保留示例中提供的 `iplaylf2` 源，以便持续访问公开维护的依赖。
 
 > [!NOTE]
 > **清理冲突源**
-> 如果你曾使用过备选的“本地打包”方案，请在恢复依赖前，先运行 `dotnet nuget disable source local` 暂停本地源；如需彻底清理，可改用 `dotnet nuget remove source local`。
+> 如果你曾使用过备选的“本地打包”方案，请在恢复依赖前运行 `dotnet nuget disable source local` 暂停本地源，确保 `dotnet restore` 优先使用远程私有源。
 
 ## 备选方案：本地打包
 
