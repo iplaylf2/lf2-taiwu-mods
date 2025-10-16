@@ -12,6 +12,27 @@
 
 请注意，通过 NuGet 包（如 `LF2.Taiwu.Backend`）引用的游戏库是为适配当前仓库中的 Mod 而精心筛选的。如果你在开发中发现缺少某个游戏 API，则可能需要自行引用包含该 API 的其他游戏程序集。
 
+## 打包 Mod
+
+模板在 `projects/mods/LF2Mod.targets` 中提供了 `LF2PublishMod` 目标，用来将指定的 Mod 项目打包成游戏识别的目录结构。运行以下命令即可触发打包流程，其中 `LF2Mod` 参数填写你的 Mod 目录名：
+
+```bash
+dotnet build -t:LF2PublishMod -p LF2Mod=my-mod
+```
+
+命令会同时编译前端与后端插件，并将生成的 Mod 包写入仓库根目录的 `.lf2.publish/` 中，方便直接复制到游戏的 Mods 目录或用于后续发版操作。
+
+## Git 标签与自动打包
+
+当需要产出可分发的压缩包时，可以通过 Git 标签触发 `.github/workflows/push-to-mod-tag.yaml` 中的自动化流程。标签格式固定为 `mods/<mod-name>/v<version>`，例如：
+
+```bash
+git tag mods/my-mod/v1.2.0
+git push origin mods/my-mod/v1.2.0
+```
+
+推送后，工作流会读取标签中的 Mod 名称与版本号，调用 `LF2PublishMod` 目标生成 `.lf2.publish/<mod-name>/` 下的产物，并将其打包为 `<mod-name>_v<version>.zip` 发布到 GitHub Release，方便他人直接下载。
+
 ## 核心工具
 
 本模板的自动化功能主要由以下几个关键的开源工具驱动。感谢它们的开发者。
