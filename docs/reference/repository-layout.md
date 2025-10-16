@@ -6,6 +6,8 @@
 .
 ├── docs/                     # 项目文档与指南
 ├── Directory.Packages.props  # 全局 NuGet 包版本管理
+├── .lf2.nupkg/               # dotnet pack 默认输出目录（仅在需要本地源时使用）
+├── .lf2.publish/             # Mod 发布目录（执行 LF2PublishMod 目标后生成）
 ├── projects/
 │   ├── common/               # 所有 Mod 可复用的公共库
 │   ├── mods/                 # 你的 Mod 工作区，每个 Mod 建议单独目录

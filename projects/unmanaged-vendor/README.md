@@ -11,6 +11,14 @@
     - **版本锁定**：这些包与特定版本的游戏或 Unity 编辑器紧密耦合。游戏更新后，这些包必须手动同步更新，否则会导致 Mod 编译失败或运行时崩溃。
     - **维护成本**：维护这些包的同步更新需要持续投入精力。
 
+## 目录结构概览
+
+- `game/`：用于生成 Taiwu 官方程序集包，供 Mod 在编译阶段引用，默认不会随 Mod 分发。
+- `upm/`：供高级场景打包第三方或 UPM 库使用；自动化工作流不会处理该目录，具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)。
+
+> [!TIP]
+> 完整的目录示例与推荐的文件布局请参考 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md)。
+
 ---
 
 ## 快速上手：使用私有源
@@ -22,12 +30,18 @@
   - **可复现与共享**：团队成员在配置完凭据后即可通过 `dotnet restore` 拉取一致的依赖。
   - **一键发布**：无需手动下载、打包、上传，工作流会自动处理所有步骤。
 
-### 发布到私有源
+### 准备压缩包
+
+将游戏 DLL 按 `game/<PackageId>/lib/` 整理好后压缩为单个 `.zip`。详细示例与命名建议见 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md)。
+
+### 发布到私有源（GitHub Actions）
 
 1. **创建你的仓库**：将本仓库作为模板 (Use this template) 或直接 Fork 来创建你自己的仓库。
 2. **配置仓库机密**：为避免在日志中暴露下载地址，工作流将从名为 `LF2_GAME_LIBS_URL` 的[仓库机密](https://docs.github.com/zh/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository)中读取游戏库的下载地址。请预先在你的仓库中设置该机密。
 3. **运行工作流**：在你的仓库 `Actions` 页面找到 `Pack and Publish Game Libraries` 工作流。
-4. **提供参数并执行**：根据工作流的提示，仅需提供游戏库的**版本号**即可。工作流会自动处理你所提供的压缩包，请确保包内文件已经按照下述目录结构放置。
+4. **提供参数并执行**：根据工作流的提示，提供游戏库的版本号与压缩包下载地址。工作流会自动下载并解压你准备的压缩包。
+
+工作流会自动识别 `projects/unmanaged-vendor/` 下标记为可打包的工程并生成对应的 NuGet 包，无需额外配置。
 
 > [!NOTE]
 > **工作流可能不会立即显示**
@@ -35,12 +49,7 @@
 
 ### 必要目录结构：游戏核心程序集
 
-自动化工作流与本地打包方案均遵循相同的打包策略。对于游戏核心程序集，你需要按以下结构组织文件，以便工具能正确识别它们并打包为“仅编译时”的引用。
-
-- **目录示例**：`unmanaged-vendor/game/Taiwu.Backend/lib/`
-- **依赖示例**：`GameData.dll`、`GameData.Shared.dll`
-
-所谓“仅编译时”引用，是指 Mod 项目在编译时可以正常链接它们，但在运行时会依赖游戏本身提供的程序集，从而避免重复分发。
+确保压缩包中的目录层级与 `game/<PackageId>/lib/` 一致。这样生成的 NuGet 包会将 DLL 作为仅编译时引用，避免在发布 Mod 时重复分发游戏文件。完整示例与校验方法同样可在[指南](../../docs/how-to/game-lib-packaging.md#目录结构约定)中找到。
 
 ### 配置开发环境以使用私有源
 
@@ -50,10 +59,8 @@
 
 > [!NOTE]
 > **清理冲突源**
-> 如果你曾使用过备选的“本地打包”方案，请在恢复依赖前，先运行 `dotnet nuget disable source local` 禁用本地源，以避免冲突。
-
----
+> 如果你曾使用过备选的“本地打包”方案，请在恢复依赖前，先运行 `dotnet nuget disable source local` 暂停本地源；如需彻底清理，可改用 `dotnet nuget remove source local`。
 
 ## 备选方案：本地打包
 
-对于**快速上手、项目初期验证**或无法使用远程源的场景，你也可以选择本地打包方案。该方案的详细步骤请参阅 [**离线环境下的游戏依赖准备**](../../docs/how-to/offline-game-dependency-setup.md)。
+对于快速验证或无法联网的场景，可以选择本地打包方案。具体命令行步骤、验证方法以及升级建议均整理在 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md) 与 [离线环境下的游戏依赖准备](../../docs/how-to/offline-game-dependency-setup.md) 中。

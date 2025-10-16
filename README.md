@@ -52,6 +52,10 @@
 
 现在，在你的项目文件夹中添加 C# 代码（如 `ModEntry.cs`），并遵循游戏官方的 Mod 开发文档编写逻辑即可。
 
+### 4. 构建与发布
+
+准备交付时，执行一次 `dotnet build -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
+
 ## 进一步阅读
 
 - **[文档索引](./docs/README.md)**：浏览完整的文档分类，按需跳转到操作指南与参考资料。
