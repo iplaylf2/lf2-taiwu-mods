@@ -32,6 +32,7 @@ realpath
 redzen
 roslynator
 shellcheck
+slnx
 softprops
 starg
 stefanzweifel
@@ -40,4 +41,5 @@ stfld
 stloc
 storer
 transil
+trimmable
 yoshifumi

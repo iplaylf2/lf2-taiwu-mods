@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+        <IncludeBuildOutput>true</IncludeBuildOutput>
+
+        <OutputType>Exe</OutputType>
+        <SelfContained>true</SelfContained>
+        <PublishAot>true</PublishAot>
+        <Trimmable>true</Trimmable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="YamlDotNet" />
+    </ItemGroup>
+</Project>

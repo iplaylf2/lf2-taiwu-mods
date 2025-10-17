@@ -12,6 +12,7 @@
         <PackageVersion Include="ILRepack.Lib.MSBuild.Task" Version="2.0.44" />
         <PackageVersion Include="Krafs.Publicizer" Version="2.3.0" />
         <PackageVersion Include="LF2.Transil" Version="0.0.2" />
+        <PackageVersion Include="YamlDotNet" Version="16.3.0" />
 
         <PackageVersion Include="LF2.UniTask" Version="$(LF2UniTaskVersion)-$(LF2TaiwuUnityVersion)" />
 
