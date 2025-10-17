@@ -20,8 +20,27 @@ jobs:
       - name: Set Configuration
         id: config
         run: |
-          echo "property_source_project=projects/unmanaged-vendor/game/Taiwu.Backend" >> $GITHUB_OUTPUT
-          echo "relative_artifacts_path=artifacts/bin/*/release" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          sln_root_dir="."
+          property_source_project_abs=$(
+            find "$sln_root_dir/projects/mods" -type f -name '*.csproj' -print \
+              | LC_ALL=C sort \
+              | head -n 1
+          )
+
+          if [ -z "$property_source_project_abs" ]; then
+            echo "::error::Unable to locate a property source project under '$sln_root_dir/projects/mods'."
+            exit 1
+          fi
+
+          property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
+
+          {
+            printf 'sln_root_dir=%s\n' "$sln_root_dir"
+            printf 'property_source_project=%s\n' "$property_source_project_rel"
+            printf 'relative_artifacts_path=%s\n' "artifacts/bin/*/release"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -30,15 +49,20 @@ jobs:
         uses: ./.github/actions/setup-mod-env
 
       - name: Build Solution
-        run: dotnet build -c Release
+        run: |
+          set -euo pipefail
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
+          (cd "$sln_root_dir" && dotnet build -c Release)
 
       - name: Get Full Artifacts Path
         id: get-path
         run: |
-          SOURCE_PROJECT="${{ steps.config.outputs.property_source_project }}"
-          RELATIVE_PATH="${{ steps.config.outputs.relative_artifacts_path }}"
-          BASE_DIR=$(dotnet msbuild "$SOURCE_PROJECT" -getProperty:LF2ModsDir)
-          echo "path=$BASE_DIR/$RELATIVE_PATH" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          source_project="${{ steps.config.outputs.property_source_project }}"
+          relative_path="${{ steps.config.outputs.relative_artifacts_path }}"
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
+          mods_dir=$(cd "$sln_root_dir" && dotnet msbuild "$source_project" -getProperty:LF2ModsDir)
+          echo "path=$mods_dir/$relative_path" >> $GITHUB_OUTPUT
 
       - name: Upload Mod Build Artifacts
         uses: actions/upload-artifact@v4

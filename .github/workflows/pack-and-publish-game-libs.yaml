@@ -25,8 +25,22 @@ jobs:
       - name: Set Configuration
         id: config
         run: |
-          echo "property_source_project=projects/unmanaged-vendor/game/Taiwu.Backend" >> $GITHUB_OUTPUT
-          echo "relative_game_dir=game" >> $GITHUB_OUTPUT
+          set -euo pipefail
+
+          sln_root_dir="projects/unmanaged-vendor/game"
+          property_source_project_abs=$(find "$sln_root_dir" -type f -name '*.csproj' -print -quit)
+
+          if [ -z "$property_source_project_abs" ]; then
+            echo "::error::No .csproj files found under '$sln_root_dir'."
+            exit 1
+          fi
+
+          property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
+
+          {
+            printf 'sln_root_dir=%s\n' "$sln_root_dir"
+            printf 'property_source_project=%s\n' "$property_source_project_rel"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -38,34 +52,31 @@ jobs:
         id: props
         run: |
           set -euo pipefail
+          repo_root="$(pwd)"
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
           source_project="${{ steps.config.outputs.property_source_project }}"
-          relative_game_dir="${{ steps.config.outputs.relative_game_dir }}"
 
-          unmanaged_vendor_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir)
-          nupkg_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2NupkgDir)
+          unmanaged_vendor_dir_abs=$(
+            cd "$sln_root_dir" && dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir
+          )
+          nupkg_dir_abs=$(
+            cd "$sln_root_dir" && dotnet msbuild "$source_project" -getProperty:LF2NupkgDir
+          )
 
           if [ -z "$unmanaged_vendor_dir_abs" ] || [ -z "$nupkg_dir_abs" ]; then
             echo "::error::Failed to retrieve MSBuild properties (LF2UnmanagedVendorDir or LF2NupkgDir)."
             exit 1
           fi
 
-          unmanaged_vendor_dir_rel=$(realpath --relative-to=. "$unmanaged_vendor_dir_abs")
-          nupkg_dir_rel=$(realpath --relative-to=. "$nupkg_dir_abs")
-          game_dir_rel="$unmanaged_vendor_dir_rel/$relative_game_dir"
+          game_dir_abs=$(realpath "$sln_root_dir")
+          nupkg_dir_abs=$(realpath "$nupkg_dir_abs")
+          game_dir_rel=$(realpath --relative-to="$repo_root" "$game_dir_abs")
+          nupkg_dir_rel=$(realpath --relative-to="$repo_root" "$nupkg_dir_abs")
 
-          echo "game_dir=$game_dir_rel" >> $GITHUB_OUTPUT
-          echo "nupkg_dir=$nupkg_dir_rel" >> $GITHUB_OUTPUT
-
-      - name: Unload Other Projects
-        run: |
-          set -euo pipefail
-          game_dir="${{ steps.props.outputs.game_dir }}"
-
-          echo "Unloading projects outside of $game_dir..."
-          dotnet sln list \
-            | grep "\.csproj$" \
-            | grep -v "^$game_dir/" \
-            | xargs -r -I {} dotnet sln remove "{}"
+          {
+            printf 'game_dir=%s\n' "$game_dir_rel"
+            printf 'nupkg_dir=%s\n' "$nupkg_dir_rel"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Download and Extract Game Libraries
         run: |
@@ -109,12 +120,16 @@ jobs:
         run: |
           set -euo pipefail
           version="${{ github.event.inputs.version }}"
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
 
           echo "Packing unmanaged vendor projects..."
-          dotnet pack \
-            -c Release \
-            -p:Version="$version" \
-            -p:PackageVersion="$version"
+          (
+            cd "$sln_root_dir"
+            dotnet pack \
+              -c Release \
+              -p:Version="$version" \
+              -p:PackageVersion="$version"
+          )
 
       - name: Publish to NuGet Source
         run: |
