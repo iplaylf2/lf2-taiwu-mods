@@ -32,6 +32,7 @@ realpath
 redzen
 roslynator
 shellcheck
+slnf
 slnx
 softprops
 starg
