@@ -1,28 +1,30 @@
-name: Setup Environment
-description: Sets up .NET and optionally restores NuGet packages.
+name: Setup Mod Environment
+description: Sets up .NET and restores dependencies for Mod projects.
 
 inputs:
   token:
-    description: GitHub token for NuGet auth. Defaults to the GITHUB_TOKEN.
+    description: A GitHub token for authenticating to NuGet package sources. Defaults to the `GITHUB_TOKEN`.
     required: false
     default: ${{ github.token }}
-  restore:
-    description: Set to "false" to skip the dotnet restore step.
-    required: false
-    default: "true"
 
 runs:
   using: composite
 
   steps:
+    - name: Check for existence of mod projects
+      id: check-projects
+      shell: bash
+      run: ls projects/mods/**/*.csproj >/dev/null 2>&1
+      continue-on-error: true
+
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        cache: ${{ inputs.restore == 'true' }}
+        cache: ${{ steps.check-projects.outcome == 'success' }}
         cache-dependency-path: projects/mods/**/packages.lock.json
 
-    - name: Restore Nuget packages
-      if: inputs.restore == 'true'
+    - name: Restore NuGet packages
+      if: steps.check-projects.outcome == 'success'
       env:
         GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ inputs.token }}

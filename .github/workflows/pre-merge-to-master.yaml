@@ -26,7 +26,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Environment
+      - name: Setup Mod Environment
         uses: ./.github/actions/setup-environment
 
       - name: Build Solution

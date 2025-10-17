@@ -31,10 +31,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Environment
-        uses: ./.github/actions/setup-environment
-        with:
-          restore: false
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
 
       - name: Resolve MSBuild Properties
         id: props
