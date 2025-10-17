@@ -6,6 +6,7 @@
         <IncludeBuildOutput>true</IncludeBuildOutput>
 
         <OutputType>Exe</OutputType>
+        <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>true</SelfContained>
         <PublishAot>true</PublishAot>
         <Trimmable>true</Trimmable>
@@ -13,5 +14,6 @@
 
     <ItemGroup>
         <PackageReference Include="YamlDotNet" />
+        <PackageReference Include="System.CommandLine" />
     </ItemGroup>
 </Project>
