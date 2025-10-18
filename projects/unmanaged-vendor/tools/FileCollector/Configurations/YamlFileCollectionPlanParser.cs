@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
@@ -21,16 +22,28 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
                 throw new FileCollectionConfigurationException("Configuration file is empty. At least one entry is required.");
             }
 
-            var entries = rawEntries.Select(CreateEntry).ToArray();
-            return new FileCollectionPlan(entries);
+            var errors = new List<string>();
+            var entries = new List<FileCollectionEntry>(rawEntries.Count);
+
+            for (var index = 0; index < rawEntries.Count; index++)
+            {
+                var error = TryCreateEntry(rawEntries[index], index, out var entry);
+                if (error is not null)
+                {
+                    errors.Add(error);
+                    continue;
+                }
+
+                entries.Add(entry!);
+            }
+
+            return errors.Count != 0
+                ? throw new FileCollectionConfigurationException(BuildErrorMessage(errors))
+                : new FileCollectionPlan(entries);
         }
         catch (YamlException ex)
         {
             throw new FileCollectionConfigurationException("Failed to parse YAML configuration content.", ex);
-        }
-        catch (InvalidDataException ex)
-        {
-            throw new FileCollectionConfigurationException(ex.Message, ex);
         }
     }
 
@@ -40,45 +53,90 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
         return Parse(reader);
     }
 
-    private static FileCollectionEntry CreateEntry(YamlFileCollectionEntry rawEntry)
+    private static string? TryCreateEntry(YamlFileCollectionEntry entry, int index, out FileCollectionEntry? result)
     {
-        var entry = rawEntry ?? throw new InvalidDataException("Configuration entry cannot be null.");
+        var errors = new List<string>();
+        var context = $"Entry {index}";
 
-        var targetDirectory = NormalizeDirectory(entry.TargetDirectory);
-        var sourceFiles = NormalizeSources(entry.SourceFiles);
-
-        return new FileCollectionEntry(targetDirectory, sourceFiles);
-    }
-
-    private static string NormalizeDirectory(string? value)
-    {
-        return !string.IsNullOrWhiteSpace(value)
-            ? value.Trim()
-            : throw new InvalidDataException($"Configuration entry is missing the {FileCollectionFields.TargetDirectory} field.");
-    }
-
-    private static IReadOnlyList<string> NormalizeSources(List<string>? values)
-    {
-        if (values is not { Count: > 0 })
+        var targetError = TryNormalizeTargetDirectory(entry.TargetDirectory, context, out var targetDirectory);
+        if (targetError is not null)
         {
-            throw new InvalidDataException($"Each configuration entry must contain at least one {FileCollectionFields.SourceFiles} value.");
+            errors.Add(targetError);
         }
 
-        var normalized = new List<string>(values.Count);
-        for (var index = 0; index < values.Count; index++)
+        var sourcesError = TryNormalizeSourceFiles(entry.SourceFiles, context, out var sourceFiles);
+        if (sourcesError is not null)
         {
-            var source = values[index];
+            errors.Add(sourcesError);
+        }
+
+        if (errors.Count == 0 && targetDirectory is not null && sourceFiles is not null)
+        {
+            result = new FileCollectionEntry(targetDirectory, sourceFiles);
+            return null;
+        }
+
+        result = null;
+        return string.Join(Environment.NewLine, errors);
+    }
+
+    private static string? TryNormalizeTargetDirectory(string? value, string context, out string? normalized)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            normalized = null;
+            return $"{context}: Missing {FileCollectionFields.TargetDirectory} value.";
+        }
+
+        normalized = value.Trim();
+        return null;
+    }
+
+    private static string? TryNormalizeSourceFiles(List<string>? values, string context, out IReadOnlyList<string>? normalized)
+    {
+        if (values is not { Count: > 0 } typedValues)
+        {
+            normalized = null;
+            return $"{context}: At least one {FileCollectionFields.SourceFiles} value is required.";
+        }
+
+        var errors = new List<string>();
+        var entries = new List<string>(typedValues.Count);
+
+        for (var index = 0; index < typedValues.Count; index++)
+        {
+            var source = typedValues[index];
             if (string.IsNullOrWhiteSpace(source))
             {
-                throw new InvalidDataException($"Configuration entry contains an empty {FileCollectionFields.SourceFiles} value at index {index}.");
+                errors.Add($"{context}: {FileCollectionFields.SourceFiles} value at index {index} is empty.");
+                continue;
             }
 
-            normalized.Add(source.Trim());
+            entries.Add(source.Trim());
         }
 
-        return [.. normalized];
+        if (errors is { Count: > 0 })
+        {
+            normalized = null;
+            return string.Join(Environment.NewLine, errors);
+        }
+
+        normalized = entries;
+        return null;
     }
 
+    private static string BuildErrorMessage(IEnumerable<string> errors)
+    {
+        var builder = new StringBuilder();
+        _ = builder.AppendLine("Configuration contains invalid entries:");
+
+        foreach (var error in errors)
+        {
+            _ = builder.Append("  - ").AppendLine(error);
+        }
+
+        return builder.ToString().TrimEnd();
+    }
     [SuppressMessage
     ("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "<Pending>")
     ]
