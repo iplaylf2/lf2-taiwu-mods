@@ -7,16 +7,17 @@
         <IsPublishable>true</IsPublishable>
 
         <OutputType>Exe</OutputType>
-        <PublishSingleFile>true</PublishSingleFile>
-        <SelfContained>true</SelfContained>
-        <Trimmable>true</Trimmable>
-
         <PublishAot>true</PublishAot>
         <IsAotCompatible>true</IsAotCompatible>
+        <Trimmable>true</Trimmable>
 
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebugType>none</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
