@@ -1,8 +1,8 @@
-using FileCollector.Configurations;
+using FileCourier.Manifest;
 
-namespace FileCollector.Processing;
+namespace FileCourier.Processing;
 
-internal static class FileCollectionExecutionPlanBuilder
+internal static class FileCourierExecutionPlanBuilder
 {
     private static readonly StringComparison PathComparison = OperatingSystem.IsWindows()
         ? StringComparison.OrdinalIgnoreCase
@@ -12,7 +12,7 @@ internal static class FileCollectionExecutionPlanBuilder
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
-    public static FileCollectionExecutionPlan Build(FileCollectionPlan plan, string readWorkingDirectory, string writeWorkingDirectory)
+    public static FileCourierExecutionPlan Build(FileCourierPlan plan, string readWorkingDirectory, string writeWorkingDirectory)
     {
         var readRoot = NormalizeRoot(readWorkingDirectory);
         var writeRoot = NormalizeRoot(writeWorkingDirectory);
@@ -24,7 +24,7 @@ internal static class FileCollectionExecutionPlanBuilder
 
         foreach (var entry in plan.Entries)
         {
-            var targetValidationError = ValidateRelativePath(entry.TargetDirectory, FileCollectionFields.TargetDirectory);
+            var targetValidationError = ValidateRelativePath(entry.TargetDirectory, FileCourierFields.TargetDirectory);
             if (targetValidationError is { })
             {
                 invalidTargetEntries.Add(targetValidationError);
@@ -32,7 +32,7 @@ internal static class FileCollectionExecutionPlanBuilder
             }
 
             var targetDirectoryPath = ResolveRelativePath(writeRoot, entry.TargetDirectory);
-            var targetError = ValidateWithinRoot(targetDirectoryPath, writeRoot, FileCollectionFields.TargetDirectory);
+            var targetError = ValidateWithinRoot(targetDirectoryPath, writeRoot, FileCourierFields.TargetDirectory);
             if (targetError is { })
             {
                 invalidTargetEntries.Add(targetError);
@@ -41,7 +41,7 @@ internal static class FileCollectionExecutionPlanBuilder
 
             foreach (var sourceFile in entry.SourceFiles)
             {
-                var sourceValidationError = ValidateRelativePath(sourceFile, FileCollectionFields.SourceFiles);
+                var sourceValidationError = ValidateRelativePath(sourceFile, FileCourierFields.SourceFiles);
                 if (sourceValidationError is { })
                 {
                     invalidSourceEntries.Add(sourceValidationError);
@@ -49,7 +49,7 @@ internal static class FileCollectionExecutionPlanBuilder
                 }
 
                 var sourceFilePath = ResolveRelativePath(readRoot, sourceFile);
-                var sourceError = ValidateWithinRoot(sourceFilePath, readRoot, FileCollectionFields.SourceFiles);
+                var sourceError = ValidateWithinRoot(sourceFilePath, readRoot, FileCourierFields.SourceFiles);
                 if (sourceError is { })
                 {
                     invalidSourceEntries.Add(sourceError);
@@ -102,10 +102,10 @@ internal static class FileCollectionExecutionPlanBuilder
                 lines.AddRange(missingFiles.OrderBy(path => path, PathComparer).Select(path => $"  {path}"));
             }
 
-            throw new FileCollectionExecutionException(string.Join(Environment.NewLine, lines));
+            throw new FileCourierExecutionException(string.Join(Environment.NewLine, lines));
         }
 
-        return new FileCollectionExecutionPlan(readRoot, writeRoot, transfers);
+        return new FileCourierExecutionPlan(readRoot, writeRoot, transfers);
     }
 
     private static string NormalizeRoot(string root)

@@ -1,12 +1,12 @@
-namespace FileCollector.Processing;
+namespace FileCourier.Processing;
 
-internal static class FileCollectionPlanExecutor
+internal static class FileCourierPlanExecutor
 {
     private static readonly StringComparer PathComparer = OperatingSystem.IsWindows()
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
-    public static Task<IReadOnlyList<FileTransfer>> ExecuteAsync(FileCollectionExecutionPlan plan)
+    public static Task<IReadOnlyList<FileTransfer>> ExecuteAsync(FileCourierExecutionPlan plan)
     {
         EnsureWriteDirectory(plan.WriteRoot);
         return ExecuteTransfersAsync(plan.Transfers);
@@ -30,7 +30,7 @@ internal static class FileCollectionPlanExecutor
             var targetDirectory = Path.GetDirectoryName(transfer.DestinationPath);
             if (string.IsNullOrEmpty(targetDirectory))
             {
-                throw new FileCollectionExecutionException($"Destination path {transfer.DestinationPath} is missing a directory segment.");
+                throw new FileCourierExecutionException($"Destination path {transfer.DestinationPath} is missing a directory segment.");
             }
 
             if (ensuredDirectories.Add(targetDirectory))

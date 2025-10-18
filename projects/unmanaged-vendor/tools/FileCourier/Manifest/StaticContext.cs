@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 
-namespace FileCollector.Configurations;
+namespace FileCourier.Manifest;
 
 [SuppressMessage
 ("Performance", "CA1852: Seal internal types", Justification = "<Pending>")

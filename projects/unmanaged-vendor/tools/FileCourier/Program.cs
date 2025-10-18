@@ -1,15 +1,15 @@
 using System.CommandLine;
-using FileCollector.Cli;
-using FileCollector.Configurations;
-using FileCollector.Processing;
+using FileCourier.Cli;
+using FileCourier.Manifest;
+using FileCourier.Processing;
 
-return await FileCollector.FileCollectorCli.InvokeAsync(args);
+return await FileCourier.FileCourierCli.InvokeAsync(args);
 
-namespace FileCollector
+namespace FileCourier
 {
-    internal static class FileCollectorCli
+    internal static class FileCourierCli
     {
-        private const string DefaultConfigurationFileName = "assets.yaml";
+        private const string DefaultConfigurationFileName = "manifest.yaml";
 
         public static Task<int> InvokeAsync(string[] args)
         {
@@ -63,10 +63,10 @@ namespace FileCollector
             try
             {
                 var cliContext = CliArgumentsAnalyzer.Analyze(readWorkingDirectory, writeWorkingDirectory, configurationPath);
-                var plan = FileCollectionConfigurationLoader.Load(cliContext.ConfigurationPath);
-                var executionPlan = FileCollectionExecutionPlanBuilder.Build(plan, cliContext.ReadRoot, cliContext.WriteRoot);
+                var manifest = FileCourierConfigurationLoader.Load(cliContext.ConfigurationPath);
+                var executionPlan = FileCourierExecutionPlanBuilder.Build(manifest, cliContext.ReadRoot, cliContext.WriteRoot);
 
-                var transfers = await FileCollectionPlanExecutor.ExecuteAsync(executionPlan);
+                var transfers = await FileCourierPlanExecutor.ExecuteAsync(executionPlan);
 
                 await Console.Out.WriteLineAsync($"Copied {transfers.Count} files.");
                 foreach (var transfer in transfers)
@@ -81,7 +81,7 @@ namespace FileCollector
                 await Console.Error.WriteLineAsync(ex.Message);
                 return 1;
             }
-            catch (FileCollectionException ex)
+            catch (FileCourierException ex)
             {
                 await Console.Error.WriteLineAsync(ex.Message);
                 return 2;

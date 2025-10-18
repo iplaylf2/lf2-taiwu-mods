@@ -21,7 +21,7 @@
         <PackageReference Include="YamlDotNet" />
         <PackageReference Include="System.CommandLine" />
 
-        <Content Include="assets.yaml">
+        <Content Include="manifest.yaml">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>

@@ -1,7 +1,7 @@
-using FileCollector.Configurations;
-using FileCollector.Processing;
+using FileCourier.Manifest;
+using FileCourier.Processing;
 
-namespace FileCollector.Cli;
+namespace FileCourier.Cli;
 
 internal static class CliArgumentsAnalyzer
 {
@@ -13,21 +13,21 @@ internal static class CliArgumentsAnalyzer
         if (!Directory.Exists(readRoot))
         {
             var message = $"Read working directory does not exist: {readRoot}";
-            throw new FileCollectionExecutionException(message);
+            throw new FileCourierExecutionException(message);
         }
 
         var writeRoot = Normalize(writeWorkingDirectory);
         if (Directory.Exists(writeRoot) && Directory.EnumerateFileSystemEntries(writeRoot).Any())
         {
             var message = $"Write working directory {writeRoot} must be empty.";
-            throw new FileCollectionExecutionException(message);
+            throw new FileCourierExecutionException(message);
         }
 
         var configurationFullPath = Normalize(configurationPath);
         if (!File.Exists(configurationFullPath))
         {
             var message = $"Configuration file not found: {configurationFullPath}";
-            throw new FileCollectionConfigurationException(message);
+            throw new FileCourierConfigurationException(message);
         }
 
         return new Result(readRoot, writeRoot, configurationFullPath);

@@ -3,27 +3,27 @@ using System.Text;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
-namespace FileCollector.Configurations;
+namespace FileCourier.Manifest;
 
-internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
+internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
 {
-    public YamlFileCollectionPlanParser()
+    public YamlFileCourierPlanParser()
         : this(new StaticDeserializerBuilder(new StaticContext()).IgnoreUnmatchedProperties().Build())
     {
     }
 
-    public FileCollectionPlan Parse(TextReader reader)
+    public FileCourierPlan Parse(TextReader reader)
     {
         try
         {
-            var rawEntries = deserializer.Deserialize<List<YamlFileCollectionEntry>>(reader);
+            var rawEntries = deserializer.Deserialize<List<YamlFileCourierEntry>>(reader);
             if (rawEntries is not { Count: > 0 })
             {
-                throw new FileCollectionConfigurationException("Configuration file is empty. At least one entry is required.");
+                throw new FileCourierConfigurationException("Configuration file is empty. At least one entry is required.");
             }
 
             var errors = new List<string>();
-            var entries = new List<FileCollectionEntry>(rawEntries.Count);
+            var entries = new List<FileCourierEntry>(rawEntries.Count);
 
             for (var index = 0; index < rawEntries.Count; index++)
             {
@@ -38,22 +38,22 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
             }
 
             return errors.Count != 0
-                ? throw new FileCollectionConfigurationException(BuildErrorMessage(errors))
-                : new FileCollectionPlan(entries);
+                ? throw new FileCourierConfigurationException(BuildErrorMessage(errors))
+                : new FileCourierPlan(entries);
         }
         catch (YamlException ex)
         {
-            throw new FileCollectionConfigurationException("Failed to parse YAML configuration content.", ex);
+            throw new FileCourierConfigurationException("Failed to parse YAML configuration content.", ex);
         }
     }
 
-    public FileCollectionPlan ParseFromString(string yamlContent)
+    public FileCourierPlan ParseFromString(string yamlContent)
     {
         using var reader = new StringReader(yamlContent);
         return Parse(reader);
     }
 
-    private static string? TryCreateEntry(YamlFileCollectionEntry entry, int index, out FileCollectionEntry? result)
+    private static string? TryCreateEntry(YamlFileCourierEntry entry, int index, out FileCourierEntry? result)
     {
         var errors = new List<string>();
         var context = $"Entry {index}";
@@ -72,7 +72,7 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
 
         if (errors.Count == 0 && targetDirectory is not null && sourceFiles is not null)
         {
-            result = new FileCollectionEntry(targetDirectory, sourceFiles);
+            result = new FileCourierEntry(targetDirectory, sourceFiles);
             return null;
         }
 
@@ -85,7 +85,7 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
         if (string.IsNullOrWhiteSpace(value))
         {
             normalized = null;
-            return $"{context}: Missing {FileCollectionFields.TargetDirectory} value.";
+            return $"{context}: Missing {FileCourierFields.TargetDirectory} value.";
         }
 
         normalized = value.Trim();
@@ -97,7 +97,7 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
         if (values is not { Count: > 0 } typedValues)
         {
             normalized = null;
-            return $"{context}: At least one {FileCollectionFields.SourceFiles} value is required.";
+            return $"{context}: At least one {FileCourierFields.SourceFiles} value is required.";
         }
 
         var errors = new List<string>();
@@ -108,7 +108,7 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
             var source = typedValues[index];
             if (string.IsNullOrWhiteSpace(source))
             {
-                errors.Add($"{context}: {FileCollectionFields.SourceFiles} value at index {index} is empty.");
+                errors.Add($"{context}: {FileCourierFields.SourceFiles} value at index {index} is empty.");
                 continue;
             }
 
@@ -140,12 +140,12 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
     [SuppressMessage
     ("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "<Pending>")
     ]
-    private sealed class YamlFileCollectionEntry
+    private sealed class YamlFileCourierEntry
     {
-        [YamlMember(Alias = FileCollectionFields.TargetDirectory)]
+        [YamlMember(Alias = FileCourierFields.TargetDirectory)]
         public string? TargetDirectory { get; set; }
 
-        [YamlMember(Alias = FileCollectionFields.SourceFiles)]
+        [YamlMember(Alias = FileCourierFields.SourceFiles)]
         public List<string>? SourceFiles { get; set; }
     }
 }

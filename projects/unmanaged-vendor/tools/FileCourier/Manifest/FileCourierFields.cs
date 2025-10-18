@@ -1,6 +1,6 @@
-namespace FileCollector.Configurations;
+namespace FileCourier.Manifest;
 
-internal static class FileCollectionFields
+internal static class FileCourierFields
 {
     public const string TargetDirectory = "target-dir";
     public const string SourceFiles = "source-files";
