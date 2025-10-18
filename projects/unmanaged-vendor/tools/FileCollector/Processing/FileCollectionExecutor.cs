@@ -58,11 +58,10 @@ internal static class FileCollectionExecutor
             _ = Directory.CreateDirectory(normalized);
         }
 
-        _ = Directory.CreateDirectory(normalized);
         return normalized;
     }
 
-    public static IReadOnlyList<(string SourcePath, string DestinationPath)> Execute
+    public static async Task<IReadOnlyList<(string SourcePath, string DestinationPath)>> ExecuteAsync
     (
         FileCollectionPlan plan,
         string readWorkingDirectory,
@@ -73,7 +72,7 @@ internal static class FileCollectionExecutor
         var writeRoot = NormalizeRoot(writeWorkingDirectory, mustExist: false);
         var pendingTransfers = BuildTransferPlan(plan, readRoot, writeRoot);
 
-        return ExecuteTransfers(pendingTransfers, writeRoot);
+        return await ExecuteTransfersAsync(pendingTransfers, writeRoot);
     }
 
     private static List<PendingTransfer> BuildTransferPlan(FileCollectionPlan plan, string readRoot, string writeRoot)
@@ -113,7 +112,7 @@ internal static class FileCollectionExecutor
         return transfers;
     }
 
-    private static IReadOnlyList<(string SourcePath, string DestinationPath)> ExecuteTransfers
+    private static async Task<IReadOnlyList<(string SourcePath, string DestinationPath)>> ExecuteTransfersAsync
     (
         IReadOnlyList<PendingTransfer> transfers,
         string writeRoot
@@ -129,7 +128,31 @@ internal static class FileCollectionExecutor
                 _ = Directory.CreateDirectory(transfer.TargetDirectory);
             }
 
-            File.Copy(transfer.SourcePath, transfer.DestinationPath, overwrite: true);
+            await using var sourceStream = new FileStream
+            (
+                transfer.SourcePath,
+                new FileStreamOptions
+                {
+                    Mode = FileMode.Open,
+                    Access = FileAccess.Read,
+                    Share = FileShare.Read,
+                    Options = FileOptions.Asynchronous | FileOptions.SequentialScan
+                }
+            );
+
+            await using var destinationStream = new FileStream
+            (
+                transfer.DestinationPath,
+                new FileStreamOptions
+                {
+                    Mode = FileMode.Create,
+                    Access = FileAccess.Write,
+                    Share = FileShare.None,
+                    Options = FileOptions.Asynchronous
+                }
+            );
+
+            await sourceStream.CopyToAsync(destinationStream);
             completedTransfers.Add((transfer.SourcePath, transfer.DestinationPath));
         }
 

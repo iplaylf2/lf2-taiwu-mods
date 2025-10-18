@@ -2,7 +2,7 @@ using System.CommandLine;
 using FileCollector.Configurations;
 using FileCollector.Processing;
 
-return await FileCollector.FileCollectorCli.InvokeAsync(args).ConfigureAwait(false);
+return await FileCollector.FileCollectorCli.InvokeAsync(args);
 
 namespace FileCollector
 {
@@ -45,19 +45,19 @@ namespace FileCollector
                 configurationOption,
             };
 
-            rootCommand.SetAction(parseResult =>
+            rootCommand.SetAction(async parseResult =>
             {
                 var readDir = parseResult.GetRequiredValue(readWorkingDirectoryArgument);
                 var writeDir = parseResult.GetRequiredValue(writeWorkingDirectoryArgument);
                 var configPath = parseResult.GetValue(configurationOption) ?? DefaultConfigurationFileName;
 
-                return Execute(readDir, writeDir, configPath);
+                return await ExecuteAsync(readDir, writeDir, configPath);
             });
 
             return rootCommand;
         }
 
-        private static int Execute(string readWorkingDirectory, string writeWorkingDirectory, string configurationPath)
+        private static async Task<int> ExecuteAsync(string readWorkingDirectory, string writeWorkingDirectory, string configurationPath)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace FileCollector
                     throw new FileCollectionConfigurationException($"Configuration file not found: {fullConfigurationPath}");
                 }
 
-                using var stream = File.OpenRead(fullConfigurationPath);
+                await using var stream = File.OpenRead(fullConfigurationPath);
                 using var reader = new StreamReader(stream);
                 var parser = new YamlFileCollectionPlanParser();
                 var plan = parser.Parse(reader);
@@ -75,24 +75,24 @@ namespace FileCollector
                 FileCollectionExecutor.ValidateSourceFiles(plan, readWorkingDirectory);
 
                 var preparedWriteDirectory = FileCollectionExecutor.PrepareWriteDirectory(writeWorkingDirectory);
-                var transfers = FileCollectionExecutor.Execute(plan, readWorkingDirectory, preparedWriteDirectory);
+                var transfers = await FileCollectionExecutor.ExecuteAsync(plan, readWorkingDirectory, preparedWriteDirectory);
 
-                Console.Out.WriteLine($"Copied {transfers.Count} files.");
+                await Console.Out.WriteLineAsync($"Copied {transfers.Count} files.");
                 foreach (var (sourcePath, destinationPath) in transfers)
                 {
-                    Console.Out.WriteLine($"  {sourcePath} -> {destinationPath}");
+                    await Console.Out.WriteLineAsync($"  {sourcePath} -> {destinationPath}");
                 }
 
                 return 0;
             }
             catch (ArgumentException ex)
             {
-                Console.Error.WriteLine(ex.Message);
+                await Console.Error.WriteLineAsync(ex.Message);
                 return 1;
             }
             catch (FileCollectionException ex)
             {
-                Console.Error.WriteLine(ex.Message);
+                await Console.Error.WriteLineAsync(ex.Message);
                 return 2;
             }
         }
