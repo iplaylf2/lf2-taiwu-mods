@@ -1,9 +1,11 @@
-using FileCollector;
-
 namespace FileCollector.Processing;
 
-public sealed class FileCollectionExecutionException : FileCollectionException
+internal sealed class FileCollectionExecutionException : FileCollectionException
 {
+    public FileCollectionExecutionException()
+    {
+    }
+
     public FileCollectionExecutionException(string message)
         : base(message)
     {

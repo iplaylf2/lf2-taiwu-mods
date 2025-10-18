@@ -1,0 +1,16 @@
+- target-dir: documents/reports
+  source-files:
+    - /path/to/source/quarterly_report.docx
+    - data/project_plan.xlsx
+    - notes/meeting_notes.txt
+
+- target-dir: images/project_alpha
+  source-files:
+    - downloads/logo.png
+    - assets/main_banner.jpg
+    - /another/path/icon.svg
+
+- target-dir: archive/logs
+  source-files:
+    - /var/log/app.log
+    - /var/log/system.log

@@ -1,9 +1,6 @@
-using System.Collections.Generic;
-using System.IO;
-
 namespace FileCollector.IO;
 
-public interface IFileSystem
+internal interface IFileSystem
 {
     bool DirectoryExists(string path);
 

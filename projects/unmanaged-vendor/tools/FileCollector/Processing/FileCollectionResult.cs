@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FileCollector.Processing;
 
-public sealed class FileCollectionResult
+internal sealed class FileCollectionResult
 {
     public FileCollectionResult(IEnumerable<FileTransferRecord> completedTransfers)
     {

@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-
 namespace FileCollector.IO;
 
-public sealed class PhysicalFileSystem : IFileSystem
+internal sealed class PhysicalFileSystem : IFileSystem
 {
     public bool DirectoryExists(string path)
     {
@@ -13,7 +9,7 @@ public sealed class PhysicalFileSystem : IFileSystem
 
     public void EnsureDirectory(string path)
     {
-        Directory.CreateDirectory(EnsurePathProvided(path, nameof(path)));
+        _ = Directory.CreateDirectory(EnsurePathProvided(path, nameof(path)));
     }
 
     public bool FileExists(string path)
@@ -41,11 +37,6 @@ public sealed class PhysicalFileSystem : IFileSystem
 
     private static string EnsurePathProvided(string? path, string parameterName)
     {
-        if (path is null)
-        {
-            throw new ArgumentNullException(parameterName);
-        }
-
-        return path;
+        return path ?? throw new ArgumentNullException(parameterName);
     }
 }

@@ -1,20 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FileCollector.Configurations;
 
-/// <summary>
-/// Represents the complete set of file collection entries described by the configuration.
-/// </summary>
-public sealed class FileCollectionPlan
-{
-    public FileCollectionPlan(IEnumerable<FileCollectionEntry> entries)
-    {
-        Entries = new ReadOnlyCollection<FileCollectionEntry>(MaterializeEntries(entries));
-    }
 
-    public IReadOnlyList<FileCollectionEntry> Entries { get; }
+internal sealed class FileCollectionPlan(IEnumerable<FileCollectionEntry> entries)
+{
+    public IReadOnlyList<FileCollectionEntry> Entries { get; } = new ReadOnlyCollection<FileCollectionEntry>(MaterializeEntries(entries));
 
     private static List<FileCollectionEntry> MaterializeEntries(IEnumerable<FileCollectionEntry> entries)
     {
@@ -26,11 +17,8 @@ public sealed class FileCollectionPlan
             materialized.Add(entry ?? throw new ArgumentException("Entry cannot be null.", nameof(entries)));
         }
 
-        if (materialized.Count == 0)
-        {
-            throw new ArgumentException("The collection plan must contain at least one entry.", nameof(entries));
-        }
-
-        return materialized;
+        return materialized.Count == 0
+            ? throw new ArgumentException("The collection plan must contain at least one entry.", nameof(entries))
+            : materialized;
     }
 }

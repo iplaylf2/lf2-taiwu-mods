@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FileCollector.Configurations;
 using FileCollector.IO;
 
 namespace FileCollector.Processing;
 
-public sealed class FileCollectionExecutor
+internal sealed class FileCollectionExecutor(IFileSystem fileSystem, TimeProvider? timeProvider = null)
 {
     private sealed record PendingTransfer(string SourcePath, string TargetDirectory, string DestinationPath);
 
@@ -18,14 +14,8 @@ public sealed class FileCollectionExecutor
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
-    private readonly IFileSystem _fileSystem;
-    private readonly TimeProvider _timeProvider;
-
-    public FileCollectionExecutor(IFileSystem fileSystem, TimeProvider? timeProvider = null)
-    {
-        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-        _timeProvider = timeProvider ?? TimeProvider.System;
-    }
+    private readonly IFileSystem _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
 
     public FileCollectionResult Execute(FileCollectionPlan plan, string readWorkingDirectory, string writeWorkingDirectory)
     {
@@ -61,7 +51,7 @@ public sealed class FileCollectionExecutor
         _fileSystem.EnsureDirectory(writeRoot);
     }
 
-    private IReadOnlyList<PendingTransfer> BuildTransferPlan(FileCollectionPlan plan, string readRoot, string writeRoot)
+    private List<PendingTransfer> BuildTransferPlan(FileCollectionPlan plan, string readRoot, string writeRoot)
     {
         var transfers = new List<PendingTransfer>();
 
@@ -97,7 +87,7 @@ public sealed class FileCollectionExecutor
         return transfers;
     }
 
-    private IReadOnlyList<FileTransferRecord> ExecuteTransfers(IReadOnlyList<PendingTransfer> transfers, string writeRoot)
+    private List<FileTransferRecord> ExecuteTransfers(IReadOnlyList<PendingTransfer> transfers, string writeRoot)
     {
         HashSet<string> ensuredDirectories = new(PathComparer) { writeRoot };
         var completedTransfers = new List<FileTransferRecord>(transfers.Count);
@@ -120,12 +110,9 @@ public sealed class FileCollectionExecutor
     {
         var fullPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(root));
 
-        if (mustExist && !_fileSystem.DirectoryExists(fullPath))
-        {
-            throw new FileCollectionExecutionException($"Directory does not exist: {fullPath}");
-        }
-
-        return fullPath;
+        return mustExist && !_fileSystem.DirectoryExists(fullPath)
+            ? throw new FileCollectionExecutionException($"Directory does not exist: {fullPath}")
+            : fullPath;
     }
 
     private static string ResolveRelativePath(string root, string relativePath)
@@ -155,13 +142,11 @@ public sealed class FileCollectionExecutor
 
     private static string AppendDirectorySeparator(string path)
     {
-        if (string.IsNullOrEmpty(path))
+        return path switch
         {
-            return path;
-        }
-
-        return Path.EndsInDirectorySeparator(path)
-            ? path
-            : path + Path.DirectorySeparatorChar;
+            var p when string.IsNullOrEmpty(p) => path,
+            var p when Path.EndsInDirectorySeparator(p) => path,
+            var p => p + Path.DirectorySeparatorChar
+        };
     }
 }

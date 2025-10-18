@@ -1,23 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace FileCollector.Configurations;
 
-/// <summary>
-/// Represents a single target directory mapping to a set of source files.
-/// </summary>
-public sealed class FileCollectionEntry
+internal sealed class FileCollectionEntry(string targetDirectory, IEnumerable<string> sourceFiles)
 {
-    public FileCollectionEntry(string targetDirectory, IEnumerable<string> sourceFiles)
-    {
-        TargetDirectory = NormalizeDirectory(targetDirectory);
-        SourceFiles = new ReadOnlyCollection<string>(BuildSourceList(sourceFiles));
-    }
+    public string TargetDirectory { get; } = NormalizeDirectory(targetDirectory);
 
-    public string TargetDirectory { get; }
-
-    public IReadOnlyList<string> SourceFiles { get; }
+    public IReadOnlyList<string> SourceFiles { get; } = new ReadOnlyCollection<string>(BuildSourceList(sourceFiles));
 
     private static string NormalizeDirectory(string value)
     {
@@ -25,7 +14,7 @@ public sealed class FileCollectionEntry
         return value.Trim();
     }
 
-    private static IList<string> BuildSourceList(IEnumerable<string> sources)
+    private static List<string> BuildSourceList(IEnumerable<string> sources)
     {
         ArgumentNullException.ThrowIfNull(sources);
 
@@ -35,12 +24,9 @@ public sealed class FileCollectionEntry
             normalizedSources.Add(NormalizeSource(source));
         }
 
-        if (normalizedSources.Count == 0)
-        {
-            throw new ArgumentException("At least one source file must be specified.", nameof(sources));
-        }
-
-        return normalizedSources;
+        return normalizedSources.Count == 0
+            ? throw new ArgumentException("At least one source file must be specified.", nameof(sources))
+            : normalizedSources;
     }
 
     private static string NormalizeSource(string source)

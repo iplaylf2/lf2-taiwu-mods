@@ -1,25 +1,16 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
 namespace FileCollector.Configurations;
 
-public sealed class YamlFileCollectionPlanParser
+internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
 {
-    private readonly IDeserializer _deserializer;
+    private readonly IDeserializer _deserializer = deserializer ?? throw new ArgumentNullException(nameof(deserializer));
 
     public YamlFileCollectionPlanParser()
-        : this(new DeserializerBuilder().IgnoreUnmatchedProperties().Build())
+        : this(new StaticDeserializerBuilder(new StaticContext()).IgnoreUnmatchedProperties().Build())
     {
-    }
-
-    public YamlFileCollectionPlanParser(IDeserializer deserializer)
-    {
-        _deserializer = deserializer ?? throw new ArgumentNullException(nameof(deserializer));
     }
 
     public FileCollectionPlan Parse(TextReader reader)
@@ -57,20 +48,22 @@ public sealed class YamlFileCollectionPlanParser
 
     private static FileCollectionEntry CreateEntry(YamlFileCollectionEntry rawEntry)
     {
-        if (rawEntry.TargetDirectory is null)
+        return rawEntry switch
         {
-            throw new InvalidDataException("Configuration entry is missing the target-dir field.");
-        }
+            { TargetDirectory: null } =>
+                throw new InvalidDataException("Configuration entry is missing the target-dir field."),
+            { SourceFiles: null } or { SourceFiles.Count: 0 } =>
+                throw new InvalidDataException("Each configuration entry must contain at least one source-files value."),
+            { TargetDirectory: var TargetDirectory, SourceFiles: var SourceFiles } =>
+               new FileCollectionEntry(TargetDirectory, SourceFiles),
+            _ => throw new NotImplementedException()
+        };
 
-        if (rawEntry.SourceFiles is null || rawEntry.SourceFiles.Count == 0)
-        {
-            throw new InvalidDataException("Each configuration entry must contain at least one source-files value.");
-        }
-
-        return new FileCollectionEntry(rawEntry.TargetDirectory, rawEntry.SourceFiles);
     }
 
-    [SuppressMessage("Performance", "CA1812", Justification = "YamlDotNet creates this type via reflection.")]
+    [SuppressMessage
+    ("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "<Pending>")
+    ]
     private sealed class YamlFileCollectionEntry
     {
         [YamlMember(Alias = "target-dir")]

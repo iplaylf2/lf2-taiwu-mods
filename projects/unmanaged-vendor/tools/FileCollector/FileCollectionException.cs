@@ -1,8 +1,6 @@
-using System;
-
 namespace FileCollector;
 
-public class FileCollectionException : Exception
+internal class FileCollectionException : Exception
 {
     public FileCollectionException()
     {
