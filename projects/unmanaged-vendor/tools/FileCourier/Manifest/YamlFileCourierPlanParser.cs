@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
@@ -92,7 +91,7 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
         return null;
     }
 
-    private static string? TryNormalizeSourceFiles(List<string>? values, string context, out IReadOnlyList<string>? normalized)
+    private static string? TryNormalizeSourceFiles(IReadOnlyList<string>? values, string context, out IReadOnlyList<string>? normalized)
     {
         if (values is not { Count: > 0 } typedValues)
         {
@@ -136,16 +135,5 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
         }
 
         return builder.ToString().TrimEnd();
-    }
-    [SuppressMessage
-    ("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "<Pending>")
-    ]
-    private sealed class YamlFileCourierEntry
-    {
-        [YamlMember(Alias = FileCourierFields.TargetDirectory)]
-        public string? TargetDirectory { get; set; }
-
-        [YamlMember(Alias = FileCourierFields.SourceFiles)]
-        public List<string>? SourceFiles { get; set; }
     }
 }
