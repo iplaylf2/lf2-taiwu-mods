@@ -1,4 +1,5 @@
 using System.CommandLine;
+using FileCollector.Cli;
 using FileCollector.Configurations;
 using FileCollector.Processing;
 
@@ -61,26 +62,16 @@ namespace FileCollector
         {
             try
             {
-                var fullConfigurationPath = Path.GetFullPath(configurationPath);
-                if (!File.Exists(fullConfigurationPath))
-                {
-                    throw new FileCollectionConfigurationException($"Configuration file not found: {fullConfigurationPath}");
-                }
+                var cliContext = CliArgumentsAnalyzer.Analyze(readWorkingDirectory, writeWorkingDirectory, configurationPath);
+                var plan = FileCollectionConfigurationLoader.Load(cliContext.ConfigurationPath);
+                var executionPlan = FileCollectionExecutionPlanBuilder.Build(plan, cliContext.ReadRoot, cliContext.WriteRoot);
 
-                await using var stream = File.OpenRead(fullConfigurationPath);
-                using var reader = new StreamReader(stream);
-                var parser = new YamlFileCollectionPlanParser();
-                var plan = parser.Parse(reader);
-
-                FileCollectionExecutor.ValidateSourceFiles(plan, readWorkingDirectory);
-
-                var preparedWriteDirectory = FileCollectionExecutor.PrepareWriteDirectory(writeWorkingDirectory);
-                var transfers = await FileCollectionExecutor.ExecuteAsync(plan, readWorkingDirectory, preparedWriteDirectory);
+                var transfers = await FileCollectionPlanExecutor.ExecuteAsync(executionPlan);
 
                 await Console.Out.WriteLineAsync($"Copied {transfers.Count} files.");
-                foreach (var (sourcePath, destinationPath) in transfers)
+                foreach (var transfer in transfers)
                 {
-                    await Console.Out.WriteLineAsync($"  {sourcePath} -> {destinationPath}");
+                    await Console.Out.WriteLineAsync($"  {transfer.SourcePath} -> {transfer.DestinationPath}");
                 }
 
                 return 0;
