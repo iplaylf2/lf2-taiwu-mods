@@ -66,13 +66,19 @@ namespace FileCourier
                 var manifest = FileCourierConfigurationLoader.Load(cliContext.ConfigurationPath);
                 var executionPlan = FileCourierExecutionPlanBuilder.Build(manifest, cliContext.ReadRoot, cliContext.WriteRoot);
 
-                var transfers = await FileCourierPlanExecutor.ExecuteAsync(executionPlan);
+                var totalTransfers = executionPlan.Transfers.Count;
+                var completedTransfers = 0;
 
-                await Console.Out.WriteLineAsync($"Copied {transfers.Count} files.");
-                foreach (var transfer in transfers)
+                await foreach (var transfer in FileCourierPlanExecutor.ExecuteAsync(executionPlan))
                 {
-                    await Console.Out.WriteLineAsync($"  {transfer.SourcePath} -> {transfer.DestinationPath}");
+                    completedTransfers++;
+                    await Console.Out.WriteLineAsync
+                    (
+                        $"[{completedTransfers}/{totalTransfers}] {transfer.SourcePath} -> {transfer.DestinationPath}"
+                    );
                 }
+
+                await Console.Out.WriteLineAsync($"Copied {completedTransfers} files.");
 
                 return 0;
             }

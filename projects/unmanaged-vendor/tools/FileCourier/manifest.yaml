@@ -241,7 +241,7 @@
 
 - target-dir: Taiwu.Modding/lib
   source-files:
-    - ./The Scroll of Taiwu_Data/TaiwuModdingLib.dll
+    - ./The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll
 
 - target-dir: Taiwu.Patching/lib
   source-files:

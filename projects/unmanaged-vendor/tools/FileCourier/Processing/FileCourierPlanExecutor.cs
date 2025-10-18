@@ -6,7 +6,7 @@ internal static class FileCourierPlanExecutor
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
-    public static Task<IReadOnlyList<FileTransfer>> ExecuteAsync(FileCourierExecutionPlan plan)
+    public static IAsyncEnumerable<FileTransfer> ExecuteAsync(FileCourierExecutionPlan plan)
     {
         EnsureWriteDirectory(plan.WriteRoot);
         return ExecuteTransfersAsync(plan.Transfers);
@@ -20,10 +20,9 @@ internal static class FileCourierPlanExecutor
         }
     }
 
-    private static async Task<IReadOnlyList<FileTransfer>> ExecuteTransfersAsync(IReadOnlyList<FileTransfer> transfers)
+    private static async IAsyncEnumerable<FileTransfer> ExecuteTransfersAsync(IReadOnlyList<FileTransfer> transfers)
     {
         var ensuredDirectories = new HashSet<string>(PathComparer);
-        var completedTransfers = new List<FileTransfer>(transfers.Count);
 
         foreach (var transfer in transfers)
         {
@@ -63,9 +62,8 @@ internal static class FileCourierPlanExecutor
             );
 
             await sourceStream.CopyToAsync(destinationStream);
-            completedTransfers.Add(transfer);
-        }
 
-        return completedTransfers;
+            yield return transfer;
+        }
     }
 }
