@@ -10,7 +10,7 @@ namespace FileCollector
 {
     internal static class FileCollectorCli
     {
-        private const string DefaultConfigurationFileName = "game-assets.yaml";
+        private const string DefaultConfigurationFileName = "assets.yaml";
 
         public static Task<int> InvokeAsync(string[] args)
         {
@@ -35,7 +35,7 @@ namespace FileCollector
 
             var configurationOption = new Option<string>("--config", ["-c"])
             {
-                Description = "Specify the YAML configuration file path. Defaults to game-assets.yaml in the current directory.",
+                Description = "Specify the YAML configuration file path. Defaults to assets.yaml in the current directory.",
                 Arity = ArgumentArity.ZeroOrOne
             };
 
