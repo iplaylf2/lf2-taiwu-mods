@@ -1,5 +1,5 @@
 <Project>
-    <Target Name="RepackForBuild" AfterTargets="Build" Condition="'$(LF2IsModEntry)' == 'true'">
+    <Target Name="RepackForBuild" AfterTargets="Build">
         <CallTarget Targets="_RepackRun" />
     </Target>
 

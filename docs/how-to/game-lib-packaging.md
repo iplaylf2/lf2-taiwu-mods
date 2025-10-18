@@ -40,10 +40,13 @@ projects/unmanaged-vendor/
 
 ## 本地打包（离线 / 临时方案）
 
-若处于离线环境，或只需在本机快速验证 Mod，可先将游戏 DLL 拷贝到对应的 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录，然后在仓库根目录执行打包命令：
+若处于离线环境，或只需在本机快速验证 Mod，可按以下步骤操作：
+
+1. 将游戏 DLL 拷贝到对应的 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录。
+2. 在仓库根目录运行下列命令打包所有游戏相关项目：
 
 ```bash
-dotnet pack --no-restore -c Release
+dotnet pack ./projects/unmanaged-vendor/game/game.slnx --no-restore -c Release
 ```
 
 - `--no-restore` 可避免在没有网络的情况下触发额外的包还原。
@@ -56,5 +59,5 @@ dotnet pack --no-restore -c Release
 
 1. 更新仓库根目录 `Directory.Build.props` 中的 `LF2TaiwuVersion`。
 2. 用新版本 DLL 覆盖 `game/` 下的 `lib/` 文件。
-3. 通过 GitHub Actions 工作流或本地 `dotnet pack` 重新生成 NuGet 包。
+3. 通过 GitHub Actions 工作流或本地执行 `dotnet pack ./projects/unmanaged-vendor/game/game.slnx` 重新生成 NuGet 包。
 4. 在 Mod 项目上执行 `dotnet restore` 与一次 `dotnet build -t:LF2PublishMod`，确保依赖链在新版下仍能顺利编译。

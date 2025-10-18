@@ -6,6 +6,8 @@ coderabbitai
 contentfiles
 cysharp
 docstrings
+firstpass
+imgui
 iplaylf2
 kawai
 krafs
@@ -32,6 +34,8 @@ realpath
 redzen
 roslynator
 shellcheck
+slnf
+slnx
 softprops
 starg
 stefanzweifel
@@ -39,5 +43,10 @@ stelem
 stfld
 stloc
 storer
+tilemap
 transil
+trimmable
+ugui
+uninstantiated
+vecc
 yoshifumi

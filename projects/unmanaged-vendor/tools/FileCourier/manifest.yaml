@@ -1,0 +1,254 @@
+- target-dir: Taiwu.Backend/lib
+  source-files:
+    - Backend/CompDevLib.Interpreter.dll
+    - Backend/CompDevLib.Interpreter.pdb
+    - Backend/GameData.Combat.Math.dll
+    - Backend/GameData.Combat.Math.pdb
+    - Backend/GameData.Common.Algorithm.dll
+    - Backend/GameData.Common.Algorithm.pdb
+    - Backend/GameData.Common.dll
+    - Backend/GameData.Common.pdb
+    - Backend/GameData.dll
+    - Backend/GameData.pdb
+    - Backend/GameData.Serializer.dll
+    - Backend/GameData.Serializer.pdb
+    - Backend/GameData.Shared.dll
+    - Backend/GameData.Shared.pdb
+    - Backend/GameData.Utilities.dll
+    - Backend/GameData.Utilities.pdb
+    - Backend/GameData.Utilities.Structure.dll
+    - Backend/GameData.Utilities.Structure.pdb
+    - Backend/MoonSharp.Interpreter.dll
+    - Backend/Newtonsoft.Json.dll
+    - Backend/Redzen.dll
+
+- target-dir: Taiwu.Frontend/lib
+  source-files:
+    - ./The Scroll of Taiwu_Data/Managed/Assembly-CSharp-firstpass.dll
+    - ./The Scroll of Taiwu_Data/Managed/Assembly-CSharp-firstpass.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Assembly-CSharp.dll
+    - ./The Scroll of Taiwu_Data/Managed/Assembly-CSharp.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Coffee.SoftMaskForUGUI.dll
+    - ./The Scroll of Taiwu_Data/Managed/Coffee.SoftMaskForUGUI.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Coffee.UIParticle.dll
+    - ./The Scroll of Taiwu_Data/Managed/Coffee.UIParticle.pdb
+    - ./The Scroll of Taiwu_Data/Managed/CompDevLib.Interpreter.dll
+    - ./The Scroll of Taiwu_Data/Managed/EasyButtons.dll
+    - ./The Scroll of Taiwu_Data/Managed/EasyButtons.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Encyclopedia.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Adventure.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Combat.Math.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Common.Algorithm.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Common.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Serializer.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Shared.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Utilities.dll
+    - ./The Scroll of Taiwu_Data/Managed/GameData.Utilities.Structure.dll
+    - ./The Scroll of Taiwu_Data/Managed/Google.Protobuf.dll
+    - ./The Scroll of Taiwu_Data/Managed/MoonSharp.Interpreter.dll
+    - ./The Scroll of Taiwu_Data/Managed/Newtonsoft.Json.dll
+    - ./The Scroll of Taiwu_Data/Managed/Newtonsoft.Json.pdb
+    - ./The Scroll of Taiwu_Data/Managed/NLog.dll
+    - ./The Scroll of Taiwu_Data/Managed/Redzen.dll
+    - ./The Scroll of Taiwu_Data/Managed/spine-csharp.dll
+    - ./The Scroll of Taiwu_Data/Managed/spine-csharp.pdb
+    - ./The Scroll of Taiwu_Data/Managed/spine-unity.dll
+    - ./The Scroll of Taiwu_Data/Managed/spine-unity.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Analytics.DataPrivacy.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Analytics.DataPrivacy.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Burst.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Burst.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Burst.Unsafe.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Collections.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Collections.LowLevel.ILSupport.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Collections.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Mathematics.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Mathematics.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.MemoryProfiler.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.MemoryProfiler.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Profiling.Core.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Profiling.Core.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Analytics.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Analytics.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Analytics.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Analytics.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Components.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Components.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Configuration.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Configuration.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Device.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Device.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Environments.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Environments.Internal.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Environments.Internal.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Environments.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Internal.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Internal.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Networking.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Networking.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Registration.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Registration.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Scheduler.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Scheduler.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Telemetry.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Telemetry.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Threading.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Core.Threading.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.TextMeshPro.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.TextMeshPro.pdb
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Timeline.dll
+    - ./The Scroll of Taiwu_Data/Managed/Unity.Timeline.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AccessibilityModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AccessibilityModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AIModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AIModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AndroidJNIModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AndroidJNIModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AnimationModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AnimationModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ARModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ARModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AssetBundleModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AssetBundleModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AudioModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.AudioModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ClothModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ClothModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ClusterInputModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ClusterInputModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ClusterRendererModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ClusterRendererModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ContentLoadModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ContentLoadModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.CoreModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.CoreModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.CrashReportingModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.CrashReportingModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.DirectorModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.DirectorModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.DSPGraphModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.DSPGraphModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.GameCenterModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.GameCenterModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.GIModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.GIModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.GridModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.GridModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.HotReloadModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.HotReloadModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ImageConversionModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ImageConversionModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.IMGUIModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.IMGUIModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.InputLegacyModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.InputLegacyModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.InputModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.InputModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.JSONSerializeModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.JSONSerializeModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.LocalizationModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.LocalizationModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.NVIDIAModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.NVIDIAModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ParticleSystemModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ParticleSystemModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.PerformanceReportingModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.PerformanceReportingModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.Physics2DModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.Physics2DModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.PhysicsModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.PhysicsModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ProfilerModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ProfilerModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.PropertiesModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.PropertiesModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ScreenCaptureModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.ScreenCaptureModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SharedInternalsModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SharedInternalsModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SpriteMaskModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SpriteMaskModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SpriteShapeModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SpriteShapeModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.StreamingModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.StreamingModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SubstanceModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SubstanceModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SubsystemsModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.SubsystemsModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TerrainModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TerrainModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TerrainPhysicsModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TerrainPhysicsModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TextCoreFontEngineModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TextCoreFontEngineModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TextCoreTextEngineModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TextCoreTextEngineModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TextRenderingModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TextRenderingModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TilemapModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TilemapModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TLSModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.TLSModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UI.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UI.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UIElementsModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UIElementsModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UIModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UIModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UmbraModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UmbraModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityAnalyticsCommonModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityAnalyticsCommonModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityAnalyticsModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityAnalyticsModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityConnectModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityConnectModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityCurlModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityCurlModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityTestProtocolModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityTestProtocolModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestAssetBundleModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestAssetBundleModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestAudioModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestAudioModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestTextureModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestTextureModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestWWWModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.UnityWebRequestWWWModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VehiclesModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VehiclesModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VFXModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VFXModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VideoModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VideoModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VirtualTexturingModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VirtualTexturingModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VRModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.VRModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.WindModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.WindModule.pdb
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.XRModule.dll
+    - ./The Scroll of Taiwu_Data/Managed/UnityEngine.XRModule.pdb
+
+- target-dir: Taiwu.Modding/lib
+  source-files:
+    - ./The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll
+
+- target-dir: Taiwu.Patching/lib
+  source-files:
+    - ./The Scroll of Taiwu_Data/Managed/0Harmony.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.Mdb.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.Pdb.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.Rocks.dll
+    - ./The Scroll of Taiwu_Data/Managed/MonoMod.RuntimeDetour.dll
+    - ./The Scroll of Taiwu_Data/Managed/MonoMod.Utils.dll
