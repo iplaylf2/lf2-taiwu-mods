@@ -6,6 +6,8 @@ coderabbitai
 contentfiles
 cysharp
 docstrings
+firstpass
+IMGUI
 iplaylf2
 kawai
 krafs
@@ -41,7 +43,9 @@ stelem
 stfld
 stloc
 storer
+Tilemap
 transil
 trimmable
+UGUI
 uninstantiated
 yoshifumi

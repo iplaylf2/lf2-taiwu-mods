@@ -20,5 +20,9 @@
     <ItemGroup>
         <PackageReference Include="YamlDotNet" />
         <PackageReference Include="System.CommandLine" />
+
+        <Content Include="assets.yaml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 </Project>
