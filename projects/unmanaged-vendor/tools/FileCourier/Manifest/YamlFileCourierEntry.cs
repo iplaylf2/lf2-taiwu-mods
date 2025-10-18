@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 
@@ -22,6 +21,12 @@ public sealed class YamlFileCourierEntry
     /// <summary>
     /// Gets or sets the collection of source file paths to copy.
     /// </summary>
+    [SuppressMessage
+    ("Usage", "CA2227:Collection properties should be read only", Justification = "<Pending>")
+    ]
+    [SuppressMessage
+    ("Design", "CA1002:Do not expose generic lists", Justification = "<Pending>")
+    ]
     [YamlMember(Alias = FileCourierFields.SourceFiles)]
-    public ReadOnlyCollection<string>? SourceFiles { get; set; }
+    public List<string>? SourceFiles { get; set; }
 }

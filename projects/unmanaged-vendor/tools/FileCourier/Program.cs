@@ -83,7 +83,7 @@ namespace FileCourier
             }
             catch (FileCourierException ex)
             {
-                await Console.Error.WriteLineAsync(ex.Message);
+                await Console.Error.WriteLineAsync(ex.ToDisplayString());
                 return 2;
             }
         }

@@ -17,5 +17,6 @@ roslynator_analyzers.enabled_by_default = true
 roslynator_refactorings.enabled = true
 roslynator_compiler_diagnostic_fixes.enabled = true
 
+
 [*.g.cs]
 dotnet_analyzer_diagnostic.severity = none
