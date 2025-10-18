@@ -6,8 +6,6 @@ namespace FileCollector.Configurations;
 
 internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
 {
-    private readonly IDeserializer _deserializer = deserializer ?? throw new ArgumentNullException(nameof(deserializer));
-
     public YamlFileCollectionPlanParser()
         : this(new StaticDeserializerBuilder(new StaticContext()).IgnoreUnmatchedProperties().Build())
     {
@@ -15,17 +13,15 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
 
     public FileCollectionPlan Parse(TextReader reader)
     {
-        ArgumentNullException.ThrowIfNull(reader);
-
         try
         {
-            var rawEntries = _deserializer.Deserialize<List<YamlFileCollectionEntry>>(reader);
+            var rawEntries = deserializer.Deserialize<List<YamlFileCollectionEntry>>(reader);
             if (rawEntries is not { Count: > 0 })
             {
                 throw new FileCollectionConfigurationException("Configuration file is empty. At least one entry is required.");
             }
 
-            List<FileCollectionEntry> entries = [.. rawEntries.Select(CreateEntry)];
+            var entries = rawEntries.Select(CreateEntry).ToArray();
             return new FileCollectionPlan(entries);
         }
         catch (YamlException ex)
@@ -40,25 +36,47 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
 
     public FileCollectionPlan ParseFromString(string yamlContent)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(yamlContent);
-
         using var reader = new StringReader(yamlContent);
         return Parse(reader);
     }
 
     private static FileCollectionEntry CreateEntry(YamlFileCollectionEntry rawEntry)
     {
-        return rawEntry switch
-        {
-            { TargetDirectory: null } =>
-                throw new InvalidDataException("Configuration entry is missing the target-dir field."),
-            { SourceFiles: null } or { SourceFiles.Count: 0 } =>
-                throw new InvalidDataException("Each configuration entry must contain at least one source-files value."),
-            { TargetDirectory: var TargetDirectory, SourceFiles: var SourceFiles } =>
-               new FileCollectionEntry(TargetDirectory, SourceFiles),
-            _ => throw new NotImplementedException()
-        };
+        var entry = rawEntry ?? throw new InvalidDataException("Configuration entry cannot be null.");
 
+        var targetDirectory = NormalizeDirectory(entry.TargetDirectory);
+        var sourceFiles = NormalizeSources(entry.SourceFiles);
+
+        return new FileCollectionEntry(targetDirectory, sourceFiles);
+    }
+
+    private static string NormalizeDirectory(string? value)
+    {
+        return !string.IsNullOrWhiteSpace(value)
+            ? value.Trim()
+            : throw new InvalidDataException($"Configuration entry is missing the {FileCollectionFields.TargetDirectory} field.");
+    }
+
+    private static IReadOnlyList<string> NormalizeSources(List<string>? values)
+    {
+        if (values is not { Count: > 0 })
+        {
+            throw new InvalidDataException($"Each configuration entry must contain at least one {FileCollectionFields.SourceFiles} value.");
+        }
+
+        var normalized = new List<string>(values.Count);
+        for (var index = 0; index < values.Count; index++)
+        {
+            var source = values[index];
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                throw new InvalidDataException($"Configuration entry contains an empty {FileCollectionFields.SourceFiles} value at index {index}.");
+            }
+
+            normalized.Add(source.Trim());
+        }
+
+        return [.. normalized];
     }
 
     [SuppressMessage
@@ -66,10 +84,10 @@ internal sealed class YamlFileCollectionPlanParser(IDeserializer deserializer)
     ]
     private sealed class YamlFileCollectionEntry
     {
-        [YamlMember(Alias = "target-dir")]
+        [YamlMember(Alias = FileCollectionFields.TargetDirectory)]
         public string? TargetDirectory { get; set; }
 
-        [YamlMember(Alias = "source-files")]
+        [YamlMember(Alias = FileCollectionFields.SourceFiles)]
         public List<string>? SourceFiles { get; set; }
     }
 }

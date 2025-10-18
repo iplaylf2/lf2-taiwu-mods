@@ -1,10 +1,8 @@
 using System.CommandLine;
-using FileCollector;
 using FileCollector.Configurations;
-using FileCollector.IO;
 using FileCollector.Processing;
 
-return await FileCollectorCli.InvokeAsync(args).ConfigureAwait(false);
+return await FileCollector.FileCollectorCli.InvokeAsync(args).ConfigureAwait(false);
 
 namespace FileCollector
 {
@@ -17,8 +15,9 @@ namespace FileCollector
             var command = BuildCommand();
             var parserConfiguration = new ParserConfiguration();
             var parseResult = command.Parse(args, parserConfiguration);
-            var invocationConfiguration = parseResult.InvocationConfiguration ?? new InvocationConfiguration();
-            return parseResult.InvokeAsync(invocationConfiguration, CancellationToken.None);
+            var invocationConfiguration = parseResult.InvocationConfiguration;
+
+            return parseResult.InvokeAsync(invocationConfiguration);
         }
 
         private static RootCommand BuildCommand()
@@ -35,7 +34,7 @@ namespace FileCollector
 
             var configurationOption = new Option<string>("--config", ["-c"])
             {
-                Description = "Specify the YAML configuration file path. Defaults to assets.yaml in the current directory.",
+                Description = $"Specify the YAML configuration file path. Defaults to {DefaultConfigurationFileName} in the current directory.",
                 Arity = ArgumentArity.ZeroOrOne
             };
 
@@ -62,29 +61,26 @@ namespace FileCollector
         {
             try
             {
-                var fileSystem = new PhysicalFileSystem();
-
                 var fullConfigurationPath = Path.GetFullPath(configurationPath);
-                if (!fileSystem.FileExists(fullConfigurationPath))
+                if (!File.Exists(fullConfigurationPath))
                 {
                     throw new FileCollectionConfigurationException($"Configuration file not found: {fullConfigurationPath}");
                 }
 
+                using var stream = File.OpenRead(fullConfigurationPath);
+                using var reader = new StreamReader(stream);
                 var parser = new YamlFileCollectionPlanParser();
-                FileCollectionPlan plan;
-                using (var stream = fileSystem.OpenRead(fullConfigurationPath))
-                using (var reader = new StreamReader(stream))
-                {
-                    plan = parser.Parse(reader);
-                }
+                var plan = parser.Parse(reader);
 
-                var executor = new FileCollectionExecutor(fileSystem);
-                var result = executor.Execute(plan, readWorkingDirectory, writeWorkingDirectory);
+                FileCollectionExecutor.ValidateSourceFiles(plan, readWorkingDirectory);
 
-                Console.Out.WriteLine($"Copied {result.CompletedTransfers.Count} files.");
-                foreach (var transfer in result.CompletedTransfers)
+                var preparedWriteDirectory = FileCollectionExecutor.PrepareWriteDirectory(writeWorkingDirectory);
+                var transfers = FileCollectionExecutor.Execute(plan, readWorkingDirectory, preparedWriteDirectory);
+
+                Console.Out.WriteLine($"Copied {transfers.Count} files.");
+                foreach (var (sourcePath, destinationPath) in transfers)
                 {
-                    Console.Out.WriteLine($"  {transfer.SourcePath} -> {transfer.DestinationPath}");
+                    Console.Out.WriteLine($"  {sourcePath} -> {destinationPath}");
                 }
 
                 return 0;

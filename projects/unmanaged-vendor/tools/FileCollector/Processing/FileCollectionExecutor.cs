@@ -1,9 +1,8 @@
 using FileCollector.Configurations;
-using FileCollector.IO;
 
 namespace FileCollector.Processing;
 
-internal sealed class FileCollectionExecutor(IFileSystem fileSystem, TimeProvider? timeProvider = null)
+internal static class FileCollectionExecutor
 {
     private sealed record PendingTransfer(string SourcePath, string TargetDirectory, string DestinationPath);
 
@@ -14,61 +13,88 @@ internal sealed class FileCollectionExecutor(IFileSystem fileSystem, TimeProvide
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
-    private readonly IFileSystem _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-    private readonly TimeProvider _timeProvider = timeProvider ?? TimeProvider.System;
-
-    public FileCollectionResult Execute(FileCollectionPlan plan, string readWorkingDirectory, string writeWorkingDirectory)
+    public static void ValidateSourceFiles(FileCollectionPlan plan, string readWorkingDirectory)
     {
-        ArgumentNullException.ThrowIfNull(plan);
-        ArgumentException.ThrowIfNullOrWhiteSpace(readWorkingDirectory);
-        ArgumentException.ThrowIfNullOrWhiteSpace(writeWorkingDirectory);
-
         var readRoot = NormalizeRoot(readWorkingDirectory, mustExist: true);
-        var writeRoot = NormalizeRoot(writeWorkingDirectory, mustExist: false);
+        var missingFiles = new List<string>();
 
-        EnsureWriteRootIsReady(writeRoot);
+        foreach (var entry in plan.Entries)
+        {
+            foreach (var sourceFile in entry.SourceFiles)
+            {
+                ValidateRelativePath(sourceFile, FileCollectionFields.SourceFiles);
 
-        var pendingTransfers = BuildTransferPlan(plan, readRoot, writeRoot);
-        var completedTransfers = ExecuteTransfers(pendingTransfers, writeRoot);
+                var sourceFilePath = ResolveRelativePath(readRoot, sourceFile);
+                EnsureWithinRootOrThrow(sourceFilePath, readRoot, FileCollectionFields.SourceFiles);
 
-        return new FileCollectionResult(completedTransfers);
+                if (!File.Exists(sourceFilePath))
+                {
+                    missingFiles.Add(sourceFilePath);
+                }
+            }
+        }
+
+        if (missingFiles.Count > 0)
+        {
+            var details = string.Join(Environment.NewLine, missingFiles.Select(path => $"  {path}"));
+            var message = "Source files not found:" + Environment.NewLine + details;
+            throw new FileCollectionExecutionException(message);
+        }
     }
 
-    private void EnsureWriteRootIsReady(string writeRoot)
+    public static string PrepareWriteDirectory(string writeWorkingDirectory)
     {
-        if (_fileSystem.DirectoryExists(writeRoot))
+        var normalized = NormalizeRoot(writeWorkingDirectory, mustExist: false);
+
+        if (Directory.Exists(normalized))
         {
-            if (_fileSystem.EnumerateFileSystemEntries(writeRoot).Any())
+            if (Directory.EnumerateFileSystemEntries(normalized).Any())
             {
-                throw new FileCollectionExecutionException($"Write working directory {writeRoot} must be empty.");
+                throw new FileCollectionExecutionException($"Write working directory {normalized} must be empty.");
             }
         }
         else
         {
-            _fileSystem.EnsureDirectory(writeRoot);
+            _ = Directory.CreateDirectory(normalized);
         }
 
-        _fileSystem.EnsureDirectory(writeRoot);
+        _ = Directory.CreateDirectory(normalized);
+        return normalized;
     }
 
-    private List<PendingTransfer> BuildTransferPlan(FileCollectionPlan plan, string readRoot, string writeRoot)
+    public static IReadOnlyList<(string SourcePath, string DestinationPath)> Execute
+    (
+        FileCollectionPlan plan,
+        string readWorkingDirectory,
+        string writeWorkingDirectory
+    )
+    {
+        var readRoot = NormalizeRoot(readWorkingDirectory, mustExist: true);
+        var writeRoot = NormalizeRoot(writeWorkingDirectory, mustExist: false);
+        var pendingTransfers = BuildTransferPlan(plan, readRoot, writeRoot);
+
+        return ExecuteTransfers(pendingTransfers, writeRoot);
+    }
+
+    private static List<PendingTransfer> BuildTransferPlan(FileCollectionPlan plan, string readRoot, string writeRoot)
     {
         var transfers = new List<PendingTransfer>();
 
         foreach (var entry in plan.Entries)
         {
-            ValidateRelativePath(entry.TargetDirectory, "target-dir");
+            ValidateRelativePath(entry.TargetDirectory, FileCollectionFields.TargetDirectory);
+
             var targetDirectoryPath = ResolveRelativePath(writeRoot, entry.TargetDirectory);
-            EnsureWithinRootOrThrow(targetDirectoryPath, writeRoot, "target-dir");
+            EnsureWithinRootOrThrow(targetDirectoryPath, writeRoot, FileCollectionFields.TargetDirectory);
 
             foreach (var sourceFile in entry.SourceFiles)
             {
-                ValidateRelativePath(sourceFile, "source-files");
+                ValidateRelativePath(sourceFile, FileCollectionFields.SourceFiles);
 
                 var sourceFilePath = ResolveRelativePath(readRoot, sourceFile);
-                EnsureWithinRootOrThrow(sourceFilePath, readRoot, "source-files");
+                EnsureWithinRootOrThrow(sourceFilePath, readRoot, FileCollectionFields.SourceFiles);
 
-                if (!_fileSystem.FileExists(sourceFilePath))
+                if (!File.Exists(sourceFilePath))
                 {
                     throw new FileCollectionExecutionException($"Source file not found: {sourceFilePath}");
                 }
@@ -87,30 +113,34 @@ internal sealed class FileCollectionExecutor(IFileSystem fileSystem, TimeProvide
         return transfers;
     }
 
-    private List<FileTransferRecord> ExecuteTransfers(IReadOnlyList<PendingTransfer> transfers, string writeRoot)
+    private static IReadOnlyList<(string SourcePath, string DestinationPath)> ExecuteTransfers
+    (
+        IReadOnlyList<PendingTransfer> transfers,
+        string writeRoot
+    )
     {
-        HashSet<string> ensuredDirectories = new(PathComparer) { writeRoot };
-        var completedTransfers = new List<FileTransferRecord>(transfers.Count);
+        var ensuredDirectories = new HashSet<string>(PathComparer) { writeRoot };
+        var completedTransfers = new List<(string SourcePath, string DestinationPath)>(transfers.Count);
 
         foreach (var transfer in transfers)
         {
             if (ensuredDirectories.Add(transfer.TargetDirectory))
             {
-                _fileSystem.EnsureDirectory(transfer.TargetDirectory);
+                _ = Directory.CreateDirectory(transfer.TargetDirectory);
             }
 
-            _fileSystem.CopyFile(transfer.SourcePath, transfer.DestinationPath, overwrite: true);
-            completedTransfers.Add(new FileTransferRecord(transfer.SourcePath, transfer.DestinationPath, _timeProvider.GetUtcNow()));
+            File.Copy(transfer.SourcePath, transfer.DestinationPath, overwrite: true);
+            completedTransfers.Add((transfer.SourcePath, transfer.DestinationPath));
         }
 
-        return completedTransfers;
+        return [.. completedTransfers];
     }
 
-    private string NormalizeRoot(string root, bool mustExist)
+    private static string NormalizeRoot(string root, bool mustExist)
     {
         var fullPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(root));
 
-        return mustExist && !_fileSystem.DirectoryExists(fullPath)
+        return mustExist && !Directory.Exists(fullPath)
             ? throw new FileCollectionExecutionException($"Directory does not exist: {fullPath}")
             : fullPath;
     }
@@ -125,19 +155,24 @@ internal sealed class FileCollectionExecutor(IFileSystem fileSystem, TimeProvide
         var normalizedRoot = AppendDirectorySeparator(rootPath);
         var normalizedCandidate = Path.TrimEndingDirectorySeparator(candidatePath);
 
-        if (!normalizedCandidate.Equals(normalizedRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), PathComparison) &&
-            !normalizedCandidate.StartsWith(normalizedRoot, PathComparison))
+        if
+        (
+            !normalizedCandidate.Equals(normalizedRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), PathComparison) &&
+            !normalizedCandidate.StartsWith(normalizedRoot, PathComparison)
+        )
         {
-            throw new FileCollectionExecutionException($"Configuration field {configFieldName} points to {candidatePath}, which lies outside the write root {rootPath}.");
+            throw new FileCollectionExecutionException
+            (
+                $"Configuration field {configFieldName} points to {candidatePath}, which lies outside the write root {rootPath}."
+            );
         }
     }
 
     private static void ValidateRelativePath(string path, string fieldName)
     {
-        if (Path.IsPathRooted(path) || Path.IsPathFullyQualified(path))
-        {
-            throw new FileCollectionExecutionException($"Configuration field {fieldName} value {path} must be a relative path.");
-        }
+        _ = Path.IsPathRooted(path) || Path.IsPathFullyQualified(path)
+            ? throw new FileCollectionExecutionException($"Configuration field {fieldName} value {path} must be a relative path.")
+            : (object?)null;
     }
 
     private static string AppendDirectorySeparator(string path)
