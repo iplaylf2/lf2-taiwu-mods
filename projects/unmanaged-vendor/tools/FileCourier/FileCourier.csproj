@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <PackageReference Include="YamlDotNet" />
+        <PackageReference Include="Vecc.YamlDotNet.Analyzers.StaticGenerator" />
         <PackageReference Include="System.CommandLine" />
 
         <Content Include="manifest.yaml">

@@ -7,7 +7,7 @@ contentfiles
 cysharp
 docstrings
 firstpass
-IMGUI
+imgui
 iplaylf2
 kawai
 krafs
@@ -43,9 +43,10 @@ stelem
 stfld
 stloc
 storer
-Tilemap
+tilemap
 transil
 trimmable
-UGUI
+ugui
 uninstantiated
+vecc
 yoshifumi
