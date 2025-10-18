@@ -4,12 +4,17 @@
 
         <IsPackable>false</IsPackable>
         <IncludeBuildOutput>true</IncludeBuildOutput>
+        <IsPublishable>true</IsPublishable>
 
         <OutputType>Exe</OutputType>
         <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>true</SelfContained>
-        <PublishAot>true</PublishAot>
         <Trimmable>true</Trimmable>
+
+        <PublishAot>true</PublishAot>
+        <IsAotCompatible>true</IsAotCompatible>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
