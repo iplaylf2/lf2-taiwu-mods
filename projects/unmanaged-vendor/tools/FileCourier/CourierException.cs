@@ -1,17 +1,17 @@
 namespace FileCourier;
 
-internal class FileCourierException : Exception
+internal class CourierException : Exception
 {
-    public FileCourierException()
+    public CourierException()
     {
     }
 
-    public FileCourierException(string message)
+    public CourierException(string message)
         : base(message)
     {
     }
 
-    public FileCourierException(string message, Exception innerException)
+    public CourierException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

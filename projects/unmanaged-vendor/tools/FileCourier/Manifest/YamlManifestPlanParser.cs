@@ -4,25 +4,25 @@ using YamlDotNet.Serialization;
 
 namespace FileCourier.Manifest;
 
-internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
+internal sealed class YamlManifestPlanParser(IDeserializer deserializer)
 {
-    public YamlFileCourierPlanParser()
+    public YamlManifestPlanParser()
         : this(new StaticDeserializerBuilder(new StaticContext()).IgnoreUnmatchedProperties().Build())
     {
     }
 
-    public FileCourierPlan Parse(TextReader reader)
+    public ManifestPlan Parse(TextReader reader)
     {
         try
         {
-            var rawEntries = deserializer.Deserialize<List<YamlFileCourierEntry>>(reader);
+            var rawEntries = deserializer.Deserialize<List<YamlManifestEntry>>(reader);
             if (rawEntries is not { Count: > 0 })
             {
-                throw new FileCourierConfigurationException("Configuration file is empty. At least one entry is required.");
+                throw new ManifestException("Manifest file is empty. At least one entry is required.");
             }
 
             var errors = new List<string>();
-            var entries = new List<FileCourierEntry>(rawEntries.Count);
+            var entries = new List<ManifestEntry>(rawEntries.Count);
 
             for (var index = 0; index < rawEntries.Count; index++)
             {
@@ -37,22 +37,22 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
             }
 
             return errors.Count != 0
-                ? throw new FileCourierConfigurationException(BuildErrorMessage(errors))
-                : new FileCourierPlan(entries);
+                ? throw new ManifestException(BuildErrorMessage(errors))
+                : new ManifestPlan(entries);
         }
         catch (YamlException ex)
         {
-            throw new FileCourierConfigurationException("Failed to parse YAML configuration content.", ex);
+            throw new ManifestException("Failed to parse YAML manifest content.", ex);
         }
     }
 
-    public FileCourierPlan ParseFromString(string yamlContent)
+    public ManifestPlan ParseFromString(string yamlContent)
     {
         using var reader = new StringReader(yamlContent);
         return Parse(reader);
     }
 
-    private static string? TryCreateEntry(YamlFileCourierEntry entry, int index, out FileCourierEntry? result)
+    private static string? TryCreateEntry(YamlManifestEntry entry, int index, out ManifestEntry? result)
     {
         var errors = new List<string>();
         var context = $"Entry {index}";
@@ -71,7 +71,7 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
 
         if (errors.Count == 0 && targetDirectory is not null && sourceFiles is not null)
         {
-            result = new FileCourierEntry(targetDirectory, sourceFiles);
+            result = new ManifestEntry(targetDirectory, sourceFiles);
             return null;
         }
 
@@ -84,7 +84,7 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
         if (string.IsNullOrWhiteSpace(value))
         {
             normalized = null;
-            return $"{context}: Missing {FileCourierFields.TargetDirectory} value.";
+            return $"{context}: Missing {ManifestFields.TargetDirectory} value.";
         }
 
         normalized = value.Trim();
@@ -96,7 +96,7 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
         if (values is not { Count: > 0 } typedValues)
         {
             normalized = null;
-            return $"{context}: At least one {FileCourierFields.SourceFiles} value is required.";
+            return $"{context}: At least one {ManifestFields.SourceFiles} value is required.";
         }
 
         var errors = new List<string>();
@@ -107,7 +107,7 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
             var source = typedValues[index];
             if (string.IsNullOrWhiteSpace(source))
             {
-                errors.Add($"{context}: {FileCourierFields.SourceFiles} value at index {index} is empty.");
+                errors.Add($"{context}: {ManifestFields.SourceFiles} value at index {index} is empty.");
                 continue;
             }
 
@@ -127,7 +127,7 @@ internal sealed class YamlFileCourierPlanParser(IDeserializer deserializer)
     private static string BuildErrorMessage(IEnumerable<string> errors)
     {
         var builder = new StringBuilder();
-        _ = builder.AppendLine("Configuration contains invalid entries:");
+        _ = builder.AppendLine("Manifest contains invalid entries:");
 
         foreach (var error in errors)
         {

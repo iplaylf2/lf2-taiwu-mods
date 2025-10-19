@@ -2,7 +2,7 @@ using FileCourier.Manifest;
 
 namespace FileCourier.Processing;
 
-internal static class FileCourierExecutionPlanBuilder
+internal static class ExecutionPlanBuilder
 {
     private static readonly StringComparison PathComparison = OperatingSystem.IsWindows()
         ? StringComparison.OrdinalIgnoreCase
@@ -12,7 +12,7 @@ internal static class FileCourierExecutionPlanBuilder
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
-    public static FileCourierExecutionPlan Build(FileCourierPlan plan, string readWorkingDirectory, string writeWorkingDirectory)
+    public static ExecutionPlan Build(ManifestPlan plan, string readWorkingDirectory, string writeWorkingDirectory)
     {
         var readRoot = NormalizeRoot(readWorkingDirectory);
         var writeRoot = NormalizeRoot(writeWorkingDirectory);
@@ -24,7 +24,7 @@ internal static class FileCourierExecutionPlanBuilder
 
         foreach (var entry in plan.Entries)
         {
-            var targetValidationError = ValidateRelativePath(entry.TargetDirectory, FileCourierFields.TargetDirectory);
+            var targetValidationError = ValidateRelativePath(entry.TargetDirectory, ManifestFields.TargetDirectory);
             if (targetValidationError is { })
             {
                 invalidTargetEntries.Add(targetValidationError);
@@ -32,7 +32,7 @@ internal static class FileCourierExecutionPlanBuilder
             }
 
             var targetDirectoryPath = ResolveRelativePath(writeRoot, entry.TargetDirectory);
-            var targetError = ValidateWithinRoot(targetDirectoryPath, writeRoot, FileCourierFields.TargetDirectory);
+            var targetError = ValidateWithinRoot(targetDirectoryPath, writeRoot, ManifestFields.TargetDirectory);
             if (targetError is { })
             {
                 invalidTargetEntries.Add(targetError);
@@ -41,7 +41,7 @@ internal static class FileCourierExecutionPlanBuilder
 
             foreach (var sourceFile in entry.SourceFiles)
             {
-                var sourceValidationError = ValidateRelativePath(sourceFile, FileCourierFields.SourceFiles);
+                var sourceValidationError = ValidateRelativePath(sourceFile, ManifestFields.SourceFiles);
                 if (sourceValidationError is { })
                 {
                     invalidSourceEntries.Add(sourceValidationError);
@@ -49,7 +49,7 @@ internal static class FileCourierExecutionPlanBuilder
                 }
 
                 var sourceFilePath = ResolveRelativePath(readRoot, sourceFile);
-                var sourceError = ValidateWithinRoot(sourceFilePath, readRoot, FileCourierFields.SourceFiles);
+                var sourceError = ValidateWithinRoot(sourceFilePath, readRoot, ManifestFields.SourceFiles);
                 if (sourceError is { })
                 {
                     invalidSourceEntries.Add(sourceError);
@@ -102,10 +102,10 @@ internal static class FileCourierExecutionPlanBuilder
                 lines.AddRange(missingFiles.OrderBy(path => path, PathComparer).Select(path => $"  {path}"));
             }
 
-            throw new FileCourierExecutionException(string.Join(Environment.NewLine, lines));
+            throw new ExecutionException(string.Join(Environment.NewLine, lines));
         }
 
-        return new FileCourierExecutionPlan(readRoot, writeRoot, transfers);
+        return new ExecutionPlan(readRoot, writeRoot, transfers);
     }
 
     private static string NormalizeRoot(string root)
@@ -118,7 +118,7 @@ internal static class FileCourierExecutionPlanBuilder
         return Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.Join(root, relativePath)));
     }
 
-    private static string? ValidateWithinRoot(string candidatePath, string rootPath, string configFieldName)
+    private static string? ValidateWithinRoot(string candidatePath, string rootPath, string manifestFieldName)
     {
         var normalizedRoot = AppendDirectorySeparator(rootPath);
         var normalizedCandidate = Path.TrimEndingDirectorySeparator(candidatePath);
@@ -126,13 +126,13 @@ internal static class FileCourierExecutionPlanBuilder
         return normalizedCandidate.Equals(normalizedRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), PathComparison) ||
                normalizedCandidate.StartsWith(normalizedRoot, PathComparison)
             ? null
-            : $"Configuration field {configFieldName} points to {candidatePath}, which lies outside the root directory {rootPath}.";
+            : $"Manifest field {manifestFieldName} points to {candidatePath}, which lies outside the root directory {rootPath}.";
     }
 
     private static string? ValidateRelativePath(string path, string fieldName)
     {
         return Path.IsPathRooted(path) || Path.IsPathFullyQualified(path)
-            ? $"Configuration field {fieldName} value {path} must be a relative path."
+            ? $"Manifest field {fieldName} value {path} must be a relative path."
             : null;
     }
 

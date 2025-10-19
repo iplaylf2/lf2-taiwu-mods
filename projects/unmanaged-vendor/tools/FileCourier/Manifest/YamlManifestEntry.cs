@@ -10,12 +10,12 @@ namespace FileCourier.Manifest;
 ("Maintainability", "CA1515:Consider making public types internal", Justification = "<Pending>")
 ]
 [YamlSerializable]
-public sealed class YamlFileCourierEntry
+public sealed class YamlManifestEntry
 {
     /// <summary>
     /// Gets or sets the destination directory for the copied files.
     /// </summary>
-    [YamlMember(Alias = FileCourierFields.TargetDirectory)]
+    [YamlMember(Alias = ManifestFields.TargetDirectory)]
     public string? TargetDirectory { get; set; }
 
     /// <summary>
@@ -27,6 +27,6 @@ public sealed class YamlFileCourierEntry
     [SuppressMessage
     ("Design", "CA1002:Do not expose generic lists", Justification = "<Pending>")
     ]
-    [YamlMember(Alias = FileCourierFields.SourceFiles)]
+    [YamlMember(Alias = ManifestFields.SourceFiles)]
     public List<string>? SourceFiles { get; set; }
 }

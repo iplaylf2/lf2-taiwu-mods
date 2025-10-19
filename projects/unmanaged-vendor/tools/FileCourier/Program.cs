@@ -3,20 +3,20 @@ using FileCourier.Cli;
 using FileCourier.Manifest;
 using FileCourier.Processing;
 
-return await FileCourierCli.InvokeAsync(args, ExecuteAsync);
+return await CourierCli.InvokeAsync(args, ExecuteAsync);
 
-static async Task<int> ExecuteAsync(FileCourierCliRequest request)
+static async Task<int> ExecuteAsync(CliRequest request)
 {
     try
     {
-        var cliContext = CliArgumentsAnalyzer.Analyze(request.ReadWorkingDirectory, request.WriteWorkingDirectory, request.ConfigurationPath);
-        var manifest = FileCourierConfigurationLoader.Load(cliContext.ConfigurationPath);
-        var executionPlan = FileCourierExecutionPlanBuilder.Build(manifest, cliContext.ReadRoot, cliContext.WriteRoot);
+        var cliContext = CliArgumentsAnalyzer.Analyze(request.ReadWorkingDirectory, request.WriteWorkingDirectory, request.ManifestPath);
+        var manifest = ManifestLoader.Load(cliContext.ManifestPath);
+        var executionPlan = ExecutionPlanBuilder.Build(manifest, cliContext.ReadRoot, cliContext.WriteRoot);
 
         var totalTransfers = executionPlan.Transfers.Count;
         var completedTransfers = 0;
 
-        await foreach (var transfer in FileCourierPlanExecutor.ExecuteAsync(executionPlan))
+        await foreach (var transfer in PlanExecutor.ExecuteAsync(executionPlan))
         {
             completedTransfers++;
             await Console.Out.WriteLineAsync
@@ -29,7 +29,7 @@ static async Task<int> ExecuteAsync(FileCourierCliRequest request)
 
         return 0;
     }
-    catch (FileCourierException ex)
+    catch (CourierException ex)
     {
         await Console.Error.WriteLineAsync(ex.ToDisplayString());
         return 2;
