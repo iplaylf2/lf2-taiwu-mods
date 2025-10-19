@@ -18,7 +18,6 @@
         <OutputType>Exe</OutputType>
         <PublishAot>true</PublishAot>
         <IsAotCompatible>true</IsAotCompatible>
-        <Trimmable>true</Trimmable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PublishDocumentationFile>false</PublishDocumentationFile>
 
