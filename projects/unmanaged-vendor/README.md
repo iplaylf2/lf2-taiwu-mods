@@ -17,7 +17,7 @@
 - `upm/`：供高级场景打包第三方或 UPM 库使用；自动化工作流不会处理该目录，具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)。
 
 > [!TIP]
-> [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 已按包 ID 列出 `game/` 目录需要的完整映射，可直接照单整理文件；如需了解背后的目录约定或打包流程的更多细节，可查看 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md)。
+> [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 已按包 ID 列出 `game/` 目录需要的完整映射，可直接照单整理文件；如需了解目录约定或打包流程的更多细节，可查看 [游戏依赖打包参考手册](../../docs/reference/game-libs-packaging.md)。
 
 ---
 
@@ -55,7 +55,7 @@
 
 ### 必要目录结构：游戏核心程序集
 
-确保压缩包中的目录层级与 `game/<PackageId>/lib/` 一致。这样生成的 NuGet 包会将 DLL 作为仅编译时引用，避免在发布 Mod 时重复分发游戏文件。完整示例与校验方法同样可在[指南](../../docs/how-to/game-lib-packaging.md#准备目录结构)中找到。
+确保压缩包中的目录层级与 `game/<PackageId>/lib/` 一致。这样生成的 NuGet 包会将 DLL 作为仅编译时引用，避免在发布 Mod 时重复分发游戏文件。完整示例与校验方法同样可在[参考手册](../../docs/reference/game-libs-packaging.md#目录结构与清单)中找到。
 
 ### 配置开发环境以使用私有源
 
@@ -69,7 +69,7 @@
 
 ## 备选方案：本地打包
 
-对于快速验证或无法联网的场景，可以选择本地打包方案。具体命令行步骤、验证方法以及升级建议均整理在 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md) 与 [离线环境下的游戏依赖准备](../../docs/how-to/offline-game-dependency-setup.md) 中。
+对于快速验证或无法联网的场景，可以选择本地打包方案。具体命令行步骤、验证方法以及升级建议均整理在 [使用 GitHub Actions 发布游戏依赖](../../docs/how-to/game-lib-packaging.md) 与 [离线环境下的游戏依赖准备](../../docs/how-to/offline-game-dependency-setup.md) 中；整体策略与可选项则汇总在 [游戏依赖打包参考手册](../../docs/reference/game-libs-packaging.md)。
 
 ## FileCourier 自动分拣工具
 

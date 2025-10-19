@@ -1,76 +1,34 @@
-# 游戏依赖打包与发布
+# 使用 GitHub Actions 发布游戏依赖
 
-本文提供一份自建 NuGet 包源或在本地生成游戏依赖包的操作指南，聚焦于为《太吾绘卷》Mod 项目补齐官方游戏程序集的流程。
+当你已经准备好《太吾绘卷》的游戏程序集，需要把它们同步到团队可访问的私有 NuGet 源时，可按本流程操作。关于目录布局、FileCourier、离线备选方案等细节，请参阅参考文档《[游戏依赖打包参考手册](../reference/game-libs-packaging.md)》。
 
-## 准备目录结构
+## 前置条件
 
-所有待打包的 DLL 需遵循 `projects/unmanaged-vendor/game/` 下的目录布局。`projects/unmanaged-vendor/game/game-libs.manifest.yaml` 已按包 ID → 目标 `lib/` 目录列出完整清单，可直接照单整理。
+- 已依据 manifest 整理好 `projects/unmanaged-vendor/game/` 目录，并压缩为单个 `.zip`（或确认有可下载的压缩包）。
+- GitHub 仓库的 Secrets 中已配置目标包源的访问凭据。
+- 了解你的私有源地址，稍后会写入 `nuget.config`。
 
-```text
-projects/unmanaged-vendor/
-`-- game/
-    |-- Taiwu.Backend/
-    |-- Taiwu.Frontend/
-    |-- Taiwu.Modding/
-    `-- Taiwu.Patching/
-```
+## 操作步骤
 
-- 将游戏原始 DLL 放进 `game/<PackageId>/lib/`，打包后会作为 Mod 编译期依赖提供。manifest 为这一布局的机器可读版本，适合用来校对或脚本化处理。
+1. **提供压缩包下载地址**  
+   将整理好的压缩包上传到团队内部可访问的位置，并在仓库 Secrets 中设置或更新 `LF2_GAME_LIBS_URL`。
 
-> [!NOTE]
-> 若需处理第三方或 UPM 依赖，请参考 [依赖管理操作指南](./dependency-management.md) 的相关章节；本文仅关注 Taiwu 官方程序集。
+2. **触发工作流**  
+   打开 GitHub `Actions`，选择 `Pack and Publish Game Libraries` 工作流，点击 `Run workflow`。  
+   - `Package Version`：填写希望发布的游戏依赖版本号。  
+   - `Artifact URL`：填写刚才准备好的压缩包地址。
 
-> [!TIP]
-> 不需要在 `lib/` 下继续按目标框架拆分目录；现有的 MSBuild 配置会替你完成。
+3. **等待自动化执行**  
+   工作流会下载压缩包、覆盖 `projects/unmanaged-vendor/game/` 目录、执行 `dotnet pack` 并推送包到目标私有源。依赖的打包策略与 reference 文档中描述的一致，无需手动操作。
 
-### 可选：使用 FileCourier 分拣文件
+4. **在本地消费包**  
+   - 打开仓库根目录的 `nuget.config`，新增或启用一个指向私有源的 `<add>` 条目。  
+   - 运行 `dotnet restore`，即可从私有源获取游戏依赖。
 
-可从本仓库的 Release 页面下载与你平台匹配的 FileCourier 可执行文件，并与 `game-libs.manifest.yaml` 放在同一目录。随后直接运行：
+## 常见问题
 
-```bash
-./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
-```
+- **需要回到离线方案？**  
+  请按照《[离线环境下的游戏依赖准备](./offline-game-dependency-setup.md)》执行，记得在完成后禁用私有源。
 
-命令会按照 manifest 自动复制所需文件，生成的 `game/` 目录即可用于压缩或放回仓库。
-
-> [!NOTE]
-> FileCourier 是本仓库孵化中的开源小工具，核心作用与维护计划在 [`projects/unmanaged-vendor/README.md`](../../projects/unmanaged-vendor/README.md#filecourier-自动分拣工具) 中统一说明，欢迎先查阅该节获取最新信息。
-
----
-
-## 发布到私有源（推荐）
-
-当团队具备可访问的远程包源时，建议使用仓库自带的 GitHub Actions 工作流来生成并发布 NuGet 包，步骤如下：
-
-1. **准备压缩包**：依据 manifest 整理好 `game/` 目录后压缩为单个 `.zip` 文件；若已使用上节的 FileCourier，直接压缩输出即可。
-2. **配置机密**：在你的仓库 Secrets 中设置 `LF2_GAME_LIBS_URL`，存放该压缩包的下载地址。
-3. **运行工作流**：在 GitHub `Actions` 页面手动触发 `Pack and Publish Game Libraries`，填写目标版本号及压缩包地址。
-4. **等待发布完成**：工作流会自动完成解压、打包与推送，仅针对 `projects/unmanaged-vendor/` 下标记为可打包的工程生成 NuGet 包。
-
-完成后，在仓库根目录的 `nuget.config` 中新增（或启用）一个指向你私有包源的 `<add>` 条目，并为其配置凭据。请保留默认的 `iplaylf2` 源，它被用于访问公开的仓库依赖。随后即可直接通过 `dotnet restore` 获取依赖。
-
----
-
-## 本地打包（离线 / 临时方案）
-
-若处于离线环境，或只需在本机快速验证 Mod，可按以下步骤操作：
-
-1. 按 manifest 把游戏 DLL 放到 `projects/unmanaged-vendor/game/<PackageId>/lib/`（如需自动化，可复用前述 FileCourier 指令）。
-2. 在仓库根目录运行下列命令打包所有游戏相关项目：
-
-```bash
-dotnet pack ./projects/unmanaged-vendor/game/game.slnx --no-restore -c Release
-```
-
-- `--no-restore` 可避免在没有网络的情况下触发额外的包还原。
-- 若需要自定义包版本，可追加 `-p:Version=<your-version>`。
-- 输出的 `.nupkg` 默认写入仓库根目录的 `.lf2.nupkg/`。该目录已在 `nuget.config` 中以 `local` 源名预注册，默认处于禁用状态；需要时执行 `dotnet nuget enable source local` 启用，使用完后可用 `dotnet nuget disable source local` 关闭。
-
----
-
-## 升级到新游戏版本
-
-1. 更新仓库根目录 `Directory.Build.props` 中的 `LF2TaiwuVersion`。
-2. 用新版本 DLL 覆盖 `game/` 下的 `lib/` 文件。
-3. 通过 GitHub Actions 工作流或本地执行 `dotnet pack ./projects/unmanaged-vendor/game/game.slnx` 重新生成 NuGet 包。
-4. 在 Mod 项目上执行 `dotnet restore` 与一次 `dotnet build -t:LF2PublishMod`，确保依赖链在新版下仍能顺利编译。
+- **需要更新游戏版本？**  
+  参考《[游戏依赖打包参考手册](../reference/game-libs-packaging.md#升级到新游戏版本)》中的版本升级流程。

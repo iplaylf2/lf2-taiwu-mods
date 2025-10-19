@@ -1,46 +1,42 @@
 # 离线环境下的游戏依赖准备
 
-本文档聚焦于“如何在离线或受限网络环境下，准备游戏核心依赖”这一问题。通过将依赖打包到本地 NuGet 源，你可以在没有私有远程仓库的情况下完成开发环境搭建。
+当无法访问团队私有源或仅需在本机快速验证 Mod 时，可直接在仓库内打包并消费游戏依赖。详细背景、目录规范及更多可选项请参阅《[游戏依赖打包参考手册](../reference/game-libs-packaging.md)》。
 
 ## 适用场景
 
-- 新加入项目、尚未申请到私有源凭据的开发者。
-- 仅在本机快速验证或演示 Mod，暂不需要远程依赖分发。
-- 构建机无法访问 GitHub Packages 等远程源，但可以读取受控的本地目录。
-
----
-
-## 将依赖项打包到本地并恢复
+- 新加入项目但尚无私有源凭据。
+- 构建机或演示环境受限，无法访问 GitHub Packages／内部源。
+- 临时迭代或排查问题，不准备立即发布到远程源。
 
 > [!NOTE]
-> **方案互斥**
-> 请注意：本地方案与主文档中推荐的远程源方案是互斥的，请不要同时启用。如需切换回远程源方案，请参考主方案文档中的指引。
+> 本地方案与远程私有源方案互斥。启用本地源时请关闭远程源，避免混用；若需切换回远程方案，请参见《[使用 GitHub Actions 发布游戏依赖](./game-lib-packaging.md)》。
 
-此方法是解决游戏核心程序集依赖问题的最直接方案，适合快速上手、项目初期验证或快速调试。它将这些依赖打包到项目本地的 `.lf2.nupkg` 目录下，供 `dotnet restore` 直接使用，从而避免了它们的网络分发。
+## 快速步骤
 
-1. **准备文件**：按 `projects/unmanaged-vendor/game/game-libs.manifest.yaml` 中的映射，将游戏 DLL 放入对应的 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录。
-2. **打包**：在**仓库根目录**下运行下列命令，将 `unmanaged-vendor` 目录下的所有项目打包至 `.lf2.nupkg/` 文件夹，并避免在离线环境中触发额外的还原请求。
+1. **整理 DLL（可选 FileCourier）**  
+   按 `game-libs.manifest.yaml` 的映射将游戏 DLL 放入 `projects/unmanaged-vendor/game/<PackageId>/lib/`。如需自动分拣，可运行：
+
+   ```bash
+   ./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
+   ```
+
+2. **本地打包**  
+   在仓库根目录执行：
 
    ```bash
    dotnet pack ./projects/unmanaged-vendor/game/game.slnx --no-restore -c Release
    ```
 
-3. **启用本地源**：在**仓库根目录**下运行 `dotnet nuget enable source local`。仓库自带的 `nuget.config` 已预置名为 `local` 的源，默认禁用，启用后即可供恢复使用。
-4. **恢复**：在**仓库根目录**下运行 `dotnet restore`。NuGet 会自动找到本地包并完成依赖恢复。
+   打包结果写入 `.lf2.nupkg/`，供 `dotnet` 本地读取。
+
+3. **启用本地源并恢复依赖**
+
+   ```bash
+   dotnet nuget enable source local
+   dotnet restore
+   ```
 
 > [!TIP]
-> `dotnet pack` 命令会一次性处理所选解决方案中的所有 `unmanaged-vendor` 项目。`lib` 目录为空的项目也会被正常打包成一个空包，以确保 `dotnet restore` 能够顺利执行。
+> 处理完离线任务后可运行 `dotnet nuget disable source local` 恢复到默认配置，不需要清理 `.lf2.nupkg/`。
 
-> [!TIP]
-> 若想跳过手动整理，可从本仓库的 Release 页面下载 FileCourier，并与 `game-libs.manifest.yaml` 放在同一目录后运行：
->
-> ```bash
-> ./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
-> ```
->
-> 复制完成后再将输出放回 `projects/unmanaged-vendor/game/`。
-
-> [!NOTE]
-> FileCourier 的定位与后续维护计划在 [`projects/unmanaged-vendor/README.md`](../../projects/unmanaged-vendor/README.md#filecourier-自动分拣工具) 中统一说明，可在试用前先阅读该节。
-
-完成上述步骤后，依赖恢复流程与远程私有源完全一致：执行 `dotnet restore` 即可编译 Mod。若需要切换回远程源，只需运行 `dotnet nuget disable source local` 禁用本地源，并重新启用私有源，无须额外清理本地包。
+执行完以上步骤后，Mod 工程便能在离线或受限网络环境中完成 `dotnet build` 与 `dotnet restore`。
