@@ -18,6 +18,7 @@ ldftn
 ldloc
 ldnull
 ldsfld
+mapfile
 msbuild
 netstandard
 newarr
