@@ -1,3 +1,4 @@
+anycpu
 behaviour
 callvirt
 castclass

@@ -56,10 +56,10 @@ projects/unmanaged-vendor/
 2. **打包**：在仓库根目录运行：
 
    ```bash
-   dotnet pack ./projects/unmanaged-vendor/game/game.slnx --no-restore -c Release
+   dotnet pack ./projects/unmanaged-vendor/game/game.slnx -c Release
    ```
 
-   该命令会把所有 `unmanaged-vendor/game` 项目打包到 `.lf2.nupkg/` 目录，并避免在离线环境中触发额外还原。
+   该命令会把所有 `unmanaged-vendor/game` 项目打包到 `.lf2.nupkg/` 目录。
 
 3. **启用本地源**：执行 `dotnet nuget enable source local`，启用 `nuget.config` 中预置的本地源。
 4. **恢复依赖**：运行 `dotnet restore`，NuGet 会从 `.lf2.nupkg/` 读取包。

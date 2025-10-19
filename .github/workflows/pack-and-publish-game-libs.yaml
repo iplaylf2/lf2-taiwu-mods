@@ -29,9 +29,8 @@ jobs:
 
           sln_root_dir="projects/unmanaged-vendor/game"
           property_source_project_abs=$(find "$sln_root_dir" -type f -name '*.csproj' -print -quit)
-
           if [ -z "$property_source_project_abs" ]; then
-            echo "::error::No .csproj files found under '$sln_root_dir'."
+            echo "::error::Required project files were not found under '$sln_root_dir'."
             exit 1
           fi
 
@@ -69,6 +68,8 @@ jobs:
             echo "::error::Failed to retrieve MSBuild properties (LF2UnmanagedVendorDir or LF2NupkgDir)."
             exit 1
           fi
+
+          mkdir -p "$nupkg_dir_abs"
 
           game_dir_abs=$(realpath "$sln_root_dir")
           nupkg_dir_abs=$(realpath "$nupkg_dir_abs")
@@ -127,10 +128,21 @@ jobs:
           echo "Packing unmanaged vendor projects..."
           (
             cd "$sln_root_dir"
-            dotnet pack \
-              -c Release \
-              -p:Version="$version" \
-              -p:PackageVersion="$version"
+            mapfile -t projects < <(find . -type f -name '*.csproj' -print | sort)
+
+            if [ "${#projects[@]}" -eq 0 ]; then
+              echo "::error::No projects found to pack under '$sln_root_dir'."
+              exit 1
+            fi
+
+            for project in "${projects[@]}"; do
+              echo "Packing ${project#./}..."
+              dotnet pack \
+                "$project" \
+                -c Release \
+                -p:Version="$version" \
+                -p:PackageVersion="$version"
+            done
           )
 
       - name: Publish to NuGet Source

@@ -104,6 +104,7 @@ jobs:
             exit 1
           fi
 
+          mkdir -p "$publish_base_dir_abs"
           publish_base_dir_rel=$(realpath --relative-to="$repo_root" "$publish_base_dir_abs")
 
           {

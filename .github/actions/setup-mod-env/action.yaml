@@ -14,7 +14,14 @@ runs:
     - name: Check for existence of mod projects
       id: check-projects
       shell: bash
-      run: ls projects/mods/**/*.csproj >/dev/null 2>&1
+      run: |
+        set -euo pipefail
+        if find projects/mods -type f -name '*.csproj' -print -quit | grep -q .; then
+          exit 0
+        fi
+
+        echo "No mod projects found under projects/mods." >&2
+        exit 1
       continue-on-error: true
 
     - name: Setup .NET SDK

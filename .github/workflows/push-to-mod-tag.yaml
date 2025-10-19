@@ -88,6 +88,7 @@ jobs:
             exit 1
           fi
 
+          mkdir -p "$publish_base_dir_abs"
           publish_base_dir_rel=$(realpath --relative-to=. "$publish_base_dir_abs")
 
           echo "game_version=$game_version" >> $GITHUB_OUTPUT

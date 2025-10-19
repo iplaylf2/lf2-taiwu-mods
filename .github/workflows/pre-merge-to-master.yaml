@@ -25,7 +25,7 @@ jobs:
             echo "::error::No .slnx files found."
             exit 1
           fi
-          matrix_json=$(printf '%s\n' "${solutions[@]}" | jq -R -s -c '{solution: [split("\n")[]]}')
+          matrix_json=$(printf '%s\n' "${solutions[@]}" | jq -R -s -c '{solution: (split("\n") | map(select(length > 0)))}')
           echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
 
   build-check:
