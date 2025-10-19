@@ -171,11 +171,13 @@ jobs:
         run: |
           set -euo pipefail
 
+          repo_root="$(pwd)"
           sln_root_dir="${{ needs.prepare.outputs.sln_root_dir }}"
           project_dir="${{ needs.prepare.outputs.tool_project_dir }}"
           runtime="${{ matrix.rid }}"
           publish_base_dir="${{ needs.prepare.outputs.publish_base_dir }}"
-          artifact_dir="${publish_base_dir}/tools/${{ needs.prepare.outputs.tool_name }}/${runtime}"
+          artifact_dir_rel="${publish_base_dir}/tools/${{ needs.prepare.outputs.tool_name }}/${runtime}"
+          artifact_dir="${repo_root}/${artifact_dir_rel}"
 
           rm -rf "$artifact_dir"
           mkdir -p "$artifact_dir"

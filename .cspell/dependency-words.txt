@@ -6,6 +6,7 @@ coderabbitai
 contentfiles
 cysharp
 docstrings
+elif
 firstpass
 imgui
 iplaylf2
@@ -39,6 +40,7 @@ slnf
 slnx
 softprops
 starg
+startswith
 stefanzweifel
 stelem
 stfld
