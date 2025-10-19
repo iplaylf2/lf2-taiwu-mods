@@ -28,7 +28,7 @@
 ## 常见问题
 
 - **需要回到离线方案？**  
-  请按照《[离线环境下的游戏依赖准备](./offline-game-dependency-setup.md)》执行，记得在完成后禁用私有源。
+  请按照《[离线环境下的游戏依赖准备](./game-libs-offline-setup.md)》执行，记得在完成后禁用私有源。
 
 - **需要更新游戏版本？**  
   参考《[游戏依赖打包参考手册](../reference/game-libs-packaging.md#升级到新游戏版本)》中的版本升级流程。

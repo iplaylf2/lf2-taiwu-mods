@@ -69,7 +69,7 @@
 
 ## 备选方案：本地打包
 
-对于快速验证或无法联网的场景，可以选择本地打包方案。具体命令行步骤、验证方法以及升级建议均整理在 [使用 GitHub Actions 发布游戏依赖](../../docs/how-to/game-lib-packaging.md) 与 [离线环境下的游戏依赖准备](../../docs/how-to/offline-game-dependency-setup.md) 中；整体策略与可选项则汇总在 [游戏依赖打包参考手册](../../docs/reference/game-libs-packaging.md)。
+对于快速验证或无法联网的场景，可以选择本地打包方案。具体命令行步骤、验证方法以及升级建议均整理在 [使用 GitHub Actions 发布游戏依赖](../../docs/how-to/game-libs-remote-publish.md) 与 [离线环境下的游戏依赖准备](../../docs/how-to/game-libs-offline-setup.md) 中；整体策略与可选项则汇总在 [游戏依赖打包参考手册](../../docs/reference/game-libs-packaging.md)。
 
 ## FileCourier 自动分拣工具
 
