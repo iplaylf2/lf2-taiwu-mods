@@ -22,16 +22,14 @@ runs:
 
         echo "No mod projects found under projects/mods." >&2
         exit 1
-      continue-on-error: true
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        cache: ${{ steps.check-projects.outcome == 'success' }}
+        cache: true
         cache-dependency-path: projects/mods/**/packages.lock.json
 
     - name: Restore NuGet packages
-      if: steps.check-projects.outcome == 'success'
       env:
         GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ inputs.token }}
