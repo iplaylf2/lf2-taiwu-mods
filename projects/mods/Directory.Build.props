@@ -25,9 +25,9 @@
     <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true'">
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
 
         <IsPublishable>true</IsPublishable>
-        <UseArtifactsOutput>true</UseArtifactsOutput>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true' && '$(Configuration)' == 'Release'">

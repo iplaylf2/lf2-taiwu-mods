@@ -6,6 +6,9 @@
 
     <PropertyGroup>
         <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(IsPackable)' == 'true'">
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <NoWarn>$(NoWarn);NU5131</NoWarn>
         <PackageOutputPath>$(LF2NupkgDir)</PackageOutputPath>
