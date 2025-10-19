@@ -34,7 +34,7 @@ projects/unmanaged-vendor/
 命令会按照 manifest 自动复制所需文件，生成的 `game/` 目录即可用于压缩或放回仓库。
 
 > [!NOTE]
-> FileCourier 是本仓库维护的开源小工具，源码位于 [`projects/unmanaged-vendor/tools/FileCourier/`](../../projects/unmanaged-vendor/tools/FileCourier/)，若想了解更多用法或参与改进，可直接查阅该目录。
+> FileCourier 是本仓库孵化中的开源小工具，核心作用与维护计划在 [`projects/unmanaged-vendor/README.md`](../../projects/unmanaged-vendor/README.md#filecourier-自动分拣工具) 中统一说明，欢迎先查阅该节获取最新信息。
 
 ---
 

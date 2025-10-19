@@ -41,6 +41,6 @@
 > 复制完成后再将输出放回 `projects/unmanaged-vendor/game/`。
 
 > [!NOTE]
-> FileCourier 是本仓库维护的开源小工具，源码位于 [`projects/unmanaged-vendor/tools/FileCourier/`](../../projects/unmanaged-vendor/tools/FileCourier/)。
+> FileCourier 的定位与后续维护计划在 [`projects/unmanaged-vendor/README.md`](../../projects/unmanaged-vendor/README.md#filecourier-自动分拣工具) 中统一说明，可在试用前先阅读该节。
 
 完成上述步骤后，依赖恢复流程与远程私有源完全一致：执行 `dotnet restore` 即可编译 Mod。若需要切换回远程源，只需运行 `dotnet nuget disable source local` 禁用本地源，并重新启用私有源，无须额外清理本地包。
