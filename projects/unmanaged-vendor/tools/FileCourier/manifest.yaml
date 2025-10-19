@@ -1,0 +1,8 @@
+# Sample manifest for FileCourier
+- target-dir: config/templates
+  source-files:
+    - templates/base.json
+    - templates/options.json
+- target-dir: assets/images
+  source-files:
+    - art/logo.png

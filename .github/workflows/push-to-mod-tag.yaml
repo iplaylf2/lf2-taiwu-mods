@@ -17,16 +17,35 @@ jobs:
       DOTNET_NOLOGO: true
 
     steps:
-      - name: Set Configuration
-        id: config
-        run: |
-          echo "property_source_project=projects/unmanaged-vendor/game/Taiwu.Backend" >> $GITHUB_OUTPUT
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Environment
-        uses: ./.github/actions/setup-environment
+      - name: Set Configuration
+        id: config
+        run: |
+          set -euo pipefail
+
+          sln_root_dir="."
+          property_source_project_abs=$(
+            find "$sln_root_dir/projects/mods" -type f -name '*.csproj' -print \
+              | LC_ALL=C sort \
+              | head -n 1
+          )
+
+          if [ -z "$property_source_project_abs" ]; then
+            echo "::error::Unable to locate a property source project under '$sln_root_dir/projects/mods'."
+            exit 1
+          fi
+
+          property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
+
+          {
+            echo "sln_root_dir=$sln_root_dir"
+            echo "property_source_project=$property_source_project_rel"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Setup Mod Environment
+        uses: ./.github/actions/setup-mod-env
 
       - name: Parse Tag Information
         id: parse-tag
@@ -52,16 +71,24 @@ jobs:
         id: release-props
         run: |
           set -euo pipefail
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
           source_project="${{ steps.config.outputs.property_source_project }}"
 
-          game_version=$(dotnet msbuild "$source_project" -getProperty:LF2TaiwuVersion)
-          publish_base_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2PublishDir)
+          game_version=$(
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$source_project" -getProperty:LF2TaiwuVersion
+          )
+          publish_base_dir_abs=$(
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$source_project" -getProperty:LF2PublishDir
+          )
 
           if [ -z "$game_version" ] || [ -z "$publish_base_dir_abs" ]; then
             echo "::error::Failed to retrieve MSBuild properties (LF2TaiwuVersion or LF2PublishDir)."
             exit 1
           fi
 
+          mkdir -p "$publish_base_dir_abs"
           publish_base_dir_rel=$(realpath --relative-to=. "$publish_base_dir_abs")
 
           echo "game_version=$game_version" >> $GITHUB_OUTPUT
@@ -69,9 +96,16 @@ jobs:
 
       - name: Build and Publish Mod
         run: |
-          dotnet build -t:LF2PublishMod -c Release \
-            -p:LF2Mod=${{ steps.parse-tag.outputs.mod_name }} \
-            -p:Version=${{ steps.parse-tag.outputs.version }}
+          set -euo pipefail
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
+          (
+            cd "$sln_root_dir" && \
+            dotnet build \
+              -t:LF2PublishMod \
+              -c Release \
+              -p:LF2Mod="${{ steps.parse-tag.outputs.mod_name }}" \
+              -p:Version="${{ steps.parse-tag.outputs.version }}"
+          )
 
       - name: Package Artifact for Release
         id: package

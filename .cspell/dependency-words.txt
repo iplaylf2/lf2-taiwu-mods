@@ -1,3 +1,4 @@
+anycpu
 behaviour
 callvirt
 castclass
@@ -6,6 +7,9 @@ coderabbitai
 contentfiles
 cysharp
 docstrings
+elif
+firstpass
+imgui
 iplaylf2
 kawai
 krafs
@@ -16,6 +20,8 @@ ldftn
 ldloc
 ldnull
 ldsfld
+ltrimstr
+mapfile
 msbuild
 netstandard
 newarr
@@ -32,12 +38,20 @@ realpath
 redzen
 roslynator
 shellcheck
+slnf
+slnx
 softprops
 starg
+startswith
 stefanzweifel
 stelem
 stfld
 stloc
 storer
+tilemap
 transil
+trimmable
+ugui
+uninstantiated
+vecc
 yoshifumi

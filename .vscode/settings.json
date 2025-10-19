@@ -1,7 +1,6 @@
 {
     "files.associations": {
         "*.slnx": "xml",
-        "nuget.config": "xml"
     },
     "xml.format.emptyElements": "collapse",
     "xml.format.maxLineWidth": 0,

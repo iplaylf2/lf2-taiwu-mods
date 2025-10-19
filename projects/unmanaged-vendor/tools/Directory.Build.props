@@ -1,0 +1,30 @@
+<Project>
+    <Import
+        Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+        Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
+    />
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <TargetFramework>net9.0</TargetFramework>
+
+        <IsPublishable>true</IsPublishable>
+
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(IsPublishable)' == 'true'">
+        <OutputType>Exe</OutputType>
+        <PublishAot>true</PublishAot>
+        <IsAotCompatible>true</IsAotCompatible>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PublishDocumentationFile>false</PublishDocumentationFile>
+
+        <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+</Project>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyName>FileCourier</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="YamlDotNet" />
+        <PackageReference Include="Vecc.YamlDotNet.Analyzers.StaticGenerator" />
+        <PackageReference Include="System.CommandLine" />
+
+        <Content Include="manifest.yaml;README.md">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+</Project>

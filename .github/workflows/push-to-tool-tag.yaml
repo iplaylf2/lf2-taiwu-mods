@@ -1,0 +1,277 @@
+name: On Push to Tool Tag
+
+on:
+  push:
+    tags:
+      - tools/*/v*
+
+jobs:
+  prepare:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+    outputs:
+      sln_root_dir: ${{ steps.config.outputs.sln_root_dir }}
+      tool_name: ${{ steps.parse-tag.outputs.tool_name }}
+      version: ${{ steps.parse-tag.outputs.version }}
+      full_tag: ${{ steps.parse-tag.outputs.full_tag }}
+      tool_project_dir: ${{ steps.tool.outputs.tool_project_dir }}
+      publish_base_dir: ${{ steps.tool.outputs.publish_base_dir }}
+      publish_matrix: ${{ steps.runtime.outputs.matrix }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Configuration
+        id: config
+        run: |
+          set -euo pipefail
+          sln_root_dir="projects/unmanaged-vendor/tools"
+          property_source_project_abs=$(
+            find "$sln_root_dir" -type f -name '*.csproj' -print \
+              | LC_ALL=C sort \
+              | head -n 1
+          )
+
+          if [ -z "$property_source_project_abs" ]; then
+            echo "::error::Unable to locate a property source project under '$sln_root_dir'."
+            exit 1
+          fi
+
+          property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
+
+          {
+            echo "sln_root_dir=$sln_root_dir"
+            echo "property_source_project=$property_source_project_rel"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+
+      - name: Parse Tag Information
+        id: parse-tag
+        run: |
+          set -euo pipefail
+          full_tag="${GITHUB_REF#refs/tags/}"
+
+          if [[ ! "$full_tag" =~ ^tools/[^/]+/v[^/]+$ ]]; then
+            echo "::error::Invalid tag format. Expected 'tools/<tool-name>/v<version>'"
+            exit 1
+          fi
+
+          tool_name="${full_tag#tools/}"
+          tool_name="${tool_name%%/*}"
+          version="${full_tag##*/}"
+          version="${version#v}"
+
+          {
+            echo "full_tag=$full_tag"
+            echo "tool_name=$tool_name"
+            echo "version=$version"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Resolve Tool Properties
+        id: tool
+        run: |
+          set -euo pipefail
+
+          repo_root="$(pwd)"
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
+          property_source_project="${{ steps.config.outputs.property_source_project }}"
+          tool_name="${{ steps.parse-tag.outputs.tool_name }}"
+
+          sln_root_dir_abs=$(realpath "$sln_root_dir")
+          tool_project_dir_rel="$tool_name"
+          tool_project_dir_abs="$sln_root_dir_abs/$tool_project_dir_rel"
+
+          if [ ! -d "$tool_project_dir_abs" ]; then
+            echo "::error::Unable to locate tool directory '$tool_project_dir_abs'."
+            exit 1
+          fi
+
+          publish_base_dir_abs=$(
+            cd "$sln_root_dir_abs" && \
+            dotnet msbuild "$property_source_project" -getProperty:LF2PublishDir
+          )
+
+          if [ -z "$publish_base_dir_abs" ]; then
+            echo "::error::Failed to retrieve MSBuild property 'LF2PublishDir'."
+            exit 1
+          fi
+
+          mkdir -p "$publish_base_dir_abs"
+          publish_base_dir_rel=$(realpath --relative-to="$repo_root" "$publish_base_dir_abs")
+
+          {
+            echo "tool_project_dir=$tool_project_dir_rel"
+            echo "publish_base_dir=$publish_base_dir_rel"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Resolve Runtime Identifiers
+        id: runtime
+        run: |
+          set -euo pipefail
+
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
+          project_dir="${{ steps.tool.outputs.tool_project_dir }}"
+
+          rid_list=$(cd "$sln_root_dir" && dotnet msbuild "$project_dir" -getProperty:RuntimeIdentifiers)
+          rid_list="${rid_list//$'\r'/}"
+
+          if [ -z "$rid_list" ]; then
+            echo "::error::Project '$project_dir' does not define RuntimeIdentifiers."
+            exit 1
+          fi
+
+          matrix=$(
+            printf '%s\n' "$rid_list" \
+              | jq -R -c '
+                  split(";")
+                  | map(select(length > 0))
+                  | map({
+                      rid: .,
+                      os: (if startswith("win") then "windows-latest"
+                           elif startswith("linux") then "ubuntu-latest"
+                           elif (startswith("osx") or startswith("macos") or startswith("darwin")) then "macos-latest"
+                           else error("Unsupported runtime identifier: " + .)
+                           end)
+                    })
+                  | {include: .}
+                '
+          )
+
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  publish:
+    name: Publish Tool (${{ matrix.rid }})
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: ${{ fromJSON(needs.prepare.outputs.publish_matrix) }}
+    permissions:
+      contents: read
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: true
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+
+      - name: Publish Tool
+        run: |
+          set -euo pipefail
+
+          repo_root="$(pwd)"
+          sln_root_dir="${{ needs.prepare.outputs.sln_root_dir }}"
+          project_dir="${{ needs.prepare.outputs.tool_project_dir }}"
+          runtime="${{ matrix.rid }}"
+          publish_base_dir="${{ needs.prepare.outputs.publish_base_dir }}"
+          artifact_dir_rel="${publish_base_dir}/tools/${{ needs.prepare.outputs.tool_name }}/${runtime}"
+          artifact_dir="${repo_root}/${artifact_dir_rel}"
+
+          rm -rf "$artifact_dir"
+          mkdir -p "$artifact_dir"
+
+          (
+            cd "$sln_root_dir" && \
+            dotnet publish \
+              "$project_dir" \
+              -c Release \
+              -r "$runtime" \
+              -o "$artifact_dir" \
+              -p:Version="${{ needs.prepare.outputs.version }}"
+          )
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.rid }}
+          path: ${{ needs.prepare.outputs.publish_base_dir }}/tools/${{ needs.prepare.outputs.tool_name }}/${{ matrix.rid }}
+          retention-days: 7
+          if-no-files-found: error
+
+  release:
+    name: Create Release
+    needs:
+      - prepare
+      - publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: dist
+
+      - name: Prepare Release Assets
+        id: assets
+        env:
+          TOOL_NAME: ${{ needs.prepare.outputs.tool_name }}
+          TOOL_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          releases_dir="releases"
+          mkdir -p "$releases_dir"
+
+          declare -a archives=()
+          declare -a runtimes=()
+
+          for runtime_dir in dist/*; do
+            if [ ! -d "$runtime_dir" ]; then
+              continue
+            fi
+
+            runtime="$(basename "$runtime_dir")"
+            archive="$releases_dir/${TOOL_NAME}_v${TOOL_VERSION}_${runtime}.zip"
+
+            rm -f "$archive"
+            (cd "$runtime_dir" && zip -qry "../../$archive" .)
+
+            archives+=("$archive")
+            runtimes+=("- ${runtime}")
+          done
+
+          {
+            echo "files<<EOF"
+            printf '%s\n' "${archives[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "runtimes<<EOF"
+            printf '%s\n' "${runtimes[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          build_date=$(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          echo "build_date=$build_date" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.full_tag }}
+          name: ${{ needs.prepare.outputs.tool_name }} v${{ needs.prepare.outputs.version }}
+          body: |
+            ## Tool Release: ${{ needs.prepare.outputs.tool_name }}
+            **Version**: ${{ needs.prepare.outputs.version }}
+            **Build Date**: ${{ steps.assets.outputs.build_date }}
+            **Runtimes**:
+            ${{ steps.assets.outputs.runtimes }}
+          files: ${{ steps.assets.outputs.files }}
+          draft: false
+          prerelease: false

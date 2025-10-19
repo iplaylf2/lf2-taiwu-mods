@@ -25,11 +25,13 @@
     <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true'">
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
-
-        <ILRepackTargetsFile>$(MSBuildThisFileDirectory)ILRepack.targets</ILRepackTargetsFile>
+        <UseArtifactsOutput>true</UseArtifactsOutput>
 
         <IsPublishable>true</IsPublishable>
-        <UseArtifactsOutput>true</UseArtifactsOutput>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true' and '$(Configuration)' == 'Release'">
+        <ILRepackTargetsFile>$(MSBuildThisFileDirectory)ILRepack.targets</ILRepackTargetsFile>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">

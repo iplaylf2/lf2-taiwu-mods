@@ -22,52 +22,60 @@ jobs:
       DOTNET_NOLOGO: true
 
     steps:
-      - name: Set Configuration
-        id: config
-        run: |
-          echo "property_source_project=projects/unmanaged-vendor/game/Taiwu.Backend" >> $GITHUB_OUTPUT
-          echo "relative_game_dir=game" >> $GITHUB_OUTPUT
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Environment
-        uses: ./.github/actions/setup-environment
-        with:
-          restore: false
+      - name: Set Configuration
+        id: config
+        run: |
+          set -euo pipefail
+
+          sln_root_dir="projects/unmanaged-vendor/game"
+          property_source_project_abs=$(find "$sln_root_dir" -type f -name '*.csproj' -print -quit)
+          if [ -z "$property_source_project_abs" ]; then
+            echo "::error::Required project files were not found under '$sln_root_dir'."
+            exit 1
+          fi
+
+          property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
+
+          {
+            echo "sln_root_dir=$sln_root_dir"
+            echo "property_source_project=$property_source_project_rel"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
 
       - name: Resolve MSBuild Properties
         id: props
         run: |
           set -euo pipefail
+          repo_root="$(pwd)"
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
           source_project="${{ steps.config.outputs.property_source_project }}"
-          relative_game_dir="${{ steps.config.outputs.relative_game_dir }}"
 
-          unmanaged_vendor_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir)
-          nupkg_dir_abs=$(dotnet msbuild "$source_project" -getProperty:LF2NupkgDir)
+          nupkg_dir_abs=$(
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$source_project" -getProperty:LF2NupkgDir
+          )
 
-          if [ -z "$unmanaged_vendor_dir_abs" ] || [ -z "$nupkg_dir_abs" ]; then
-            echo "::error::Failed to retrieve MSBuild properties (LF2UnmanagedVendorDir or LF2NupkgDir)."
+          if [ -z "$nupkg_dir_abs" ]; then
+            echo "::error::Failed to retrieve MSBuild property 'LF2NupkgDir'."
             exit 1
           fi
 
-          unmanaged_vendor_dir_rel=$(realpath --relative-to=. "$unmanaged_vendor_dir_abs")
-          nupkg_dir_rel=$(realpath --relative-to=. "$nupkg_dir_abs")
-          game_dir_rel="$unmanaged_vendor_dir_rel/$relative_game_dir"
+          mkdir -p "$nupkg_dir_abs"
 
-          echo "game_dir=$game_dir_rel" >> $GITHUB_OUTPUT
-          echo "nupkg_dir=$nupkg_dir_rel" >> $GITHUB_OUTPUT
+          game_dir_abs=$(realpath "$sln_root_dir")
+          nupkg_dir_abs=$(realpath "$nupkg_dir_abs")
+          game_dir_rel=$(realpath --relative-to="$repo_root" "$game_dir_abs")
+          nupkg_dir_rel=$(realpath --relative-to="$repo_root" "$nupkg_dir_abs")
 
-      - name: Unload Other Projects
-        run: |
-          set -euo pipefail
-          game_dir="${{ steps.props.outputs.game_dir }}"
-
-          echo "Unloading projects outside of $game_dir..."
-          dotnet sln list \
-            | grep "\.csproj$" \
-            | grep -v "^$game_dir/" \
-            | xargs -r -I {} dotnet sln remove "{}"
+          {
+            echo "game_dir=$game_dir_rel"
+            echo "nupkg_dir=$nupkg_dir_rel"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Download and Extract Game Libraries
         run: |
@@ -111,12 +119,27 @@ jobs:
         run: |
           set -euo pipefail
           version="${{ github.event.inputs.version }}"
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
 
           echo "Packing unmanaged vendor projects..."
-          dotnet pack \
-            -c Release \
-            -p:Version="$version" \
-            -p:PackageVersion="$version"
+          (
+            cd "$sln_root_dir"
+            mapfile -t projects < <(find . -type f -name '*.csproj' -print | sort)
+
+            if [ "${#projects[@]}" -eq 0 ]; then
+              echo "::error::No projects found to pack under '$sln_root_dir'."
+              exit 1
+            fi
+
+            for project in "${projects[@]}"; do
+              echo "Packing ${project#./}..."
+              dotnet pack \
+                "$project" \
+                -c Release \
+                -p:Version="$version" \
+                -p:PackageVersion="$version"
+            done
+          )
 
       - name: Publish to NuGet Source
         run: |
