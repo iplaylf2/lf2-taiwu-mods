@@ -24,6 +24,7 @@
    ```bash
    dotnet pack ./projects/unmanaged-vendor/game/game.slnx --no-restore -c Release
    ```
+
 3. **启用本地源**：在**仓库根目录**下运行 `dotnet nuget enable source local`。仓库自带的 `nuget.config` 已预置名为 `local` 的源，默认禁用，启用后即可供恢复使用。
 4. **恢复**：在**仓库根目录**下运行 `dotnet restore`。NuGet 会自动找到本地包并完成依赖恢复。
 

@@ -23,14 +23,16 @@
 manifest 使用 YAML 数组描述复制计划，每个条目要求如下：
 
 ```yaml
-- target-dir: Taiwu.Backend/lib         # 写目录下的目标子目录
+- target-dir: config/templates          # 写目录下的目标子目录
   source-files:                         # 读目录下需要复制的相对路径列表
-    - Backend/GameData.dll
-    - Backend/GameData.pdb
+    - templates/base.json
+    - templates/options.json
 ```
 
 - `target-dir`：必须是相对路径，指向写目录内的目标位置。
 - `source-files`：必须是相对路径，指向读目录内的文件；若文件缺失或路径指向目录，执行会失败。
+
+仓库根目录提供了最小示例 `manifest.yaml`，可以直接复制后按需调整目标目录与文件列表。
 
 ## 更多细节
 
