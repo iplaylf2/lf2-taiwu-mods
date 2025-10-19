@@ -25,7 +25,17 @@ jobs:
             echo "::error::No .slnx files found."
             exit 1
           fi
-          matrix_json=$(printf '%s\n' "${solutions[@]}" | jq -R -s -c '{solution: (split("\n") | map(select(length > 0)))}')
+          matrix_json=$(printf '%s\n' "${solutions[@]}" | jq -R -s -c '
+            def is_root_solution:
+              (ltrimstr("./") | contains("/") | not);
+            {
+              include: (split("\n")
+                | map(select(length > 0))
+                | map({
+                    solution: .,
+                    use_mod_env: (. | is_root_solution)
+                  }))
+            }')
           echo "matrix=$matrix_json" >> "$GITHUB_OUTPUT"
 
   build-check:
@@ -44,8 +54,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Mod Environment
+      - name: Prepare Mod Environment
+        if: ${{ matrix.use_mod_env }}
         uses: ./.github/actions/setup-mod-env
+
+      - name: Prepare .NET Environment
+        if: ${{ not matrix.use_mod_env }}
+        uses: actions/setup-dotnet@v5
 
       - name: Build Solution
         run: |

@@ -20,6 +20,7 @@ ldftn
 ldloc
 ldnull
 ldsfld
+ltrimstr
 mapfile
 msbuild
 netstandard

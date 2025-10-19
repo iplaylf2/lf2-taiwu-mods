@@ -32,7 +32,7 @@ projects/unmanaged-vendor/
 命令会按照 manifest 自动复制所需文件，生成的 `game/` 目录即可用于压缩或放回仓库。
 
 > [!NOTE]
-> FileCourier 的定位与维护计划在 `../../projects/unmanaged-vendor/README.md` 中统一说明，试用前可先阅读 `#filecourier-自动分拣工具` 章节获取最新信息。
+> FileCourier 的定位与维护计划在 `../../projects/unmanaged-vendor/README.md` 中统一说明，试用前可先阅读 `#FileCourier-自动分拣工具` 章节获取最新信息。
 
 ---
 
