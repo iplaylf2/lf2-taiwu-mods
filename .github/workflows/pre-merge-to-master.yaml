@@ -59,7 +59,7 @@ jobs:
         uses: ./.github/actions/setup-mod-env
 
       - name: Prepare .NET Environment
-        if: ${{ not matrix.use_mod_env }}
+        if: ${{ !matrix.use_mod_env }}
         uses: actions/setup-dotnet@v5
 
       - name: Build Solution

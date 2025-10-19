@@ -131,7 +131,7 @@ internal static class ExecutionPlanBuilder
 
     private static string? ValidateRelativePath(string path, string fieldName)
     {
-        return Path.IsPathFullyQualified(path)
+        return Path.IsPathRooted(path) || Path.IsPathFullyQualified(path)
             ? $"Manifest field {fieldName} value {path} must be a relative path."
             : null;
     }
