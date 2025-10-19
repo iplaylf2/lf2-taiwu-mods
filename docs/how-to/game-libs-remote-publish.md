@@ -15,8 +15,9 @@
 
 2. **触发工作流**  
    打开 GitHub `Actions`，选择 `Pack and Publish Game Libraries` 工作流，点击 `Run workflow`。  
+   工作流会自动读取 `LF2_GAME_LIBS_URL` 指向的压缩包，无需在界面上填写下载链接。  
    - `Package Version`：填写希望发布的游戏依赖版本号。  
-   - `Artifact URL`：填写刚才准备好的压缩包地址。
+   - `Source`（可选）：如需推送到自定义 NuGet 源，填写目标源地址；留空则使用仓库所有者的 GitHub Packages。
 
 3. **等待自动化执行**  
    工作流会下载压缩包、覆盖 `projects/unmanaged-vendor/game/` 目录、执行 `dotnet pack` 并推送包到目标私有源。依赖的打包策略与 reference 文档中描述的一致，无需手动操作。

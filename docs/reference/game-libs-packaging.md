@@ -42,7 +42,7 @@ projects/unmanaged-vendor/
 
 1. **准备压缩包**：依据 manifest 整理好 `game/` 目录后压缩为单个 `.zip` 文件；若已使用上一节的 FileCourier，直接压缩输出即可。
 2. **配置机密**：在仓库 Secrets 中设置 `LF2_GAME_LIBS_URL`，存放该压缩包的下载地址。
-3. **运行工作流**：在 GitHub `Actions` 页面手动触发 `Pack and Publish Game Libraries`，填写目标版本号及压缩包地址。
+3. **运行工作流**：在 GitHub `Actions` 页面手动触发 `Pack and Publish Game Libraries`，填写目标版本号（`Package Version`），若需覆盖默认推送目标可在 `Source` 字段填写自定义 NuGet 源；压缩包地址会从 `LF2_GAME_LIBS_URL` 机密中读取，无需手动输入。
 4. **等待发布完成**：工作流会自动完成解压、打包与推送，仅针对 `projects/unmanaged-vendor/` 下标记为可打包的工程生成 NuGet 包。
 5. **消费依赖**：在仓库根目录的 `nuget.config` 中新增（或启用）一个指向你私有包源的 `<add>` 条目，并为其配置凭据，然后执行 `dotnet restore`。
 

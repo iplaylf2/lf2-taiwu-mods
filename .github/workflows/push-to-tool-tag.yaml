@@ -132,6 +132,7 @@ jobs:
             printf '%s\n' "$rid_list" \
               | jq -R -c '
                   split(";")
+                  | map(select(length > 0))
                   | map({
                       rid: .,
                       os: (if startswith("win") then "windows-latest"
