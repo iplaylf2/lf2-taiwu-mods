@@ -74,8 +74,14 @@ jobs:
           sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
           source_project="${{ steps.config.outputs.property_source_project }}"
 
-          game_version=$(cd "$sln_root_dir" && dotnet msbuild "$source_project" -getProperty:LF2TaiwuVersion)
-          publish_base_dir_abs=$(cd "$sln_root_dir" && dotnet msbuild "$source_project" -getProperty:LF2PublishDir)
+          game_version=$(
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$source_project" -getProperty:LF2TaiwuVersion
+          )
+          publish_base_dir_abs=$(
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$source_project" -getProperty:LF2PublishDir
+          )
 
           if [ -z "$game_version" ] || [ -z "$publish_base_dir_abs" ]; then
             echo "::error::Failed to retrieve MSBuild properties (LF2TaiwuVersion or LF2PublishDir)."
@@ -91,9 +97,14 @@ jobs:
         run: |
           set -euo pipefail
           sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
-          (cd "$sln_root_dir" && dotnet build -t:LF2PublishMod -c Release \
-            -p:LF2Mod="${{ steps.parse-tag.outputs.mod_name }}" \
-            -p:Version="${{ steps.parse-tag.outputs.version }}")
+          (
+            cd "$sln_root_dir" && \
+            dotnet build \
+              -t:LF2PublishMod \
+              -c Release \
+              -p:LF2Mod="${{ steps.parse-tag.outputs.mod_name }}" \
+              -p:Version="${{ steps.parse-tag.outputs.version }}"
+          )
 
       - name: Package Artifact for Release
         id: package

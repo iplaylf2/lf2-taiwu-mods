@@ -94,7 +94,8 @@ jobs:
           fi
 
           publish_base_dir_abs=$(
-            cd "$sln_root_dir_abs" && dotnet msbuild "$property_source_project" -getProperty:LF2PublishDir
+            cd "$sln_root_dir_abs" && \
+            dotnet msbuild "$property_source_project" -getProperty:LF2PublishDir
           )
 
           if [ -z "$publish_base_dir_abs" ]; then
@@ -149,7 +150,15 @@ jobs:
           rm -rf "$artifact_dir"
           mkdir -p "$artifact_dir"
 
-          (cd "$sln_root_dir" && dotnet publish "$project_dir" -c Release -r "$runtime" -o "$artifact_dir")
+          (
+            cd "$sln_root_dir" && \
+            dotnet publish \
+              "$project_dir" \
+              -c Release \
+              -r "$runtime" \
+              -o "$artifact_dir" \
+              -p:Version="${{ needs.prepare.outputs.version }}"
+          )
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

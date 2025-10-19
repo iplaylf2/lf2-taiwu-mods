@@ -57,10 +57,12 @@ jobs:
           source_project="${{ steps.config.outputs.property_source_project }}"
 
           unmanaged_vendor_dir_abs=$(
-            cd "$sln_root_dir" && dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$source_project" -getProperty:LF2UnmanagedVendorDir
           )
           nupkg_dir_abs=$(
-            cd "$sln_root_dir" && dotnet msbuild "$source_project" -getProperty:LF2NupkgDir
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$source_project" -getProperty:LF2NupkgDir
           )
 
           if [ -z "$unmanaged_vendor_dir_abs" ] || [ -z "$nupkg_dir_abs" ]; then
