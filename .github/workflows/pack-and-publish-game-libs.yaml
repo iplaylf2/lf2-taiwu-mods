@@ -38,8 +38,8 @@ jobs:
           property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
 
           {
-            printf 'sln_root_dir=%s\n' "$sln_root_dir"
-            printf 'property_source_project=%s\n' "$property_source_project_rel"
+            echo "sln_root_dir=$sln_root_dir"
+            echo "property_source_project=$property_source_project_rel"
           } >> "$GITHUB_OUTPUT"
 
       - name: Checkout Code
@@ -74,8 +74,8 @@ jobs:
           nupkg_dir_rel=$(realpath --relative-to="$repo_root" "$nupkg_dir_abs")
 
           {
-            printf 'game_dir=%s\n' "$game_dir_rel"
-            printf 'nupkg_dir=%s\n' "$nupkg_dir_rel"
+            echo "game_dir=$game_dir_rel"
+            echo "nupkg_dir=$nupkg_dir_rel"
           } >> "$GITHUB_OUTPUT"
 
       - name: Download and Extract Game Libraries
