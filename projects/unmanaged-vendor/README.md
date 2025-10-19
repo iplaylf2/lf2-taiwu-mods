@@ -38,7 +38,7 @@
 ./FileCourier "<游戏安装目录>" "<临时输出>/game" -m game-libs.manifest.yaml
 ```
 
-复制出的 `game/` 目录即可直接用于打包。FileCourier 的更多信息可在 [`projects/unmanaged-vendor/tools/FileCourier/`](tools/FileCourier/) 中找到。
+复制出的 `game/` 目录即可直接用于打包。若想了解该工具的维护计划与贡献方式，请参阅下文“[FileCourier 自动分拣工具](#filecourier-自动分拣工具)”。
 
 ### 发布到私有源（GitHub Actions）
 
@@ -70,3 +70,7 @@
 ## 备选方案：本地打包
 
 对于快速验证或无法联网的场景，可以选择本地打包方案。具体命令行步骤、验证方法以及升级建议均整理在 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md) 与 [离线环境下的游戏依赖准备](../../docs/how-to/offline-game-dependency-setup.md) 中。
+
+## FileCourier 自动分拣工具
+
+FileCourier 是本仓库孵化中的跨平台小工具，用于根据 `game-libs.manifest.yaml` 自动从游戏安装目录复制所需 DLL 并生成符合规范的 `game/` 目录。源码位于 `projects/unmanaged-vendor/tools/FileCourier/`，我们会在此 README 中同步其目标和使用范围；如需试用或反馈问题，欢迎先参考上文的快速上手说明并在仓库提交 issue。
