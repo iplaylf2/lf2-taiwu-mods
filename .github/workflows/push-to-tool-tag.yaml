@@ -21,6 +21,7 @@ jobs:
       full_tag: ${{ steps.parse-tag.outputs.full_tag }}
       tool_project_dir: ${{ steps.tool.outputs.tool_project_dir }}
       publish_base_dir: ${{ steps.tool.outputs.publish_base_dir }}
+      publish_matrix: ${{ steps.runtime.outputs.matrix }}
 
     steps:
       - name: Checkout Code
@@ -110,17 +111,63 @@ jobs:
             echo "publish_base_dir=$publish_base_dir_rel"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Resolve Runtime Identifiers
+        id: runtime
+        run: |
+          set -euo pipefail
+
+          sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
+          project_dir="${{ steps.tool.outputs.tool_project_dir }}"
+
+          props_output=$(
+            cd "$sln_root_dir" && \
+            dotnet msbuild "$project_dir" -getProperty:RuntimeIdentifiers -getProperty:RuntimeIdentifier
+          )
+
+          props_output="${props_output//$'\r'/}"
+
+          rid_list=$(
+            printf '%s\n' "$props_output" \
+              | awk -F= '
+                  $1 == "RuntimeIdentifiers" && $2 != "" {print $2; found=1; exit}
+                  $1 == "RuntimeIdentifier" && single == "" {single=$2}
+                  END {
+                    if (!found && single != "") print single
+                  }
+                '
+          )
+
+          if [ -z "$rid_list" ]; then
+            echo "::error::Project '$project_dir' does not define RuntimeIdentifiers or RuntimeIdentifier."
+            exit 1
+          fi
+
+          matrix=$(
+            printf '%s\n' "$rid_list" \
+              | jq -R -c '
+                  split(";")
+                  | map(gsub("^\\s+|\\s+$"; ""))
+                  | map(select(length > 0))
+                  | map({
+                      rid: .,
+                      os: (if startswith("win") then "windows-latest"
+                           elif startswith("linux") then "ubuntu-latest"
+                           elif (startswith("osx") or startswith("macos") or startswith("darwin")) then "macos-latest"
+                           else error("Unsupported runtime identifier: " + .)
+                           end)
+                    })
+                  | {include: .}
+                '
+          )
+
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
   publish:
     name: Publish Tool (${{ matrix.rid }})
     needs: prepare
     runs-on: ${{ matrix.os }}
     strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            rid: linux-x64
-          - os: windows-latest
-            rid: win-x64
+      matrix: ${{ fromJSON(needs.prepare.outputs.publish_matrix) }}
     permissions:
       contents: read
     env:

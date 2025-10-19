@@ -21,10 +21,11 @@
         <Trimmable>true</Trimmable>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PublishDocumentationFile>false</PublishDocumentationFile>
+
+        <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <DebugType>none</DebugType>
-        <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
     </PropertyGroup>
 </Project>
