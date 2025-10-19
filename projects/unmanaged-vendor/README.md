@@ -17,7 +17,7 @@
 - `upm/`：供高级场景打包第三方或 UPM 库使用；自动化工作流不会处理该目录，具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)。
 
 > [!TIP]
-> 完整的目录示例与推荐的文件布局请参考 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md)。
+> [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 已按包 ID 列出 `game/` 目录需要的完整映射，可直接照单整理文件；如需了解背后的目录约定或打包流程的更多细节，可查看 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md)。
 
 ---
 
@@ -32,7 +32,13 @@
 
 ### 准备压缩包
 
-将游戏 DLL 按 `game/<PackageId>/lib/` 整理好后压缩为单个 `.zip`。详细示例与命名建议见 [游戏依赖打包与发布指南](../../docs/how-to/game-lib-packaging.md)。
+将游戏 DLL 按 `game/<PackageId>/lib/` 整理好后压缩为单个 `.zip`。遵循 [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 中的映射即可；若希望自动化分拣，可从仓库 Release 页面下载 FileCourier，可执行文件与 manifest 放在同一目录后运行：
+
+```bash
+./FileCourier "<游戏安装目录>" "<临时输出>/game" -m game-libs.manifest.yaml
+```
+
+复制出的 `game/` 目录即可直接用于打包。FileCourier 的更多信息可在 [`projects/unmanaged-vendor/tools/FileCourier/`](tools/FileCourier/) 中找到。
 
 ### 发布到私有源（GitHub Actions）
 

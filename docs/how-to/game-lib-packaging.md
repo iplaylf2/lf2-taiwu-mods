@@ -4,7 +4,7 @@
 
 ## 准备目录结构
 
-所有待打包的 DLL 需遵循 `projects/unmanaged-vendor/game/` 下既有项目的目录布局：
+所有待打包的 DLL 需遵循 `projects/unmanaged-vendor/game/` 下的目录布局。`projects/unmanaged-vendor/game/game-libs.manifest.yaml` 已按包 ID → 目标 `lib/` 目录列出完整清单，可直接照单整理。
 
 ```text
 projects/unmanaged-vendor/
@@ -15,7 +15,7 @@ projects/unmanaged-vendor/
     `-- Taiwu.Patching/
 ```
 
-- 将游戏原始 DLL 放进 `game/<PackageId>/lib/`，打包后会作为 Mod 编译期依赖提供。
+- 将游戏原始 DLL 放进 `game/<PackageId>/lib/`，打包后会作为 Mod 编译期依赖提供。manifest 为这一布局的机器可读版本，适合用来校对或脚本化处理。
 
 > [!NOTE]
 > 若需处理第三方或 UPM 依赖，请参考 [依赖管理操作指南](./dependency-management.md) 的相关章节；本文仅关注 Taiwu 官方程序集。
@@ -23,13 +23,26 @@ projects/unmanaged-vendor/
 > [!TIP]
 > 不需要在 `lib/` 下继续按目标框架拆分目录；现有的 MSBuild 配置会替你完成。
 
+### 可选：使用 FileCourier 分拣文件
+
+可从本仓库的 Release 页面下载与你平台匹配的 FileCourier 可执行文件，并与 `game-libs.manifest.yaml` 放在同一目录。随后直接运行：
+
+```bash
+./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
+```
+
+命令会按照 manifest 自动复制所需文件，生成的 `game/` 目录即可用于压缩或放回仓库。
+
+> [!NOTE]
+> FileCourier 是本仓库维护的开源小工具，源码位于 [`projects/unmanaged-vendor/tools/FileCourier/`](../../projects/unmanaged-vendor/tools/FileCourier/)，若想了解更多用法或参与改进，可直接查阅该目录。
+
 ---
 
 ## 发布到私有源（推荐）
 
 当团队具备可访问的远程包源时，建议使用仓库自带的 GitHub Actions 工作流来生成并发布 NuGet 包，步骤如下：
 
-1. **准备压缩包**：按照上文的目录约定整理 `game/` 并压缩为单个 `.zip` 文件。
+1. **准备压缩包**：依据 manifest 整理好 `game/` 目录后压缩为单个 `.zip` 文件；若已使用上节的 FileCourier，直接压缩输出即可。
 2. **配置机密**：在你的仓库 Secrets 中设置 `LF2_GAME_LIBS_URL`，存放该压缩包的下载地址。
 3. **运行工作流**：在 GitHub `Actions` 页面手动触发 `Pack and Publish Game Libraries`，填写目标版本号及压缩包地址。
 4. **等待发布完成**：工作流会自动完成解压、打包与推送，仅针对 `projects/unmanaged-vendor/` 下标记为可打包的工程生成 NuGet 包。
@@ -42,7 +55,7 @@ projects/unmanaged-vendor/
 
 若处于离线环境，或只需在本机快速验证 Mod，可按以下步骤操作：
 
-1. 将游戏 DLL 拷贝到对应的 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录。
+1. 按 manifest 把游戏 DLL 放到 `projects/unmanaged-vendor/game/<PackageId>/lib/`（如需自动化，可复用前述 FileCourier 指令）。
 2. 在仓库根目录运行下列命令打包所有游戏相关项目：
 
 ```bash

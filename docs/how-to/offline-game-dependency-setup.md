@@ -18,7 +18,7 @@
 
 此方法是解决游戏核心程序集依赖问题的最直接方案，适合快速上手、项目初期验证或快速调试。它将这些依赖打包到项目本地的 `.lf2.nupkg` 目录下，供 `dotnet restore` 直接使用，从而避免了它们的网络分发。
 
-1. **准备文件**：将需要打包的程序集（DLL 文件）放入对应 `unmanaged-vendor` 项目下的 `lib/` 目录中。关于游戏核心程序集的目录结构，请参阅 `projects/unmanaged-vendor/README.md` 中的“必要目录结构”一节。
+1. **准备文件**：按 `projects/unmanaged-vendor/game/game-libs.manifest.yaml` 中的映射，将游戏 DLL 放入对应的 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录。
 2. **打包**：在**仓库根目录**下运行下列命令，将 `unmanaged-vendor` 目录下的所有项目打包至 `.lf2.nupkg/` 文件夹，并避免在离线环境中触发额外的还原请求。
 
    ```bash
@@ -29,5 +29,17 @@
 
 > [!TIP]
 > `dotnet pack` 命令会一次性处理所选解决方案中的所有 `unmanaged-vendor` 项目。`lib` 目录为空的项目也会被正常打包成一个空包，以确保 `dotnet restore` 能够顺利执行。
+
+> [!TIP]
+> 若想跳过手动整理，可从本仓库的 Release 页面下载 FileCourier，并与 `game-libs.manifest.yaml` 放在同一目录后运行：
+>
+> ```bash
+> ./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
+> ```
+>
+> 复制完成后再将输出放回 `projects/unmanaged-vendor/game/`。
+
+> [!NOTE]
+> FileCourier 是本仓库维护的开源小工具，源码位于 [`projects/unmanaged-vendor/tools/FileCourier/`](../../projects/unmanaged-vendor/tools/FileCourier/)。
 
 完成上述步骤后，依赖恢复流程与远程私有源完全一致：执行 `dotnet restore` 即可编译 Mod。若需要切换回远程源，只需运行 `dotnet nuget disable source local` 禁用本地源，并重新启用私有源，无须额外清理本地包。
