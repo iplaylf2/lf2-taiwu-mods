@@ -119,26 +119,11 @@ jobs:
           sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
           project_dir="${{ steps.tool.outputs.tool_project_dir }}"
 
-          props_output=$(
-            cd "$sln_root_dir" && \
-            dotnet msbuild "$project_dir" -getProperty:RuntimeIdentifiers -getProperty:RuntimeIdentifier
-          )
-
-          props_output="${props_output//$'\r'/}"
-
-          rid_list=$(
-            printf '%s\n' "$props_output" \
-              | awk -F= '
-                  $1 == "RuntimeIdentifiers" && $2 != "" {print $2; found=1; exit}
-                  $1 == "RuntimeIdentifier" && single == "" {single=$2}
-                  END {
-                    if (!found && single != "") print single
-                  }
-                '
-          )
+          rid_list=$(cd "$sln_root_dir" && dotnet msbuild "$project_dir" -getProperty:RuntimeIdentifiers)
+          rid_list="${rid_list//$'\r'/}"
 
           if [ -z "$rid_list" ]; then
-            echo "::error::Project '$project_dir' does not define RuntimeIdentifiers or RuntimeIdentifier."
+            echo "::error::Project '$project_dir' does not define RuntimeIdentifiers."
             exit 1
           fi
 
@@ -146,8 +131,6 @@ jobs:
             printf '%s\n' "$rid_list" \
               | jq -R -c '
                   split(";")
-                  | map(gsub("^\\s+|\\s+$"; ""))
-                  | map(select(length > 0))
                   | map({
                       rid: .,
                       os: (if startswith("win") then "windows-latest"
