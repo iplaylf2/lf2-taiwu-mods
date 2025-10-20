@@ -6,21 +6,21 @@
     <TargetFramework Condition="'$(LF2PackageType)' == ''">$(LF2FrontendTargetFramework)</TargetFramework>
 
     <TargetFrameworks Condition="'$(LF2PackageType)' == 'common'">$(LF2CommonTargetFrameworks)</TargetFrameworks>
-    <TargetFramework Condition="'$(LF2PackageType)' == 'frontend-only'">$(LF2FrontendTargetFramework)</TargetFramework>
     <TargetFramework Condition="'$(LF2PackageType)' == 'backend-only'">$(LF2BackendTargetFramework)</TargetFramework>
+    <TargetFramework Condition="'$(LF2PackageType)' == 'frontend-only'">$(LF2FrontendTargetFramework)</TargetFramework>
 
     <Version>$(LF2TaiwuVersion)</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <TfmSpecificPackageFile
-      Condition="Exists('$(LF2PackageDir)/lib/backend') and '$(TargetFramework)' == '$(LF2BackendTargetFramework)'"
+      Condition="'$(LF2PackageType)' == 'common' or '$(LF2PackageType)' == 'backend-only'"
       Include="$(LF2PackageDir)/lib/backend/*.*"
       Pack="true"
       PackagePath="ref/$(TargetFramework)/"
     />
     <TfmSpecificPackageFile
-      Condition="Exists('$(LF2PackageDir)/lib/frontend') and '$(TargetFramework)' == '$(LF2FrontendTargetFramework)'"
+      Condition="'$(LF2PackageType)' == 'common' or '$(LF2PackageType)' == 'frontend-only'"
       Include="$(LF2PackageDir)/lib/frontend/*.*"
       Pack="true"
       PackagePath="ref/$(TargetFramework)/"
