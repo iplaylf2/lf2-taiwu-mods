@@ -1,11 +1,11 @@
 # Taiwu.Backend: 游戏的核心后端逻辑程序集。
-- target-dir: Taiwu.Backend/lib
+- target-dir: Taiwu.Backend/lib/backend
   source-files:
     - Backend/GameData.dll
     - Backend/GameData.pdb
 
 # Taiwu.Frontend: 游戏的前端相关程序集。
-- target-dir: Taiwu.Frontend/lib
+- target-dir: Taiwu.Frontend/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/Assembly-CSharp-firstpass.dll
     - ./The Scroll of Taiwu_Data/Managed/Assembly-CSharp-firstpass.pdb
@@ -42,13 +42,25 @@
     - ./The Scroll of Taiwu_Data/Managed/GameData.Utilities.Structure.dll
 
 # Taiwu.Modding: 官方 Mod 入口，Mod 必须实现其接口才能被游戏加载。
-- target-dir: Taiwu.Modding/lib
+- target-dir: Taiwu.Modding/lib/backend
+  source-files:
+    - ./The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll
+- target-dir: Taiwu.Modding/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/TaiwuModdingLib.dll
 
 # --- 第三方库依赖 ---
 
-- target-dir: Taiwu.BepInEx/lib
+- target-dir: Taiwu.BepInEx/lib/backend
+  source-files:
+    - ./The Scroll of Taiwu_Data/Managed/0Harmony.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.Mdb.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.Pdb.dll
+    - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.Rocks.dll
+    - ./The Scroll of Taiwu_Data/Managed/MonoMod.RuntimeDetour.dll
+    - ./The Scroll of Taiwu_Data/Managed/MonoMod.Utils.dll
+- target-dir: Taiwu.BepInEx/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/0Harmony.dll
     - ./The Scroll of Taiwu_Data/Managed/Mono.Cecil.dll
@@ -88,36 +100,36 @@
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/Redzen.dll
 
-- target-dir: Taiwu.Google.Protobuf/lib
+- target-dir: Taiwu.Google.Protobuf/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/Google.Protobuf.dll
 
-- target-dir: Taiwu.NLog/lib
+- target-dir: Taiwu.NLog/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/NLog.dll
 
-- target-dir: Taiwu.Spine/lib
+- target-dir: Taiwu.Spine/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/spine-csharp.dll
     - ./The Scroll of Taiwu_Data/Managed/spine-csharp.pdb
     - ./The Scroll of Taiwu_Data/Managed/spine-unity.dll
     - ./The Scroll of Taiwu_Data/Managed/spine-unity.pdb
 
-- target-dir: Taiwu.Coffee/lib
+- target-dir: Taiwu.Coffee/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/Coffee.SoftMaskForUGUI.dll
     - ./The Scroll of Taiwu_Data/Managed/Coffee.SoftMaskForUGUI.pdb
     - ./The Scroll of Taiwu_Data/Managed/Coffee.UIParticle.dll
     - ./The Scroll of Taiwu_Data/Managed/Coffee.UIParticle.pdb
 
-- target-dir: Taiwu.EasyButtons/lib
+- target-dir: Taiwu.EasyButtons/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/EasyButtons.dll
     - ./The Scroll of Taiwu_Data/Managed/EasyButtons.pdb
 
 # --- Unity 引擎核心库 ---
 
-- target-dir: Taiwu.Unity.Core/lib
+- target-dir: Taiwu.Unity.Core/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/UnityEngine.dll
     - ./The Scroll of Taiwu_Data/Managed/UnityEngine.pdb
@@ -260,7 +272,7 @@
 
 # --- Unity 引擎附加组件 ---
 
-- target-dir: Taiwu.Unity.Addons/lib
+- target-dir: Taiwu.Unity.Addons/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/Unity.Analytics.DataPrivacy.dll
     - ./The Scroll of Taiwu_Data/Managed/Unity.Analytics.DataPrivacy.pdb
@@ -283,7 +295,7 @@
 
 # --- Unity 引擎服务包 ---
 
-- target-dir: Taiwu.Unity.Services/lib
+- target-dir: Taiwu.Unity.Services/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Analytics.dll
     - ./The Scroll of Taiwu_Data/Managed/Unity.Services.Analytics.pdb

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <!-- Default framework to satisfy solution-level restore -->
+    <TargetFramework Condition="'$(LF2PackageType)' == ''">$(LF2FrontendTargetFramework)</TargetFramework>
+
+    <TargetFrameworks Condition="'$(LF2PackageType)' == 'common'">$(LF2CommonTargetFrameworks)</TargetFrameworks>
+    <TargetFramework Condition="'$(LF2PackageType)' == 'frontend-only'">$(LF2FrontendTargetFramework)</TargetFramework>
+    <TargetFramework Condition="'$(LF2PackageType)' == 'backend-only'">$(LF2BackendTargetFramework)</TargetFramework>
+
+    <Version>$(LF2TaiwuVersion)</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <TfmSpecificPackageFile
+      Condition="Exists('$(LF2PackageDir)/lib/backend') and '$(TargetFramework)' == '$(LF2BackendTargetFramework)'"
+      Include="$(LF2PackageDir)/lib/backend/*.*"
+      Pack="true"
+      PackagePath="ref/$(TargetFramework)/"
+    />
+    <TfmSpecificPackageFile
+      Condition="Exists('$(LF2PackageDir)/lib/frontend') and '$(TargetFramework)' == '$(LF2FrontendTargetFramework)'"
+      Include="$(LF2PackageDir)/lib/frontend/*.*"
+      Pack="true"
+      PackagePath="ref/$(TargetFramework)/"
+    />
+  </ItemGroup>
+</Project>

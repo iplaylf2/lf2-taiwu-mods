@@ -1,0 +1,42 @@
+<Project>
+  <Target Name="PackFromTemplates">
+    <ItemGroup>
+      <_GameLibDir Include="$(MSBuildThisFileDirectory)Taiwu.*" Condition="Exists('$(MSBuildThisFileDirectory)Taiwu.*')" />
+    </ItemGroup>
+
+    <Message Text="Found @(_GameLibDir->Count()) game library directories to pack." Importance="high" />
+
+    <MSBuild
+      Projects="$(MSBuildThisFileFile)"
+      Targets="_PackSingleLib"
+      Properties="LF2PackageDir=%(_GameLibDir.Identity);Version=$(Version)"
+      />
+  </Target>
+
+  <Target Name="_PackSingleLib">
+    <PropertyGroup>
+      <_PackageName>$([System.IO.Path]::GetFileName('$(LF2PackageDir)'))</_PackageName>
+      <_PackageId>LF2.$(_PackageName)</_PackageId>
+
+      <_HasBackend>true</_HasBackend>
+      <_HasFrontend>true</_HasFrontend>
+      <_HasBackend Condition="!Exists('$(LF2PackageDir)/lib/backend')">false</_HasBackend>
+      <_HasFrontend Condition="!Exists('$(LF2PackageDir)/lib/frontend')">false</_HasFrontend>
+
+      <_LF2PackageType>frontend-only</_LF2PackageType>
+      <_LF2PackageType Condition="$(_HasBackend) and !$(_HasFrontend)">backend-only</_LF2PackageType>
+      <_LF2PackageType Condition="!$(_HasBackend) and $(_HasFrontend)">frontend-only</_LF2PackageType>
+      <_LF2PackageType Condition="$(_HasBackend) and $(_HasFrontend)">common</_LF2PackageType>
+
+      <_TemplatePath>$(MSBuildThisFileDirectory)Template.csproj</_TemplatePath>
+    </PropertyGroup>
+
+    <Message Text="Packing $(_PackageId) from $(_PackageName) as $(_LF2PackageType)..." Importance="high" />
+
+    <MSBuild
+      Projects="$(_TemplatePath)"
+      Targets="Pack"
+      Properties="PackageId=$(_PackageId);LF2PackageDir=$(LF2PackageDir);Version=$(Version);PackageVersion=$(Version);LF2PackageType=$(_LF2PackageType)"
+      />
+  </Target>
+</Project>

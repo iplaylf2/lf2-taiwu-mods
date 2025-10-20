@@ -3,6 +3,7 @@
         <NoWarn>$(NoWarn);NU1507</NoWarn>
 
         <LF2ModsDir>$(MSBuildThisFileDirectory)projects/mods</LF2ModsDir>
+        <LF2UnmanagedVendorDir>$(MSBuildThisFileDirectory)projects/unmanaged-vendor</LF2UnmanagedVendorDir>       
         <LF2NupkgDir>$(MSBuildThisFileDirectory).lf2.nupkg</LF2NupkgDir>
         <LF2PublishDir>$(MSBuildThisFileDirectory).lf2.publish</LF2PublishDir>
 
