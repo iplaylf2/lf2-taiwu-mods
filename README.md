@@ -54,7 +54,7 @@
 
 ### 4. 构建与发布
 
-准备交付时，执行一次 `dotnet build -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
+准备交付时，执行一次 `dotnet build -c Release -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
 
 ## 进一步阅读
 
