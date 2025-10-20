@@ -73,4 +73,4 @@
 
 ## FileCourier 自动分拣工具
 
-FileCourier 是本仓库孵化中的跨平台小工具，用于根据 `game-libs.manifest.yaml` 自动从游戏安装目录复制所需 DLL 并生成符合规范的 `game/` 目录。源码位于 `projects/unmanaged-vendor/tools/FileCourier/`，我们会在此 README 中同步其目标和使用范围；如需试用或反馈问题，欢迎先参考上文的快速上手说明并在仓库提交 issue。
+FileCourier 是本仓库孵化中的跨平台小工具，用于根据 `game-libs.manifest.yaml` 自动从游戏安装目录复制所需 DLL 并生成符合规范的 `game/` 目录。源码位于 `projects/unmanaged-vendor/tools/FileCourier/`，其目标和使用范围将在此 README 中同步更新；如需试用或反馈问题，欢迎先参考上文的快速上手说明并在仓库提交 issue。
