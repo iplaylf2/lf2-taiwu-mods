@@ -4,9 +4,9 @@
 
 ## 依赖包用途说明
 
-本模板会将游戏程序集按功能拆分为不同的 NuGet 包（如 `Taiwu.Backend`、`Taiwu.Frontend` 等）。为了帮助你理解每个包的具体用途，以便在 Mod 开发中按需引用，我们提供了详细的说明文档。
+为了便于 Mod 开发，本模板已将游戏自带的众多程序集按功能整合为数个独立的 NuGet 包。若想了解每个包的详细用途、整合思路与引用建议，请参阅以下文档：
 
-- **[游戏依赖包说明](./game-dependencies.md)**：点击查阅每个核心依赖包（`Backend`、`Frontend`、`Modding`、`Patching`）的详细用途与引用场景。
+- **[游戏依赖包说明](./game-dependencies.md)**：点击查阅各依赖包的详细用途与引用场景。
 
 ## 目录结构与清单
 
@@ -16,9 +16,12 @@
 projects/unmanaged-vendor/
 `-- game/
     |-- Taiwu.Backend/
+    |-- Taiwu.BepInEx/
     |-- Taiwu.Frontend/
     |-- Taiwu.Modding/
-    `-- Taiwu.Patching/
+    |-- Taiwu.Shared/
+    |-- Taiwu.Unity.Core/
+    `-- ... (其他包)
 ```
 
 - 将游戏原始 DLL 放进 `game/<PackageId>/lib/`，打包后会作为 Mod 编译期依赖提供。manifest 为这一布局的机器可读版本，适合用来校对或脚本化处理。
