@@ -3,32 +3,45 @@
     <Message Text="[LF2GameLib] Packing game libraries..." Importance="high" />
 
     <ItemGroup>
-      <_GameLibrarySourceDir Include="$(MSBuildThisFileDirectory)Taiwu.*" />
+      <_PackageToCreate Include="$(MSBuildThisFileDirectory)Taiwu.*/**">
+        <PackageId>$([System.Text.RegularExpressions.Regex]::Replace('%(RecursiveDir)', '\/.*', ''))</PackageId>
+        <Path>$(MSBuildThisFileDirectory)%(PackageId)</Path>
+        <LF2PackageType Condition="
+          $([System.IO.Directory]::GetFiles('%(Path)/lib/backend').Length > 0) and
+          $([System.IO.Directory]::GetFiles('%(Path)/lib/frontend').Length > 0)
+        ">common</LF2PackageType>
+        <LF2PackageType Condition="
+          $([System.IO.Directory]::GetFiles('%(Path)/lib/backend').Length > 0) and
+          !$([System.IO.Directory]::GetFiles('%(Path)/lib/frontend').Length > 0)
+        ">backend-only</LF2PackageType>
+        <LF2PackageType Condition="
+          !$([System.IO.Directory]::GetFiles('%(Path)/lib/backend').Length > 0) and
+          $([System.IO.Directory]::GetFiles('%(Path)/lib/frontend').Length > 0)
+        ">frontend-only</LF2PackageType>
+      </_PackageToCreate>
     </ItemGroup>
+
+    <Message Text="[LF2GameLib] DEBUG: @(_PackageToCreate->'%(PackageId)')" Importance="high" />
 
     <ItemGroup>
-      <PackageToCreate Include="@(_GameLibrarySourceDir)">
-        <PackageId>%(Filename)</PackageId>
-        <LF2PackageType Condition=" Exists('%(Identity)/lib/backend') and  Exists('%(Identity)/lib/frontend')">common</LF2PackageType>
-        <LF2PackageType Condition=" Exists('%(Identity)/lib/backend') and !Exists('%(Identity)/lib/frontend')">backend-only</LF2PackageType>
-        <LF2PackageType Condition="!Exists('%(Identity)/lib/backend') and  Exists('%(Identity)/lib/frontend')">frontend-only</LF2PackageType>
-      </PackageToCreate>
+      <_InvalidPackage Include="@(_PackageToCreate)" Condition="'%(LF2PackageType)' == ''" />
+      <_PackageToCreate Remove="@(_InvalidPackage)" />
     </ItemGroup>
 
-    <ItemGroup>
-      <_InvalidPackage Include="@(PackageToCreate)" Condition="'%(LF2PackageType)' == ''" />
-      <PackageToCreate Remove="@(_InvalidPackage)" />
-    </ItemGroup>
+    <Message
+      Text="[LF2GameLib] WARNING: Found invalid package definitions, they will be skipped: @(_InvalidPackage->'%(Identity)', ', ')"
+      Importance="high"
+      Condition="'@(_InvalidPackage)' != ''"
+    />
 
-    <Message Text="[LF2GameLib] WARNING: Found invalid package definitions, they will be skipped: @(_InvalidPackage->'%(Identity)', ', ')" Importance="high" Condition="'@(_InvalidPackage)' != ''" />
 
     <MSBuild
       Projects="$(MSBuildThisFileDirectory)Template.csproj"
       Targets="Pack"
       Properties="
-        PackageId=%(PackageToCreate.PackageId);
-        LF2PackageDir=%(PackageToCreate.Identity);
-        LF2PackageType=%(PackageToCreate.LF2PackageType);
+        PackageId=%(_PackageToCreate.PackageId);
+        LF2PackageDir=%(_PackageToCreate.Path);
+        LF2PackageType=%(_PackageToCreate.LF2PackageType);
         Version=$(Version)
       "
     />

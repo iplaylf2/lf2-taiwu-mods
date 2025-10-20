@@ -12,7 +12,6 @@
             <_AllSourceFilesToKeep Include="$(Pkg%(_KeepPackageName.Identity))/lib/*/*.dll" />
             <_AllSourceFilesToKeep Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true')->'%(FullPath)')" />
 
-            <_DistinctSourceFilesToKeep Remove="@(_DistinctSourceFilesToKeep)" />
             <_DistinctSourceFilesToKeep Include="@(_AllSourceFilesToKeep)" />
 
             <KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename)%(Extension)')" />
