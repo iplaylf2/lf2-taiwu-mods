@@ -1,16 +1,13 @@
 <Project>
-    <PropertyGroup>
-        <Configuration>Debug</Configuration>
-        <Version>0.0.0</Version>
-
-        <_ModDir>$(MSBuildThisFileDirectory)$(LF2Mod)</_ModDir>
-        <_ArtifactsDir>$(MSBuildThisFileDirectory)artifacts</_ArtifactsDir>
-        <_PublishDir>$(LF2PublishDir)/$(LF2Mod)</_PublishDir>
-
-        <_cfg>$(Configuration.ToLowerInvariant())</_cfg>
-    </PropertyGroup>
-
     <Target Name="LF2PublishMod">
+        <PropertyGroup>
+            <_ModDir>$(MSBuildThisFileDirectory)$(LF2Mod)</_ModDir>
+            <_ArtifactsDir>$(MSBuildThisFileFileDirectory)artifacts</_ArtifactsDir>
+            <_PublishDir>$(LF2PublishDir)/$(LF2Mod)</_PublishDir>
+
+            <_cfg>$(Configuration.ToLowerInvariant())</_cfg>
+        </PropertyGroup>
+
         <ItemGroup Condition="'$(LF2Mod)' != ''">
             <_Projects Include="$(_ModDir)/**/*.csproj" />
         </ItemGroup>
@@ -20,7 +17,20 @@
             Condition="'@(_Projects)' == ''"
         />
 
-        <Message Text="Cleaning previous publish directory: $(_PublishDir)" Importance="high" />
+        <Message Text="Building projects..." Importance="high" />
+        <ItemGroup>
+            <_Properties Include="Configuration=$(Configuration);Version=$(Version)" />
+        </ItemGroup>
+
+        <Message Text="Properties: @(_Properties)" Importance="normal" />
+
+        <MSBuild
+            Projects="@(_Projects)"
+            Targets="Build"
+            Properties="@(_Properties)"
+        />
+
+        <Message Text="Cleaning and creating publish directory: $(_PublishDir)" Importance="high" />
         <RemoveDir Directories="$(_PublishDir)" />
         <MakeDir Directories="$(_PublishDir)" />
         <MakeDir Directories="$(_PublishDir)/Plugins" />
@@ -39,23 +49,7 @@
             DestinationFolder="$(_PublishDir)/%(RecursiveDir)"
         />
 
-        <ItemGroup>
-            <_Properties
-                Include="Configuration=$(Configuration);Version=$(Version)"
-            />
-        </ItemGroup>
-
-        <Message
-            Text="Properties: @(_Properties)%0aBuilding projects ..."
-            Importance="high"
-        />
-
-        <MSBuild
-            Projects="@(_Projects)"
-            Targets="Build"
-            Properties="@(_Properties)"
-        />
-
+        <Message Text="Copying compiled plugins from $(_ArtifactsDir) to $(_PublishDir)/Plugins..." Importance="high" />
         <ItemGroup>
             <_ProjectNames Include="@(_Projects->'%(Filename)')" />
 
@@ -72,7 +66,7 @@
             />
         </CreateItem>
 
-        <Message Text="Found @(_ModOutput->Count()) plugin files to copy from matched projects." Importance="high" />
+        <Message Text="Found @(_ModOutput->Count()) plugin files to copy." Importance="high" />
 
         <Copy
             SourceFiles="@(_ModOutput)"
