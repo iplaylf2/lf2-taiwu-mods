@@ -20,7 +20,7 @@
             <KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).xml')" />
         </ItemGroup>
 
-        <Message Text="Files that will be retained in output: @(KeepFiles->'%0a- %(Identity)')" Importance="high" />
+        <Message Text="[ILRepack] Analyzing assembly dependencies..." Importance="high" />
     </Target>
 
     <Target Name="_RepackRun" DependsOnTargets="_RepackPrepare">
@@ -30,6 +30,7 @@
             <_LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
         </ItemGroup>
 
+        <Message Text="[ILRepack] Merging assemblies with ILRepack..." Importance="high" />
         <ILRepack
             Parallel="true"
             Internalize="true"
@@ -51,6 +52,7 @@
             />
         </ItemGroup>
 
+        <Message Text="[ILRepack] Cleaning intermediate files..." Importance="high" />
         <Delete Files="@(_FilesToDelete)" />
 
         <ItemGroup>

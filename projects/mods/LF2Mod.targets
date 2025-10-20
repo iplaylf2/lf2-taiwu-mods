@@ -8,6 +8,8 @@
             <_cfg>$(Configuration.ToLowerInvariant())</_cfg>
         </PropertyGroup>
 
+        <Message Text="[LF2Mod] Publishing '$(LF2Mod)'..." Importance="high" />
+
         <ItemGroup Condition="'$(LF2Mod)' != ''">
             <_Projects Include="$(_ModDir)/**/*.csproj" />
         </ItemGroup>
@@ -17,25 +19,19 @@
             Condition="'@(_Projects)' == ''"
         />
 
-        <Message Text="Building projects..." Importance="high" />
-        <ItemGroup>
-            <_Properties Include="Configuration=$(Configuration);Version=$(Version)" />
-        </ItemGroup>
-
-        <Message Text="Properties: @(_Properties)" Importance="normal" />
-
         <MSBuild
             Projects="@(_Projects)"
             Targets="Build"
-            Properties="@(_Properties)"
+            Properties="
+                Configuration=$(Configuration);
+                Version=$(Version)
+            "
         />
 
-        <Message Text="Cleaning and creating publish directory: $(_PublishDir)" Importance="high" />
         <RemoveDir Directories="$(_PublishDir)" />
         <MakeDir Directories="$(_PublishDir)" />
         <MakeDir Directories="$(_PublishDir)/Plugins" />
 
-        <Message Text="Copying mod resources from $(_ModDir) to $(_PublishDir)..." Importance="high" />
         <ItemGroup>
             <_SourceCodeDirsToExclude Include="@(_Projects->'%(RootDir)%(Directory)')" />
             <_ModResources
@@ -49,7 +45,6 @@
             DestinationFolder="$(_PublishDir)/%(RecursiveDir)"
         />
 
-        <Message Text="Copying compiled plugins from $(_ArtifactsDir) to $(_PublishDir)/Plugins..." Importance="high" />
         <ItemGroup>
             <_ProjectNames Include="@(_Projects->'%(Filename)')" />
 
@@ -66,13 +61,11 @@
             />
         </CreateItem>
 
-        <Message Text="Found @(_ModOutput->Count()) plugin files to copy." Importance="high" />
-
         <Copy
             SourceFiles="@(_ModOutput)"
             DestinationFolder="$(_PublishDir)/Plugins/%(RecursiveDir)"
         />
 
-        <Message Text="Mod '$(LF2Mod)' has been successfully published to '$(_PublishDir)'" Importance="high" />
+        <Message Text="[LF2Mod] Successfully published '$(LF2Mod)' to '$(_PublishDir)'" Importance="high" />
     </Target>
 </Project>
