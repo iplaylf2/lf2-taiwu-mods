@@ -17,16 +17,16 @@ runs:
       run: |
         set -euo pipefail
         if find projects/mods -type f -name '*.csproj' -print -quit | grep -q .; then
-          exit 0
+          echo "has_projects=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "has_projects=false" >> "$GITHUB_OUTPUT"
+          echo "No mod projects found under projects/mods." >&2
         fi
-
-        echo "No mod projects found under projects/mods." >&2
-        exit 1
 
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        cache: true
+        cache: ${{ steps.check-projects.outputs.has_projects == 'true' }}
         cache-dependency-path: projects/mods/**/packages.lock.json
 
     - name: Restore NuGet packages
@@ -34,4 +34,10 @@ runs:
         GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ inputs.token }}
       shell: bash
-      run: dotnet restore --locked-mode
+      run: |
+        set -euo pipefail
+        if [ "${{ steps.check-projects.outputs.has_projects }}" == "true" ]; then
+          dotnet restore --locked-mode
+        else
+          dotnet restore
+        fi
