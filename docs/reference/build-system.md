@@ -14,11 +14,13 @@
 
 ## 打包 Mod
 
-模板在 `projects/mods/LF2Mod.targets` 中提供了 `LF2PublishMod` 目标，用来将指定的 Mod 项目打包成游戏识别的目录结构。运行以下命令即可触发打包流程，其中 `LF2Mod` 参数填写你的 Mod 目录名：
+模板在 `projects/mods/LF2Mod.targets` 中提供了 `LF2PublishMod` 目标，用来将指定的 Mod 项目打包成游戏识别的目录结构。
 
 ```bash
-dotnet build -t:LF2PublishMod -p LF2Mod=my-mod
+dotnet build -c Release -t:LF2PublishMod -p:LF2Mod=<mod-name>
 ```
+
+使用 `-c Release` 参数是触发 `ILRepack` 工具执行的关键。在 `Release` 模式下，构建系统会自动将所有必要的依赖项 DLL 合并到你的 Mod 主程序集中，生成一个独立的、不会与其他 Mod 产生依赖冲突的文件。
 
 命令会同时编译前端与后端插件，并将生成的 Mod 包写入仓库根目录的 `.lf2.publish/` 中，方便直接复制到游戏的 Mods 目录或用于后续发版操作。
 

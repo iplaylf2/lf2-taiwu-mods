@@ -28,7 +28,7 @@
 2. 在项目根目录运行 `dotnet restore`。此命令将拉取所有必需的依赖。
 
 > [!TIP]
-> **Visual Studio 用户**：Visual Studio 会在打开解决方案时自动处理大部分依赖还原。你可能无需设置环境变量，只需在 `工具 > NuGet 包管理器 > 程序包管理器设置` 中添加 GitHub 包源并配置一次凭据即可。
+> **Visual Studio 用户**：如果遇到凭据配置或 Release 编译报错等问题，请查阅专门的[环境配置指南](./docs/how-to/visual-studio-setup.md)。
 
 > [!WARNING]
 > 理想情况下，`dotnet restore` 能一键拉取所有依赖。但由于分发游戏文件存在法律风险，**本模板并未包含游戏核心库的在线包**。因此，在首次配置环境时，你可能会遇到 `NU1101` 等“包找不到”的错误。要解决此问题，你需要将这些缺失的依赖打包并推送至开发者私有的 NuGet 源。具体方法请参阅 [**非托管依赖项设置指南**](./projects/unmanaged-vendor/README.md)。
@@ -54,7 +54,7 @@
 
 ### 4. 构建与发布
 
-准备交付时，执行一次 `dotnet build -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
+准备交付时，执行一次 `dotnet build -c Release -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
 
 ## 进一步阅读
 

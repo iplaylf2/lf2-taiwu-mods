@@ -2,6 +2,12 @@
 
 本文提供打包《太吾绘卷》官方程序集所需的完整信息，涵盖目录规范、FileCourier 自动分拣、远程私有源发布以及离线/本地打包方案。How-to 文档会针对具体场景给出快速步骤，若需更细节的说明或想在两种方案之间切换，请以本手册为准。
 
+## 依赖包用途说明
+
+本模板会将游戏程序集按功能拆分为不同的 NuGet 包（如 `Taiwu.Backend`、`Taiwu.Frontend` 等）。为了帮助你理解每个包的具体用途，以便在 Mod 开发中按需引用，我们提供了详细的说明文档。
+
+- **[游戏依赖包说明](./game-dependencies.md)**：点击查阅每个核心依赖包（`Backend`、`Frontend`、`Modding`、`Patching`）的详细用途与引用场景。
+
 ## 目录结构与清单
 
 所有待打包的 DLL 需遵循 `projects/unmanaged-vendor/game/` 下的目录布局。`projects/unmanaged-vendor/game/game-libs.manifest.yaml` 已按包 ID → 目标 `lib/` 目录列出完整清单，可直接照单整理。

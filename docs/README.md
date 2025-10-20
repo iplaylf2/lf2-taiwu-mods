@@ -10,6 +10,7 @@
   - [使用 GitHub Actions 发布游戏依赖](./how-to/game-libs-remote-publish.md)：准备官方游戏 DLL、运行自动化工作流并验证私有源中的包。
 - **参考资料**
   - [构建系统参考](./reference/build-system.md)：查阅 MSBuild 变量与核心工具说明，支持进一步定制。
+  - [游戏依赖包说明](./reference/game-dependencies.md)：了解 `Backend`、`Frontend` 等核心依赖包的用途与引用场景。
   - [仓库目录结构](./reference/repository-layout.md)：了解模板的标准目录划分及职责说明。
 - **项目附录**
   - [`projects/mods/README.md`](../projects/mods/README.md)：面向玩家与开发者的仓库内 Mod 导览。
