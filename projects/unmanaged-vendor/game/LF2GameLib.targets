@@ -1,42 +1,41 @@
 <Project>
-  <Target Name="PackFromTemplates">
+  <Target Name="PackGameLibraries">
     <ItemGroup>
-      <_GameLibDir Include="$(MSBuildThisFileDirectory)Taiwu.*" Condition="Exists('$(MSBuildThisFileDirectory)Taiwu.*')" />
+      <_GameLibrarySourceDir Include="$(MSBuildThisFileDirectory)Taiwu.*" />
     </ItemGroup>
 
-    <Message Text="Found @(_GameLibDir->Count()) game library directories to pack." Importance="high" />
+    <Message Text="Found @(_GameLibrarySourceDir->Count()) game library directories to pack." Importance="high" />
+
+    <ItemGroup>
+      <PackageToCreate Include="@(_GameLibrarySourceDir)">
+        <PackageName>%(Filename)</PackageName>
+        <PackageId>LF2.%(Filename)</PackageId>
+        <LF2PackageType Condition=" Exists('%(Identity)/lib/backend') and  Exists('%(Identity)/lib/frontend')">common</LF2PackageType>
+        <LF2PackageType Condition=" Exists('%(Identity)/lib/backend') and !Exists('%(Identity)/lib/frontend')">backend-only</LF2PackageType>
+        <LF2PackageType Condition="!Exists('%(Identity)/lib/backend') and  Exists('%(Identity)/lib/frontend')">frontend-only</LF2PackageType>
+      </PackageToCreate>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_InvalidPackage Include="@(PackageToCreate)" Condition="'%(LF2PackageType)' == ''" />
+      <PackageToCreate Remove="@(_InvalidPackage)" />
+    </ItemGroup>
+
+    <Warning Text="Skipping package '%(_InvalidPackage.PackageName)' because its type could not be determined (neither 'lib/backend' nor 'lib/frontend' exist)." Condition="'@(_InvalidPackage)' != ''" />
+
+    <Message Text="Packing %(PackageToCreate.PackageId) from %(PackageToCreate.PackageName) as %(PackageToCreate.LF2PackageType)..." Importance="high" />
+
+    <ItemGroup>
+      <_Properties Include="PackageId=%(PackageToCreate.PackageId)" />
+      <_Properties Include="LF2PackageDir=%(PackageToCreate.Identity)" />
+      <_Properties Include="LF2PackageType=%(PackageToCreate.LF2PackageType)" />
+      <_Properties Include="Version=$(Version);PackageVersion=$(Version)" />
+    </ItemGroup>
 
     <MSBuild
-      Projects="$(MSBuildThisFileFile)"
-      Targets="_PackSingleLib"
-      Properties="LF2PackageDir=%(_GameLibDir.Identity);Version=$(Version)"
-      />
-  </Target>
-
-  <Target Name="_PackSingleLib">
-    <PropertyGroup>
-      <_PackageName>$([System.IO.Path]::GetFileName('$(LF2PackageDir)'))</_PackageName>
-      <_PackageId>LF2.$(_PackageName)</_PackageId>
-
-      <_HasBackend>true</_HasBackend>
-      <_HasFrontend>true</_HasFrontend>
-      <_HasBackend Condition="!Exists('$(LF2PackageDir)/lib/backend')">false</_HasBackend>
-      <_HasFrontend Condition="!Exists('$(LF2PackageDir)/lib/frontend')">false</_HasFrontend>
-
-      <_LF2PackageType>frontend-only</_LF2PackageType>
-      <_LF2PackageType Condition="$(_HasBackend) and !$(_HasFrontend)">backend-only</_LF2PackageType>
-      <_LF2PackageType Condition="!$(_HasBackend) and $(_HasFrontend)">frontend-only</_LF2PackageType>
-      <_LF2PackageType Condition="$(_HasBackend) and $(_HasFrontend)">common</_LF2PackageType>
-
-      <_TemplatePath>$(MSBuildThisFileDirectory)Template.csproj</_TemplatePath>
-    </PropertyGroup>
-
-    <Message Text="Packing $(_PackageId) from $(_PackageName) as $(_LF2PackageType)..." Importance="high" />
-
-    <MSBuild
-      Projects="$(_TemplatePath)"
+      Projects="$(MSBuildThisFileDirectory)Template.csproj"
       Targets="Pack"
-      Properties="PackageId=$(_PackageId);LF2PackageDir=$(LF2PackageDir);Version=$(Version);PackageVersion=$(Version);LF2PackageType=$(_LF2PackageType)"
-      />
+      Properties="@(_PackageBuildProperties)"
+    />
   </Target>
 </Project>
