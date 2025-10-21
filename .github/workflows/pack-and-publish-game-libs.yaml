@@ -30,6 +30,7 @@ jobs:
         run: |
           set -euo pipefail
 
+          sln_file="game.slnx"
           sln_root_dir="projects/unmanaged-vendor/game"
           property_source_project_abs=$(find "$sln_root_dir" -type f -name '*.csproj' -print -quit)
           if [ -z "$property_source_project_abs" ]; then
@@ -40,6 +41,7 @@ jobs:
           property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
 
           {
+            echo "sln_file=$sln_file"
             echo "sln_root_dir=$sln_root_dir"
             echo "property_source_project=$property_source_project_rel"
           } >> "$GITHUB_OUTPUT"
@@ -99,12 +101,14 @@ jobs:
       - name: Pack Libraries
         run: |
           set -euo pipefail
+
           version="${{ github.event.inputs.version }}"
+          sln_file="${{ steps.config.outputs.sln_file }}"
           sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
 
           echo "Packing unmanaged vendor projects..."
 
-          dotnet build $sln_root_dir \
+          dotnet build $sln_root_dir/sln_file \
               -t:LF2PackGameLibs \
               -c Release \
               -p:Version="$version" \
