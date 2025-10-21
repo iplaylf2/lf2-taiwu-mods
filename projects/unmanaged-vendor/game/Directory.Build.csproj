@@ -4,7 +4,7 @@
         Condition="'' != $([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"
     />
 
-    <Property>
+    <PropertyGroup>
         <Version>$(LF2TaiwuVersion)</Version>
-    </Property>
+    </PropertyGroup>
 </Project>
