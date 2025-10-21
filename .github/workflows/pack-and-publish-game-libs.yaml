@@ -103,13 +103,11 @@ jobs:
           sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
 
           echo "Packing unmanaged vendor projects..."
-          (
-            cd "$sln_root_dir"
-            dotnet build \
+
+          dotnet build $sln_root_dir \
               -t:LF2PackGameLibs \
               -c Release \
               -p:Version="$version" \
-          )
 
       - name: Publish to NuGet Source
         run: |
