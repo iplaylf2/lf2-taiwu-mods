@@ -2,7 +2,7 @@
     <Target Name="LF2PublishMod">
         <PropertyGroup>
             <_ModDir>$(MSBuildThisFileDirectory)$(LF2Mod)</_ModDir>
-            <_ArtifactsDir>$(MSBuildThisFileFileDirectory)artifacts</_ArtifactsDir>
+            <_ArtifactsDir>$(MSBuildThisFileDirectory)artifacts</_ArtifactsDir>
             <_PublishDir>$(LF2PublishDir)/$(LF2Mod)</_PublishDir>
 
             <_cfg>$(Configuration.ToLowerInvariant())</_cfg>
