@@ -44,14 +44,14 @@
 
 1. **创建你的仓库**：将本仓库作为模板 (Use this template) 或直接 Fork 来创建你自己的仓库。
 2. **配置仓库机密**：为避免在日志中暴露下载地址，工作流将从名为 `LF2_GAME_LIBS_URL` 的[仓库机密](https://docs.github.com/zh/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository)中读取游戏库的下载地址。请预先在你的仓库中设置该机密。
-3. **运行工作流**：在你的仓库 `Actions` 页面找到 `Pack and Publish Game Libraries` 工作流。
+3. **运行工作流**：在你的仓库 `Actions` 页面找到 `Publish Game Libraries` 工作流。
 4. **提供参数并执行**：根据工作流的提示，提供游戏库的版本号与压缩包下载地址。工作流会自动下载并解压你准备的压缩包。
 
 工作流会自动识别 `projects/unmanaged-vendor/` 下标记为可打包的工程并生成对应的 NuGet 包，无需额外配置。
 
 > [!NOTE]
 > **工作流可能不会立即显示**
-> 由于 [GitHub 的一个已知问题](https://github.com/orgs/community/discussions/25219)，基于模板创建的仓库，其工作流（Workflows）可能不会自动出现在 `Actions` 页面。如果 `Pack and Publish Game Libraries` 工作流没有显示，你可能需要对工作流文件（例如，在 `.github/workflows/` 目录下）进行一次重命名（或任意修改）并提交，才能触发 GitHub Actions 的识别。
+> 由于 [GitHub 的一个已知问题](https://github.com/orgs/community/discussions/25219)，基于模板创建的仓库，其工作流（Workflows）可能不会自动出现在 `Actions` 页面。如果 `Publish Game Libraries` 工作流没有显示，你可能需要对工作流文件（例如，在 `.github/workflows/` 目录下）进行一次重命名（或任意修改）并提交，才能触发 GitHub Actions 的识别。
 
 ### 必要目录结构：游戏核心程序集
 

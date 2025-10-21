@@ -1,4 +1,4 @@
-name: Pack and Publish Game Libraries
+name: Publish Game Libraries
 
 on:
   workflow_dispatch:
