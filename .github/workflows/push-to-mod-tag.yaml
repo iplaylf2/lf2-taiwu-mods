@@ -103,7 +103,7 @@ jobs:
           sln_file="${{ steps.config.outputs.sln_file }}"
           sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
 
-          dotnet build $sln_root_dir/sln_file \
+          dotnet build $sln_root_dir/$sln_file \
               -t:LF2PublishMod \
               -c Release \
               -p:LF2Mod="${{ steps.parse-tag.outputs.mod_name }}" \

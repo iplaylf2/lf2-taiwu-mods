@@ -108,7 +108,7 @@ jobs:
 
           echo "Packing unmanaged vendor projects..."
 
-          dotnet build $sln_root_dir/sln_file \
+          dotnet build $sln_root_dir/$sln_file \
               -t:LF2PackGameLibs \
               -c Release \
               -p:Version="$version" \
