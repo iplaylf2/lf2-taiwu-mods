@@ -3,4 +3,8 @@
         <LF2NeedBackendReference Condition="'$(TargetFramework)' == '$(LF2BackendTargetFramework)'">true</LF2NeedBackendReference>
         <LF2NeedFrontendReference Condition="'$(TargetFramework)' == '$(LF2FrontendTargetFramework)'">true</LF2NeedFrontendReference>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="LF2.Taiwu.Newtonsoft.Json" />
+    </ItemGroup>
 </Project>

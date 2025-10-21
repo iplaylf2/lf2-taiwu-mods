@@ -18,9 +18,15 @@
 
         <PackageVersion Include="LF2.UniTask" Version="$(LF2UniTaskVersion)-$(LF2TaiwuUnityVersion)" />
 
+        <PackageVersion Include="LF2.Taiwu.Modding" Version="$(LF2TaiwuVersion)" />
         <PackageVersion Include="LF2.Taiwu.Backend" Version="$(LF2TaiwuVersion)" />
         <PackageVersion Include="LF2.Taiwu.Frontend" Version="$(LF2TaiwuVersion)" />
-        <PackageVersion Include="LF2.Taiwu.Modding" Version="$(LF2TaiwuVersion)" />
-        <PackageVersion Include="LF2.Taiwu.Patching" Version="$(LF2TaiwuVersion)" />
+        <PackageVersion Include="LF2.Taiwu.Shared" Version="$(LF2TaiwuVersion)" />
+
+        <PackageVersion Include="LF2.Taiwu.BepInEx" Version="$(LF2TaiwuVersion)" />
+
+        <PackageVersion Include="LF2.Taiwu.Unity.Core" Version="$(LF2TaiwuVersion)" />
+        <PackageVersion Include="LF2.Taiwu.Newtonsoft.Json" Version="$(LF2TaiwuVersion)" />
+        <PackageVersion Include="LF2.Taiwu.Redzen" Version="$(LF2TaiwuVersion)" />
     </ItemGroup>
 </Project>

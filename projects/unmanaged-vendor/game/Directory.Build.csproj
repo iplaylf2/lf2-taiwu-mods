@@ -7,8 +7,4 @@
     <PropertyGroup>
         <Version>$(LF2TaiwuVersion)</Version>
     </PropertyGroup>
-
-    <ItemGroup>
-        <TfmSpecificPackageFile Include="lib/*.*" Pack="true" PackagePath="ref/$(TargetFramework)/" />
-    </ItemGroup>
 </Project>

@@ -3,10 +3,11 @@
         <NoWarn>$(NoWarn);NU1507</NoWarn>
 
         <LF2ModsDir>$(MSBuildThisFileDirectory)projects/mods</LF2ModsDir>
+        <LF2UnmanagedVendorDir>$(MSBuildThisFileDirectory)projects/unmanaged-vendor</LF2UnmanagedVendorDir>       
         <LF2NupkgDir>$(MSBuildThisFileDirectory).lf2.nupkg</LF2NupkgDir>
         <LF2PublishDir>$(MSBuildThisFileDirectory).lf2.publish</LF2PublishDir>
 
-        <LF2TaiwuVersion>0.0.79.50-test</LF2TaiwuVersion>
+        <LF2TaiwuVersion>0.0.79.50-test.2</LF2TaiwuVersion>
 
         <LF2TaiwuUnityVersion>2022.3.14f</LF2TaiwuUnityVersion>
         <LF2UniTaskVersion>2.5.10</LF2UniTaskVersion>

@@ -25,6 +25,7 @@ jobs:
         run: |
           set -euo pipefail
 
+          sln_file="lf2-taiwu-mods.slnx"
           sln_root_dir="."
           property_source_project_abs=$(
             find "$sln_root_dir/projects/mods" -type f -name '*.csproj' -print \
@@ -40,6 +41,7 @@ jobs:
           property_source_project_rel=$(realpath --relative-to="$sln_root_dir" "$property_source_project_abs")
 
           {
+            echo "sln_file=$sln_file"
             echo "sln_root_dir=$sln_root_dir"
             echo "property_source_project=$property_source_project_rel"
           } >> "$GITHUB_OUTPUT"
@@ -97,15 +99,15 @@ jobs:
       - name: Build and Publish Mod
         run: |
           set -euo pipefail
+
+          sln_file="${{ steps.config.outputs.sln_file }}"
           sln_root_dir="${{ steps.config.outputs.sln_root_dir }}"
-          (
-            cd "$sln_root_dir" && \
-            dotnet build \
+
+          dotnet build "$sln_root_dir/$sln_file" \
               -t:LF2PublishMod \
               -c Release \
               -p:LF2Mod="${{ steps.parse-tag.outputs.mod_name }}" \
               -p:Version="${{ steps.parse-tag.outputs.version }}"
-          )
 
       - name: Package Artifact for Release
         id: package

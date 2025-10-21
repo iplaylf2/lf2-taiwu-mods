@@ -1,4 +1,8 @@
 <Project>
+    <PropertyGroup>
+        <Version>0.0.0</Version>
+    </PropertyGroup>
+
     <Target Name="RepackForBuild" AfterTargets="Build">
         <CallTarget Targets="_RepackRun" />
     </Target>
@@ -12,7 +16,6 @@
             <_AllSourceFilesToKeep Include="$(Pkg%(_KeepPackageName.Identity))/lib/*/*.dll" />
             <_AllSourceFilesToKeep Include="@(Reference->WithMetadataValue('LF2KeepItAsIs', 'true')->'%(FullPath)')" />
 
-            <_DistinctSourceFilesToKeep Remove="@(_DistinctSourceFilesToKeep)" />
             <_DistinctSourceFilesToKeep Include="@(_AllSourceFilesToKeep)" />
 
             <KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename)%(Extension)')" />
@@ -20,7 +23,7 @@
             <KeepFiles Include="@(_AllSourceFilesToKeep->'$(OutputPath)%(Filename).xml')" />
         </ItemGroup>
 
-        <Message Text="Files that will be retained in output: @(KeepFiles->'%0a- %(Identity)')" Importance="high" />
+        <Message Text="[ILRepack] Analyzing assembly dependencies..." Importance="high" />
     </Target>
 
     <Target Name="_RepackRun" DependsOnTargets="_RepackPrepare">
@@ -30,6 +33,7 @@
             <_LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
         </ItemGroup>
 
+        <Message Text="[ILRepack] Merging assemblies with ILRepack..." Importance="high" />
         <ILRepack
             Parallel="true"
             Internalize="true"
@@ -51,6 +55,7 @@
             />
         </ItemGroup>
 
+        <Message Text="[ILRepack] Cleaning intermediate files..." Importance="high" />
         <Delete Files="@(_FilesToDelete)" />
 
         <ItemGroup>

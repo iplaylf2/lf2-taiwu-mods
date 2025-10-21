@@ -6,7 +6,28 @@
 
 - 已依据 manifest 整理好 `projects/unmanaged-vendor/game/` 目录，并压缩为单个 `.zip`（或确认有可下载的压缩包）。
 - GitHub 仓库的 Secrets 中已配置目标包源的访问凭据。
-- 了解你的私有源地址，稍后会写入 `nuget.config`。
+- 了解你的私有源地址，后续步骤中需要将它写入 `nuget.config`。
+
+## 确保包的私有性
+
+由于重新分发游戏文件存在法律风险，将这些依赖包设为**私有**至关重要。
+
+包的默认可见性取决于仓库的所有者：
+
+- **组织仓库**：在公开仓库中发布的包，默认可见性是**私有**的。这是最安全的情况。
+- **个人仓库**：在公开仓库中发布的包，默认可见性是**公开**的。**这会带来法律风险**，你必须采取额外步骤确保其私有性。
+
+如果你的仓库是**个人仓库**，你有两种方法处理首次发布的可见性问题。
+
+### 方法一：手动设置
+
+在工作流完成**第一次**发布后，立刻访问你的 GitHub Packages 页面，找到新发布的包，进入其设置页面，将可见性手动更改为**私有**。
+
+### 方法二：利用私有仓库
+
+这是一个一次性的便捷技巧，适合在项目初始化时使用。
+
+在**首次**运行工作流之前，将你的仓库临时设置为**私有**。这样，发布的包将自动成为私有包。发布完成后，你可以再将仓库设为公开。
 
 ## 操作步骤
 
@@ -14,16 +35,19 @@
    将整理好的压缩包上传到团队内部可访问的位置，并在仓库 Secrets 中设置或更新 `LF2_GAME_LIBS_URL`。
 
 2. **触发工作流**  
-   打开 GitHub `Actions`，选择 `Pack and Publish Game Libraries` 工作流，点击 `Run workflow`。  
-   工作流会自动读取 `LF2_GAME_LIBS_URL` 指向的压缩包，无需在界面上填写下载链接。  
+   打开 GitHub `Actions`，选择 `Publish Game Libraries` 工作流，点击 `Run workflow`。  
+   工作流会从仓库的 Secrets 读取 `LF2_GAME_LIBS_URL` 机密，并以此作为压缩包的下载地址。  
    - `Package Version`：填写希望发布的游戏依赖版本号。  
    - `Source`（可选）：如需推送到自定义 NuGet 源，填写目标源地址；留空则使用仓库所有者的 GitHub Packages。
 
 3. **等待自动化执行**  
-   工作流会下载压缩包、覆盖 `projects/unmanaged-vendor/game/` 目录、执行 `dotnet pack` 并推送包到目标私有源。依赖的打包策略与 reference 文档中描述的一致，无需手动操作。
+   工作流会下载压缩包、覆盖 `projects/unmanaged-vendor/game/` 目录、执行打包命令并推送包到目标私有源。依赖的打包策略与 reference 文档中描述的一致，无需手动操作。
 
 4. **在本地消费包**  
-   - 打开仓库根目录的 `nuget.config`，新增或启用一个指向私有源的 `<add>` 条目。  
+   下一步是在本地的 `nuget.config` 文件中配置私有源。工作流默认使用当前仓库所有者的 GitHub Packages 源。例如，如果你的仓库是 `https://github.com/MyUser/MyRepo`，那么对应的源地址就是 `https://nuget.pkg.github.com/MyUser/index.json`。
+
+   完成配置的步骤如下：
+   - 打开仓库根目录的 `nuget.config`，新增或启用一个指向该私有源的 `<add>` 条目。
    - 运行 `dotnet restore`，即可从私有源获取游戏依赖。
 
 ## 常见问题

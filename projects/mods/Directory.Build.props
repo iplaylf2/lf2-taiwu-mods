@@ -36,7 +36,7 @@
 
     <ItemGroup Condition="'$(LF2IsModEntry)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Modding" />
-        <PackageReference Include="LF2.Taiwu.Patching" />
+        <PackageReference Include="LF2.Taiwu.BepInEx" />
 
         <PackageReference Include="LF2.Transil" />
 

@@ -1,4 +1,5 @@
 <Project>
     <Import Project="$(MSBuildThisFileDirectory)Directory.Build.props" />
     <Import Project="$(LF2ModsDir)/LF2Mod.targets" />
+    <Import Project="$(LF2UnmanagedVendorDir)/game/LF2GameLib.targets" />
 </Project>

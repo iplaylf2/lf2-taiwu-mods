@@ -4,9 +4,9 @@
 
 ## 依赖包用途说明
 
-本模板会将游戏程序集按功能拆分为不同的 NuGet 包（如 `Taiwu.Backend`、`Taiwu.Frontend` 等）。为了帮助你理解每个包的具体用途，以便在 Mod 开发中按需引用，我们提供了详细的说明文档。
+为了便于 Mod 开发，本模板已将游戏自带的众多程序集按功能整合为数个独立的 NuGet 包。若想了解每个包的详细用途、整合思路与引用建议，请参阅以下文档：
 
-- **[游戏依赖包说明](./game-dependencies.md)**：点击查阅每个核心依赖包（`Backend`、`Frontend`、`Modding`、`Patching`）的详细用途与引用场景。
+- **[游戏依赖包说明](./game-dependencies.md)**：点击查阅各依赖包的详细用途与引用场景。
 
 ## 目录结构与清单
 
@@ -16,9 +16,12 @@
 projects/unmanaged-vendor/
 `-- game/
     |-- Taiwu.Backend/
+    |-- Taiwu.BepInEx/
     |-- Taiwu.Frontend/
     |-- Taiwu.Modding/
-    `-- Taiwu.Patching/
+    |-- Taiwu.Shared/
+    |-- Taiwu.Unity.Core/
+    `-- ... (其他包)
 ```
 
 - 将游戏原始 DLL 放进 `game/<PackageId>/lib/`，打包后会作为 Mod 编译期依赖提供。manifest 为这一布局的机器可读版本，适合用来校对或脚本化处理。
@@ -44,11 +47,11 @@ projects/unmanaged-vendor/
 
 ## 通过 GitHub Actions 发布到私有源
 
-当团队具备可访问的远程包源时，推荐使用仓库自带的 GitHub Actions 工作流来生成并发布 NuGet 包。
+当团队具备可访问的远程包源时，推荐使用仓库自带的 GitHub Actions 工作流来生成并发布 NuGet 包。以下是此方案的步骤摘要，如需更详尽的演练，请参阅《[使用 GitHub Actions 发布游戏依赖](../how-to/game-libs-remote-publish.md)》。
 
 1. **准备压缩包**：依据 manifest 整理好 `game/` 目录后压缩为单个 `.zip` 文件；若已使用上一节的 FileCourier，直接压缩输出即可。
 2. **配置机密**：在仓库 Secrets 中设置 `LF2_GAME_LIBS_URL`，存放该压缩包的下载地址。
-3. **运行工作流**：在 GitHub `Actions` 页面手动触发 `Pack and Publish Game Libraries`，填写目标版本号（`Package Version`），若需覆盖默认推送目标可在 `Source` 字段填写自定义 NuGet 源；压缩包地址会从 `LF2_GAME_LIBS_URL` 机密中读取，无需手动输入。
+3. **运行工作流**：在 GitHub `Actions` 页面手动触发 `Publish Game Libraries`，填写目标版本号（`Package Version`），若需覆盖默认推送目标可在 `Source` 字段填写自定义 NuGet 源；压缩包地址将从仓库机密 `LF2_GAME_LIBS_URL` 中获取。
 4. **等待发布完成**：工作流会自动完成解压、打包与推送，仅针对 `projects/unmanaged-vendor/` 下标记为可打包的工程生成 NuGet 包。
 5. **消费依赖**：在仓库根目录的 `nuget.config` 中新增（或启用）一个指向你私有包源的 `<add>` 条目，并为其配置凭据，然后执行 `dotnet restore`。
 
@@ -56,13 +59,13 @@ projects/unmanaged-vendor/
 
 ## 在离线或受限环境下本地打包
 
-当无法使用远程私有源时，可在本地生成 NuGet 包并通过仓库已预置的 `local` 源供 `dotnet` 直接读取。
+当无法使用远程私有源时，可在本地生成 NuGet 包并通过仓库已预置的 `local` 源供 `dotnet` 直接读取。以下是此方案的步骤摘要，如需更详尽的演练，请参阅《[离线环境下的游戏依赖准备](../how-to/game-libs-offline-setup.md)》。
 
 1. **整理 DLL**：按 `game-libs.manifest.yaml` 将文件放入 `projects/unmanaged-vendor/game/<PackageId>/lib/`。若不想手动整理，可复用 FileCourier。
 2. **打包**：在仓库根目录运行：
 
    ```bash
-   dotnet pack ./projects/unmanaged-vendor/game/game.slnx -c Release
+   dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs
    ```
 
    该命令会把所有 `unmanaged-vendor/game` 项目打包到 `.lf2.nupkg/` 目录。
@@ -79,5 +82,5 @@ projects/unmanaged-vendor/
 
 1. 更新仓库根目录 `Directory.Build.props` 中的 `LF2TaiwuVersion`。
 2. 用新版本 DLL 覆盖 `game/` 下的 `lib/` 文件。
-3. 通过 GitHub Actions 工作流或本地执行 `dotnet pack ./projects/unmanaged-vendor/game/game.slnx` 重新生成 NuGet 包。
+3. 通过 GitHub Actions 工作流或本地执行 `dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs` 重新生成 NuGet 包。
 4. 在 Mod 项目上执行 `dotnet restore` 与一次 `dotnet build -t:LF2PublishMod`，确认依赖链在新版下仍能顺利编译。

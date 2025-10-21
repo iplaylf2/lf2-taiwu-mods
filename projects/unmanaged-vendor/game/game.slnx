@@ -1,6 +1,5 @@
 <Solution>
-    <Project Path="Taiwu.Backend/Taiwu.Backend.csproj" />
-    <Project Path="Taiwu.Frontend/Taiwu.Frontend.csproj" />
-    <Project Path="Taiwu.Modding/Taiwu.Modding.csproj" />
-    <Project Path="Taiwu.Patching/Taiwu.Patching.csproj" />
+  <Project Path="Backend/Backend.csproj" />
+  <Project Path="Common/Common.csproj" />
+  <Project Path="Frontend/Frontend.csproj" />
 </Solution>

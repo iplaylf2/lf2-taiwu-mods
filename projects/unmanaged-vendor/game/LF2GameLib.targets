@@ -1,0 +1,47 @@
+<Project>
+  <PropertyGroup>
+    <Version>$(LF2TaiwuVersion)</Version>
+  </PropertyGroup>
+
+  <Target Name="LF2PackGameLibs">
+    <Message Text="[LF2GameLib] Packing game libraries..." Importance="high" />
+
+    <ItemGroup>
+      <_SourceFiles Include="$(MSBuildThisFileDirectory)Taiwu.*/**" />
+
+      <_SourcePackages
+        Include="$([System.Text.RegularExpressions.Regex]::Replace('%(_SourceFiles.RecursiveDir)', '\/.*', ''))"
+      />
+      <_SourcePackages>
+        <PackageName>%(Identity)</PackageName>
+        <PackageDir>$(MSBuildThisFileDirectory)%(Identity)</PackageDir>
+      </_SourcePackages>
+
+      <_TargetPackages Include="@(_SourcePackages)">
+        <Project Condition="
+          Exists('%(PackageDir)/lib/backend') and
+          Exists('%(PackageDir)/lib/frontend')
+        ">Common/Common.csproj</Project>
+        <Project Condition="
+           Exists('%(PackageDir)/lib/backend') and
+          !Exists('%(PackageDir)/lib/frontend')
+        ">Backend/Backend.csproj</Project>
+        <Project Condition="
+          !Exists('%(PackageDir)/lib/backend') and
+           Exists('%(PackageDir)/lib/frontend')
+        ">Frontend/Frontend.csproj</Project>
+      </_TargetPackages>
+    </ItemGroup>
+
+    <MSBuild
+      Projects="$(MSBuildThisFileDirectory)%(_TargetPackages.Project)"
+      Targets="Pack"
+      Properties="
+        PackageId=LF2.%(_TargetPackages.PackageName);
+        LF2PackageDir=%(_TargetPackages.PackageDir);
+        Configuration=$(Configuration);
+        Version=$(Version)
+      "
+    />
+  </Target>
+</Project>
