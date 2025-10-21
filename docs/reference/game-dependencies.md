@@ -38,6 +38,7 @@
 游戏本体依赖了大量第三方库。为了避免 Mod 引入不兼容的版本导致冲突，这些库也被一并打包。当你的 Mod 需要使用到这些库时，**应优先引用这些 `Taiwu.*` 的版本**。
 
 例如：
+
 - **`Taiwu.Newtonsoft.Json`**：用于处理 JSON 序列化。
 - **`Taiwu.MoonSharp`**：用于执行 Lua 脚本。
 - ...以及其他如 `Google.Protobuf`, `NLog`, `Spine` 等。
