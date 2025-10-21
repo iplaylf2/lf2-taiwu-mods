@@ -47,7 +47,7 @@ projects/unmanaged-vendor/
 
 ## 通过 GitHub Actions 发布到私有源
 
-当团队具备可访问的远程包源时，推荐使用仓库自带的 GitHub Actions 工作流来生成并发布 NuGet 包。
+当团队具备可访问的远程包源时，推荐使用仓库自带的 GitHub Actions 工作流来生成并发布 NuGet 包。以下是此方案的步骤摘要，如需更详尽的演练，请参阅《[使用 GitHub Actions 发布游戏依赖](../how-to/game-libs-remote-publish.md)》。
 
 1. **准备压缩包**：依据 manifest 整理好 `game/` 目录后压缩为单个 `.zip` 文件；若已使用上一节的 FileCourier，直接压缩输出即可。
 2. **配置机密**：在仓库 Secrets 中设置 `LF2_GAME_LIBS_URL`，存放该压缩包的下载地址。
@@ -59,7 +59,7 @@ projects/unmanaged-vendor/
 
 ## 在离线或受限环境下本地打包
 
-当无法使用远程私有源时，可在本地生成 NuGet 包并通过仓库已预置的 `local` 源供 `dotnet` 直接读取。
+当无法使用远程私有源时，可在本地生成 NuGet 包并通过仓库已预置的 `local` 源供 `dotnet` 直接读取。以下是此方案的步骤摘要，如需更详尽的演练，请参阅《[离线环境下的游戏依赖准备](../how-to/game-libs-offline-setup.md)》。
 
 1. **整理 DLL**：按 `game-libs.manifest.yaml` 将文件放入 `projects/unmanaged-vendor/game/<PackageId>/lib/`。若不想手动整理，可复用 FileCourier。
 2. **打包**：在仓库根目录运行：

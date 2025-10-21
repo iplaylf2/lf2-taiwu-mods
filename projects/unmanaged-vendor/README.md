@@ -49,6 +49,10 @@
 
 工作流会自动识别 `projects/unmanaged-vendor/` 下标记为可打包的工程并生成对应的 NuGet 包，无需额外配置。
 
+> [!WARNING]
+> **个人仓库的包可见性风险**
+> 若你的仓库是**个人**公开仓库，工作流创建的包将默认为**公开**。由于存在法律风险，你必须在首次发布后，手动将包的可见性设为**私有**。组织仓库无此风险。更详细的说明请参阅[操作指南](../../docs/how-to/game-libs-remote-publish.md)。
+
 > [!NOTE]
 > **工作流可能不会立即显示**
 > 由于 [GitHub 的一个已知问题](https://github.com/orgs/community/discussions/25219)，基于模板创建的仓库，其工作流（Workflows）可能不会自动出现在 `Actions` 页面。如果 `Publish Game Libraries` 工作流没有显示，你可能需要对工作流文件（例如，在 `.github/workflows/` 目录下）进行一次重命名（或任意修改）并提交，才能触发 GitHub Actions 的识别。
@@ -61,7 +65,7 @@
 
 当你的私有源上已经有打包好的游戏依赖后，你和其他团队成员便需要配置本地环境来使用它。
 
-这通常只需要在根目录的 `nuget.config` 文件中，为你的私有包源新增一个 `<add>` 条目，并配置对应的凭据。请保留示例中提供的 `iplaylf2` 源，以便持续访问公开维护的依赖。
+这通常只需要在根目录的 `nuget.config` 文件中，为你的私有包源新增一个 `<add>` 条目。例如，若你的 GitHub 用户名是 `MyUser`，则源地址为 `https://nuget.pkg.github.com/MyUser/index.json`。同时，你还需要配置对应的凭据。请保留示例中提供的 `iplaylf2` 源，以便持续访问公开维护的依赖。
 
 > [!NOTE]
 > **清理冲突源**
