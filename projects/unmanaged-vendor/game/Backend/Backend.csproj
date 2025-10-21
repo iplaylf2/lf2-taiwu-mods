@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(LF2BackendTargetFramework)</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <TfmSpecificPackageFile
+            Include="$(LF2PackageDir)/lib/backend/*.*"
+            Pack="true"
+            PackagePath="ref/$(TargetFramework)/"
+        />
+    </ItemGroup>
+</Project>

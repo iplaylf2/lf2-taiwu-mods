@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="Template.csproj" />
+  <Project Path="Backend/Backend.csproj" />
+  <Project Path="Common/Common.csproj" />
+  <Project Path="Frontend/Frontend.csproj" />
 </Solution>

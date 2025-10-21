@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>$(LF2CommonTargetFrameworks)</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <TfmSpecificPackageFile
+            Condition="$(TargetFramework) == $(LF2BackendTargetFramework)"
+            Include="$(LF2PackageDir)/lib/backend/*.*"
+            Pack="true"
+            PackagePath="ref/$(TargetFramework)/"
+        />
+        <TfmSpecificPackageFile
+            Condition="$(TargetFramework) == $(LF2FrontendTargetFramework)"
+            Include="$(LF2PackageDir)/lib/frontend/*.*"
+            Pack="true"
+            PackagePath="ref/$(TargetFramework)/"
+        />
+    </ItemGroup>
+</Project>
