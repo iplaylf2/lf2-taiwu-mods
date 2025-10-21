@@ -46,6 +46,7 @@
 
     <ItemGroup Condition="'$(LF2NeedBackendReference)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Backend" />
+        <PackageReference Include="LF2.Taiwu.Shared" />
 
         <PackageReference Include="Krafs.Publicizer">
             <PrivateAssets>all</PrivateAssets>
@@ -58,6 +59,9 @@
 
     <ItemGroup Condition="'$(LF2NeedFrontendReference)' == 'true'">
         <PackageReference Include="LF2.Taiwu.Frontend" />
+        <PackageReference Include="LF2.Taiwu.Shared" />
+
+        <PackageReference Include="LF2.Taiwu.Unity.Core" />
 
         <PackageReference Include="Krafs.Publicizer">
             <PrivateAssets>all</PrivateAssets>
