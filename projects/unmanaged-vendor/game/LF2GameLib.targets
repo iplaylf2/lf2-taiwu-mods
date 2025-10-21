@@ -9,7 +9,7 @@
         Include="$([System.Text.RegularExpressions.Regex]::Replace('%(_SourceFiles.RecursiveDir)', '\/.*', ''))"
       />
       <_SourcePackages>
-        <PackageId>%(Identity)</PackageId>
+        <PackageName>%(Identity)</PackageName>
         <PackageDir>$(MSBuildThisFileDirectory)%(Identity)</PackageDir>
       </_SourcePackages>
 
@@ -33,7 +33,7 @@
       Projects="$(MSBuildThisFileDirectory)%(_TargetPackages.Project)"
       Targets="Pack"
       Properties="
-        PackageId=%(_TargetPackages.PackageId);
+        PackageId=LF2.%(_TargetPackages.PackageName);
         LF2PackageDir=%(_TargetPackages.PackageDir);
         Configuration=$(Configuration);
         Version=$(Version)
