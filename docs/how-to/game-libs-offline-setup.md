@@ -24,7 +24,7 @@
    在仓库根目录执行：
 
    ```bash
-   dotnet pack ./projects/unmanaged-vendor/game/game.slnx -c Release
+   dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs
    ```
 
    打包结果写入 `.lf2.nupkg/`，供 `dotnet` 本地读取。

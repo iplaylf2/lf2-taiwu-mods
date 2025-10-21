@@ -65,7 +65,7 @@ projects/unmanaged-vendor/
 2. **打包**：在仓库根目录运行：
 
    ```bash
-   dotnet pack ./projects/unmanaged-vendor/game/game.slnx -c Release
+   dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs
    ```
 
    该命令会把所有 `unmanaged-vendor/game` 项目打包到 `.lf2.nupkg/` 目录。
@@ -82,5 +82,5 @@ projects/unmanaged-vendor/
 
 1. 更新仓库根目录 `Directory.Build.props` 中的 `LF2TaiwuVersion`。
 2. 用新版本 DLL 覆盖 `game/` 下的 `lib/` 文件。
-3. 通过 GitHub Actions 工作流或本地执行 `dotnet pack ./projects/unmanaged-vendor/game/game.slnx` 重新生成 NuGet 包。
+3. 通过 GitHub Actions 工作流或本地执行 `dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs` 重新生成 NuGet 包。
 4. 在 Mod 项目上执行 `dotnet restore` 与一次 `dotnet build -t:LF2PublishMod`，确认依赖链在新版下仍能顺利编译。

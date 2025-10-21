@@ -41,7 +41,7 @@
    - `Source`（可选）：如需推送到自定义 NuGet 源，填写目标源地址；留空则使用仓库所有者的 GitHub Packages。
 
 3. **等待自动化执行**  
-   工作流会下载压缩包、覆盖 `projects/unmanaged-vendor/game/` 目录、执行 `dotnet pack` 并推送包到目标私有源。依赖的打包策略与 reference 文档中描述的一致，无需手动操作。
+   工作流会下载压缩包、覆盖 `projects/unmanaged-vendor/game/` 目录、执行打包命令并推送包到目标私有源。依赖的打包策略与 reference 文档中描述的一致，无需手动操作。
 
 4. **在本地消费包**  
    下一步是在本地的 `nuget.config` 文件中配置私有源。工作流默认使用当前仓库所有者的 GitHub Packages 源。例如，如果你的仓库是 `https://github.com/MyUser/MyRepo`，那么对应的源地址就是 `https://nuget.pkg.github.com/MyUser/index.json`。
