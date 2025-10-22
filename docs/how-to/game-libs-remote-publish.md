@@ -47,8 +47,9 @@
    下一步是在本地的 `nuget.config` 文件中配置私有源。工作流默认使用当前仓库所有者的 GitHub Packages 源。例如，如果你的仓库是 `https://github.com/MyUser/MyRepo`，那么对应的源地址就是 `https://nuget.pkg.github.com/MyUser/index.json`。
 
    完成配置的步骤如下：
-   - 打开仓库根目录的 `nuget.config`，新增或启用一个指向该私有源的 `<add>` 条目。
-   - 运行 `dotnet restore`，即可从私有源获取游戏依赖。
+   - 打开仓库根目录的 `nuget.config` 文件
+   - 在 `<packageSources>` 节中添加：`<add key="MyUser" value="https://nuget.pkg.github.com/MyUser/index.json" />`
+   - 运行 `dotnet restore`，即可从私有源获取游戏依赖
 
 ## 常见问题
 

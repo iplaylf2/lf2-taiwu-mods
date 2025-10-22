@@ -13,12 +13,14 @@
 
 ## 快速步骤
 
-1. **整理 DLL（可选 FileCourier）**  
+1. **整理 DLL（可选 FileCourier）**
    按 `game-libs.manifest.yaml` 的映射将游戏 DLL 放入 `projects/unmanaged-vendor/game/<PackageId>/lib/`。如需自动分拣，可运行：
 
    ```bash
    ./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
    ```
+
+   FileCourier 是一个跨平台文件分拣工具，可根据配置文件自动完成文件整理工作。[详细了解](../../projects/unmanaged-vendor/tools/FileCourier/README.md)
 
 2. **本地打包**  
    在仓库根目录执行：

@@ -6,7 +6,7 @@
 
 为了便于 Mod 开发，本模板已将游戏自带的众多程序集按功能整合为数个独立的 NuGet 包。若想了解每个包的详细用途、整合思路与引用建议，请参阅以下文档：
 
-- **[游戏依赖包说明](./game-dependencies.md)**：点击查阅各依赖包的详细用途与引用场景。
+- **[游戏依赖包说明](./game-dependencies.md)**：查阅各依赖包的详细用途与引用场景。
 
 ## 目录结构与清单
 
@@ -32,7 +32,7 @@ projects/unmanaged-vendor/
 
 ### 使用 FileCourier 分拣文件（可选）
 
-可从本仓库的 Release 页面下载与你平台匹配的 FileCourier 可执行文件，并与 `game-libs.manifest.yaml` 放在同一目录。随后直接运行：
+从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载与你平台匹配的 FileCourier 可执行文件，并与 `game-libs.manifest.yaml` 放在同一目录。随后直接运行：
 
 ```bash
 ./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
@@ -41,7 +41,7 @@ projects/unmanaged-vendor/
 命令会按照 manifest 自动复制所需文件，生成的 `game/` 目录即可用于压缩或放回仓库。
 
 > [!NOTE]
-> FileCourier 的定位与维护计划在 `../../projects/unmanaged-vendor/README.md` 中统一说明，试用前可先阅读 `#FileCourier-自动分拣工具` 章节获取最新信息。
+> 如需了解 FileCourier 工具的详细说明，请参阅 [FileCourier 文档](../../projects/unmanaged-vendor/tools/FileCourier/README.md)。
 
 ---
 
@@ -61,7 +61,10 @@ projects/unmanaged-vendor/
 
 当无法使用远程私有源时，可在本地生成 NuGet 包并通过仓库已预置的 `local` 源供 `dotnet` 直接读取。以下是此方案的步骤摘要，如需更详尽的演练，请参阅《[离线环境下的游戏依赖准备](../how-to/game-libs-offline-setup.md)》。
 
-1. **整理 DLL**：按 `game-libs.manifest.yaml` 将文件放入 `projects/unmanaged-vendor/game/<PackageId>/lib/`。若不想手动整理，可复用 FileCourier。
+1. **整理 DLL**：按 `game-libs.manifest.yaml` 将文件放入 `projects/unmanaged-vendor/game/<PackageId>/lib/`。
+
+   - **手动整理**：按照清单文件手动复制和组织文件
+   - **自动化方式**：使用 FileCourier 工具（详见上文"使用 FileCourier 分拣文件"章节）
 2. **打包**：在仓库根目录运行：
 
    ```bash
@@ -80,7 +83,7 @@ projects/unmanaged-vendor/
 
 ## 升级到新游戏版本
 
-1. 更新仓库根目录 `Directory.Build.props` 中的 `LF2TaiwuVersion`。
+1. 更新仓库根目录 `Directory.Build.props` 文件中的 `LF2TaiwuVersion` 属性。
 2. 用新版本 DLL 覆盖 `game/` 下的 `lib/` 文件。
 3. 通过 GitHub Actions 工作流或本地执行 `dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs` 重新生成 NuGet 包。
 4. 在 Mod 项目上执行 `dotnet restore` 与一次 `dotnet build -t:LF2PublishMod`，确认依赖链在新版下仍能顺利编译。
