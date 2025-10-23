@@ -5,13 +5,14 @@
 - **快速上手**
   - 根目录 `README.md`：了解模板特性、准备开发环境、创建首个 Mod。
 - **操作指南**
-  - [依赖管理操作指南](./how-to/dependency-management.md)：控制依赖内嵌、手动打包第三方库、利用物料覆盖进行深度定制。
-  - [离线环境下的游戏依赖准备](./how-to/game-libs-offline-setup.md)：在离线或受限网络环境中，通过本地 NuGet 源完成依赖恢复。
-  - [使用 GitHub Actions 发布游戏依赖](./how-to/game-libs-remote-publish.md)：准备官方游戏 DLL、运行自动化工作流并验证私有源中的包。
+  - [依赖管理操作指南](./how-to/dependency-management.md)
+  - [离线环境下的游戏依赖准备](./how-to/game-libs-offline-setup.md)
+  - [使用 GitHub Actions 发布游戏依赖](./how-to/game-libs-remote-publish.md)
 - **参考资料**
-  - [构建系统参考](./reference/build-system.md)：查阅 MSBuild 变量与核心工具说明，支持进一步定制。
-  - [游戏依赖包说明](./reference/game-dependencies.md)：了解 `Backend`、`Frontend` 等核心依赖包的用途与引用场景。
-  - [仓库目录结构](./reference/repository-layout.md)：了解模板的标准目录划分及职责说明。
+  - [构建系统参考](./reference/build-system.md)
+  - [游戏依赖包说明](./reference/game-dependencies.md)
+  - [游戏依赖包技术规格](./reference/game-libs-packaging.md)
+  - [仓库目录结构](./reference/repository-layout.md)
 - **项目附录**
   - [`projects/mods/README.md`](../projects/mods/README.md)：面向玩家与开发者的仓库内 Mod 导览。
   - [`projects/unmanaged-vendor/README.md`](../projects/unmanaged-vendor/README.md)：非托管依赖的打包与自动化工作流说明。
@@ -23,5 +24,5 @@
 
 - **首次搭建环境 / 创建新 Mod**：根目录 `README.md`、[离线依赖准备](./how-to/game-libs-offline-setup.md)。
 - **修复缺失的游戏程序集或第三方库**：[`projects/unmanaged-vendor/README.md`](../projects/unmanaged-vendor/README.md)、[使用 GitHub Actions 发布游戏依赖](./how-to/game-libs-remote-publish.md)。
-- **定制构建 / 发布流程**：[构建系统参考](./reference/build-system.md)、[`LF2Mod.targets`](../projects/mods/LF2Mod.targets)。
+- **定制构建 / 发布流程**：[构建系统参考](./reference/build-system.md)（包含 [`LF2Mod.targets`](../projects/mods/LF2Mod.targets) 的详细说明）。
 - **查阅现有 Mod 实践**：[`projects/mods/README.md`](../projects/mods/README.md) 及其子目录源码。

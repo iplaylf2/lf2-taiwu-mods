@@ -17,6 +17,7 @@
 
 - **.NET SDK**：版本需满足 `global.json` 文件中的定义。
 - **GitHub PAT**：一个拥有 `read:packages` 权限的 [Personal Access Token](https://github.com/settings/tokens)。
+  - 获取方式：访问链接，点击 "Generate new token (classic)"，选择权限时勾选 `read:packages`。
 
 ### 1. 环境配置
 
@@ -24,8 +25,8 @@
 
 **VS Code / 命令行用户**：
 
-1. 将你的 GitHub 用户名和 PAT 配置为环境变量 `GITHUB_USERNAME` 和 `GITHUB_TOKEN`。
-2. 在项目根目录运行 `dotnet restore`。此命令将拉取所有必需的依赖。
+1. 将你的 GitHub 用户名和 PAT 配置为环境变量 `GITHUB_USERNAME` 和 `GITHUB_TOKEN`[^1]
+2. 在项目根目录运行 `dotnet restore`。该命令会自动拉取所有必要的 NuGet包，如果遇到依赖缺失问题，请参阅：[非托管依赖项设置指南](./projects/unmanaged-vendor/README.md)
 
 > [!TIP]
 > **Visual Studio 用户**：如果遇到凭据配置或 Release 编译报错等问题，请查阅专门的[环境配置指南](./docs/how-to/visual-studio-setup.md)。
@@ -37,8 +38,8 @@
 
 本框架遵循**约定优于配置**的理念，将创建新 Mod 的流程极大简化：
 
-1. 在 `projects/mods/` 目录下为你的新 Mod 创建一个文件夹，例如 `MyNewMod`。
-2. 在其中创建对应的项目文件夹，并遵循命名约定，例如 `MyNewMod.Backend`。
+1. 在 `projects/mods/` 目录下为你的新 Mod 创建一个文件夹，例如 `MyNewMod`
+2. 在其中创建对应的项目文件夹，并遵循命名约定，例如 `MyNewMod.Backend`
 3. 在项目文件夹中，创建一个最简化的 C# 项目文件 `MyNewMod.Backend.csproj`：
 
     ```xml
@@ -46,7 +47,7 @@
     </Project>
     ```
 
-完成！仅需遵循 `.Backend` 或 `.Frontend` 的命名约定，构建系统就会自动为你配置目标框架、引用所有游戏程序集、设置 `Publicizer` 与 `ILRepack` 等。你无需关心任何构建细节，可以立即开始编写 Mod 逻辑。
+完成！仅需遵循 `.Backend` 或 `.Frontend` 的命名约定，构建系统就会自动完成所有配置[^2]。你无需关心任何构建细节，可以立即开始编写 Mod 逻辑。
 
 ### 3. 开始编码
 
@@ -54,7 +55,7 @@
 
 ### 4. 构建与发布
 
-准备交付时，执行一次 `dotnet build -c Release -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
+准备交付时，执行一次 `dotnet build -c Release -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）[^3]。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
 
 ## 进一步阅读
 
@@ -64,3 +65,11 @@
 ## 贡献与反馈
 
 欢迎通过提交 Issue 或 Pull Request 来为本项目做出贡献。
+
+## 参考资料
+
+[^1]: PAT 是 GitHub Personal Access Token 的缩写，用于程序化访问 GitHub 服务。创建令牌请访问：[GitHub Settings > Tokens](https://github.com/settings/tokens)
+
+[^2]: `.Backend` 和 `.Frontend` 后缀是构建系统识别项目类型的关键约定。系统会据此自动配置相应的依赖和构建参数。更多约定说明请参阅：[仓库目录结构](./docs/reference/repository-layout.md)
+
+[^3]: `LF2PublishMod` 是构建系统提供的发布目标，详细机制请参阅：[构建系统参考 - Mod 打包使用指南](./docs/reference/build-system.md#mod-打包使用指南)
