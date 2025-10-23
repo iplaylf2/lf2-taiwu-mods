@@ -34,18 +34,21 @@ Mod 开发者不再需要从上百个 DLL 文件中手动挑选所需的组件�
 这是 Mod 开发中最常引用的部分，包含了游戏的核心业务逻辑，按照架构层次细分为三个包：
 
 **`LF2.Taiwu.Backend`** - 后端核心逻辑
+
 - **来源目录**：`Taiwu.Backend/`
 - **包含内容**：游戏的核心后端逻辑程序集，主要包括 `Backend/GameData.dll`、`GameData.Config.dll`、`GameData.System.dll` 等关键文件
 - **适用场景**：当你的 Mod 需要与游戏的核心数据、存档系统、角色逻辑等进行深度交互时，这是必需的依赖
 - **典型用例**：修改游戏机制、处理存档数据、操作角色属性等
 
 **`LF2.Taiwu.Frontend`** - 前端界面逻辑
+
 - **来源目录**：`Taiwu.Frontend/`
 - **包含内容**：游戏的前端相关程序集，包括 `Assembly-CSharp.dll`、`Encyclopedia.dll`、`Frontend/UI.dll` 等关键文件
 - **适用场景**：当你的 Mod 需要修改游戏界面、创建新的 UI 元素、响应用户交互操作时
 - **典型用例**：添加新的界面面板、修改现有 UI、处理用户输入事件等
 
 **`LF2.Taiwu.Shared`** - 共享组件
+
 - **来源目录**：`Taiwu.Shared/`
 - **包含内容**：游戏前后端共享的核心程序集和通用工具库
 - **适用场景**：当你的 Mod 需要使用那些在前后端都存在的通用数据结构和工具函数时
@@ -56,12 +59,14 @@ Mod 开发者不再需要从上百个 DLL 文件中手动挑选所需的组件�
 这部分提供了让 Mod 能够正常运行并修改游戏代码的基础设施：
 
 **`LF2.Taiwu.Modding`** - 官方 Mod 入口
+
 - **来源目录**：`Taiwu.Modding/`
 - **核心地位**：这是让你的 Mod 被游戏识别和加载的"钥匙"
 - **重要性**：**所有 Mod 都必须引用此库**，否则无法被游戏正确识别
 - **主要功能**：提供 Mod 生命周期管理、事件系统等基础服务
 
 **`LF2.Taiwu.BepInEx`** - 代码补丁框架
+
 - **来源目录**：`Taiwu.BepInEx/`
 - **包含内容**：`0Harmony.dll`、`Mono.Cecil.dll`、`MonoMod.RuntimeDetour.dll` 等一系列用于运行时代码修改的核心库
 - **适用场景**：当你需要使用 HarmonyX 等技术在运行时动态修改游戏的原有代码时
@@ -72,6 +77,7 @@ Mod 开发者不再需要从上百个 DLL 文件中手动挑选所需的组件�
 游戏本体依赖了大量的第三方库。为了避免 Mod 引入不兼容的版本导致冲突，这些库也被重新打包为 `LF2.Taiwu.*` 前缀的版本。当你的 Mod 需要使用这些库时，**强烈建议优先引用这些 `LF2.Taiwu.*` 版本**：
 
 **常用库示例**：
+
 - **`LF2.Taiwu.Newtonsoft.Json`**：JSON 序列化和反序列化处理
 - **`LF2.Taiwu.MoonSharp`**：Lua 脚本执行引擎
 - **`LF2.Taiwu.Google.Protobuf`**：Protocol Buffers 数据序列化
@@ -83,16 +89,19 @@ Mod 开发者不再需要从上百个 DLL 文件中手动挑选所需的组件�
 Unity 引擎相关的程序集数量庞大，按照功能用途进行了科学的归类：
 
 **`LF2.Taiwu.Unity.Core`** - 核心引擎模块
+
 - **来源目录**：`Taiwu.Unity.Core/`
 - **包含内容**：最常用和核心的 Unity 引擎模块
 - **适用场景**：大部分 Mod 开发的基础需求
 
 **`LF2.Taiwu.Unity.Addons`** - 附加组件模块
+
 - **来源目录**：`Taiwu.Unity.Addons/`
 - **包含内容**：`TextMeshPro`、`Timeline` 等 Unity 的官方附加组件
 - **适用场景**：需要高级文本渲染或时间轴功能的 Mod
 
 **`LF2.Taiwu.Unity.Services`** - 在线服务模块
+
 - **来源目录**：`Taiwu.Unity.Services/`
 - **包含内容**：Unity Analytics、云服务等在线服务相关的库
 - **适用场景**：需要数据统计或云服务功能的 Mod
@@ -106,5 +115,6 @@ Unity 引擎相关的程序集数量庞大，按照功能用途进行了科学�
 本项目的构建系统具备**智能包识别**能力：通过检测 `Taiwu.*` 目录下 `lib/backend` 和 `lib/frontend` 的存在情况，自动选择合适的项目模板（Common、Backend 或 Frontend）进行打包。
 
 详细的技术实现和构建命令请参阅：
+
 - **[构建系统参考](./build-system.md)** - 深入了解 MSBuild 目标和自动化机制
 - **[游戏依赖打包手册](./game-libs-packaging.md)** - 完整的打包流程和最佳实践

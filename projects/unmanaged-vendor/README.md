@@ -29,11 +29,13 @@
 为了更好地理解本目录的组织方式，以下是对各个子目录的详细说明：
 
 ### `game/` 目录
+
 - **主要用途**：用于生成《太吾绘卷》官方程序集包
 - **使用场景**：供 Mod 在编译阶段引用所需的游戏程序集[^1]
 - **重要说明**：这些包默认不会随 Mod 一起分发，仅作为编译时依赖
 
 ### `upm/` 目录
+
 - **主要用途**：供高级场景下打包第三方库或 Unity UPM 库使用
 - **注意事项**：自动化工作流不会自动处理该目录
 - **操作指南**：具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)
@@ -115,9 +117,11 @@
 
 1. **打开 `nuget.config` 文件**：在仓库根目录找到 `nuget.config` 文件
 2. **添加私有源**：在 `<packageSources>` 节中添加新的 `<add>` 条目
+
    ```xml
    <add key="MyUser" value="https://nuget.pkg.github.com/MyUser/index.json" />
    ```
+
    （将 `MyUser` 替换为你的 GitHub 用户名）
 3. **配置凭据**：设置环境变量或在 NuGet 配置中添加 GitHub 用户名和 PAT
 
@@ -140,4 +144,3 @@
 [^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](tools/FileCourier/README.md)
 
 [^4]: GitHub Actions 机密用于安全存储敏感信息，避免在日志中暴露。设置方式：进入仓库 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`，创建名为 `LF2_GAME_LIBS_URL` 的机密，值为压缩包下载地址。要深入了解安全最佳实践，请参考 [GitHub Actions 安全文档](https://docs.github.com/zh-cn/actions/security-guides/using-secrets-in-github-actions)
-

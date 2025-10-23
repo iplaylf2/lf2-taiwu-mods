@@ -90,14 +90,17 @@ dotnet restore
 ### 常见问题
 
 **问题**：`dotnet restore` 报告找不到包
+
 - **解决**：确认第一步的 DLL 整理已完成，且第二步的打包操作成功执行
 - **检查**：查看 `.lf2.nupkg/` 目录是否生成了 `.nupkg` 文件
 
 **问题**：FileCourier 执行失败
+
 - **解决**：确认游戏安装目录路径正确，且具有读取权限
 - **检查**：确保 `game-libs.manifest.yaml` 文件存在且格式正确
 
 **问题**：本地包版本不匹配
+
 - **解决**：重新执行第二步的打包操作生成新版本
 - **注意**：游戏更新后需要重新整理所有 DLL 文件
 
@@ -125,4 +128,3 @@ dotnet restore
 [^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](../../projects/unmanaged-vendor/tools/FileCourier/README.md)
 
 [^4]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[游戏依赖包技术规格 - 打包目标](../reference/game-libs-packaging.md#打包目标)
-

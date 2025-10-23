@@ -53,4 +53,3 @@ dotnet nuget locals all --clear
 
 > [!NOTE]
 > 此方法在 Visual Studio 2026 环境下经过测试，确能解决 `ILRepack` 引起的文件占用问题。文件占用问题主要影响 Windows 平台的 Defender 杀毒软件，其他杀毒软件可能需要类似配置。重启计算机是确保排除项完全生效的推荐步骤。
-

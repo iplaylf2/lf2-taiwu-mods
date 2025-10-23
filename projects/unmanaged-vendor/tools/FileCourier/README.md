@@ -50,6 +50,7 @@ manifest 使用 YAML 数组描述复制计划，每个条目要求如下：
 ## 反馈与贡献
 
 如遇到问题或有改进建议，欢迎通过以下方式反馈：
+
 - 在仓库提交 [Issue](https://github.com/iplaylf2/lf2-taiwu-mods/issues)
 - 查看源码并参与贡献
 

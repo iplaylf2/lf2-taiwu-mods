@@ -13,6 +13,7 @@
 ### 解决方案构建入口
 
 **[`Directory.Solution.targets`](../../Directory.Solution.targets)** - 解决方案级别的构建入口，按顺序导入关键的构建脚本：
+
 ```xml
 <Import Project="$(LF2ModsDir)/LF2Mod.targets" />
 <Import Project="$(LF2UnmanagedVendorDir)/game/LF2GameLib.targets" />
@@ -27,6 +28,7 @@
 ### Mod 发布机制
 
 **[`LF2Mod.targets`](../../projects/mods/LF2Mod.targets)** - Mod 打包发布的核心脚本，定义了 `LF2PublishMod` 目标，负责：
+
 - 编译 Mod 项目的所有组件（Backend/Frontend/Common）
 - 整理资源文件和程序集到标准目录结构
 - 生成可分发的 Mod 包到 `.lf2.publish/` 目录
@@ -34,6 +36,7 @@
 ### 程序集合并机制
 
 **[`ILRepack.targets`](../../projects/mods/ILRepack.targets)** - ILRepack 工具的集成脚本，实现了复杂的依赖合并逻辑：
+
 - **智能依赖分析**：自动识别需要保留的外部依赖（通过 `LF2KeepItAsIs` 标记）
 - **并行合并**：使用 `Parallel="true"` 提升合并性能
 - **内部化处理**：将依赖项的公共类型内部化，避免命名冲突
