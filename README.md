@@ -62,6 +62,10 @@
 - **[文档索引](./docs/README.md)**：浏览完整的文档分类，按需跳转到操作指南与参考资料。
 - **[仓库内 Mod 导览](./projects/mods/README.md)**：查看目前包含的 Mod 列表、状态与源码路径。
 
+## 贡献与反馈
+
+欢迎通过提交 Issue 或 Pull Request 来为本项目做出贡献。
+
 ## 参考资料
 
 [^1]: PAT 是 GitHub Personal Access Token 的缩写，用于程序化访问 GitHub 服务。创建令牌请访问：[GitHub Settings > Tokens](https://github.com/settings/tokens)
@@ -75,7 +79,3 @@
 [^5]: 自动化配置包括目标框架设置、游戏程序集引用、访问权限扩展（Publicizer）和程序集合并（ILRepack）等，无需开发者手动配置。深入了解请参阅：[构建系统参考 - 核心工具链介绍](./docs/reference/build-system.md#核心工具链介绍)
 
 [^6]: `LF2PublishMod` 是构建系统提供的发布目标，详细机制请参阅：[构建系统参考 - Mod 打包使用指南](./docs/reference/build-system.md#mod-打包使用指南)
-
-## 贡献与反馈
-
-欢迎通过提交 Issue 或 Pull Request 来为本项目做出贡献。
