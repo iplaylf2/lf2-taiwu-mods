@@ -12,36 +12,17 @@
 
 重新分发这些文件可能与游戏的最终用户许可协议（EULA）存在冲突。如果你选择自行打包或发布相关文件，所有法律合规性风险由你自行承担。
 
-### 2. 技术风险
+### 2. 技术权衡
 
-**版本锁定问题**
-这些依赖包与特定版本的游戏或 Unity 编辑器存在紧密的耦合关系。当游戏进行版本更新后，这些包必须手动同步更新，否则会导致：
+**版本管理需求**
+游戏依赖包与特定版本的游戏程序集存在强耦合关系。当游戏版本更新时，需要同步更新这些依赖包，以确保：
 
-- Mod 编译失败
-- 运行时崩溃
-- 功能异常等严重问题
+- Mod 编译的兼容性
+- 运行时的稳定性
+- 团队开发环境的一致性
 
-**维护成本考量**
-维护这些包的版本同步需要持续投入时间和精力，这是一个需要长期关注的技术债务。
-
-## 目录结构详解
-
-为了更好地理解本目录的组织方式，以下是对各个子目录的详细说明：
-
-### `game/` 目录
-
-- **主要用途**：用于生成《太吾绘卷》官方程序集包
-- **使用场景**：供 Mod 在编译阶段引用所需的游戏程序集[^1]
-- **重要说明**：这些包默认不会随 Mod 一起分发，仅作为编译时依赖
-
-### `upm/` 目录
-
-- **主要用途**：供高级场景下打包第三方库或 Unity UPM 库使用
-- **注意事项**：自动化工作流不会自动处理该目录
-- **操作指南**：具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)
-
-> [!TIP]
-> [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 文件已经按照包 ID 详细列出了 `game/` 目录所需的完整映射关系[^2]。你可以直接按照此清单整理文件。
+**维护投入考量**
+建立和维护依赖包体系需要持续的技术投入，包括版本同步、自动化工作流配置和团队协作机制。这是一个需要在初期效率与长期维护之间做出权衡的技术决策。
 
 ---
 
@@ -68,8 +49,8 @@
 
 **推荐方式：使用 FileCourier 自动化工具**
 
-1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的可执行文件[^3]
-2. 将可执行文件与 `game-libs.manifest.yaml` 放在同一目录
+1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的可执行文件[^1]
+2. 获取 [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 清单文件[^2]，将其与可执行文件放在同一目录
 3. 运行命令：
 
 ```bash
@@ -78,7 +59,7 @@
 
 **备选方式：手动整理**
 
-直接参考 [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 中的映射关系，按功能分组手动放置文件。
+直接参考清单文件中的映射关系，按功能分组手动放置文件。该清单文件定义了完整的 DLL 到包目录的映射规则。
 
 执行完成后，生成的 `game/` 目录就可以直接用于后续的打包流程。
 
@@ -89,7 +70,7 @@
 2. **准备游戏库压缩包**：将游戏 DLL 按 [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 的映射整理为 `game/` 目录结构，然后压缩为单个 `.zip` 文件。
    - 准备完成后，将压缩包上传到团队内部可访问的位置（如网盘、内部文件服务器等），获取下载地址。
 
-3. **配置仓库机密**：为避免在日志中暴露下载地址，工作流将从名为 `LF2_GAME_LIBS_URL` 的仓库机密中读取下载地址[^4]。
+3. **配置仓库机密**：为避免在日志中暴露下载地址，工作流将从名为 `LF2_GAME_LIBS_URL` 的仓库机密中读取下载地址[^3]。
 
 4. **运行工作流**：在你的仓库 `Actions` 页面找到 `Publish Game Libraries` 工作流。
 
@@ -135,12 +116,28 @@
 
 对于快速验证或无法联网的场景，可以选择本地打包方案。具体操作步骤请参阅 [离线环境下的游戏依赖准备](../../docs/how-to/game-libs-offline-setup.md)。更多策略与可选项请参考 [游戏依赖包技术规格](../../docs/reference/game-libs-packaging.md)。
 
+---
+
+## 目录说明
+
+### `game/` 目录
+
+- **主要用途**：用于生成《太吾绘卷》官方程序集包
+- **使用场景**：供 Mod 在编译阶段引用所需的游戏程序集[^4]
+- **重要说明**：这些包默认不会随 Mod 一起分发，仅作为编译时依赖
+
+### `upm/` 目录
+
+- **主要用途**：供高级场景下打包第三方库或 Unity UPM 库使用
+- **注意事项**：自动化工作流不会自动处理该目录
+- **操作指南**：具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)
+
 ## 参考资料
 
-[^1]: 游戏程序集作为编译时依赖，不随 Mod 分发，既避免法律风险又减少 Mod 体积。关于程序集分发的最佳实践，详见 [游戏依赖打包技术规格](../../docs/reference/game-libs-packaging.md)
+[^1]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](tools/FileCourier/README.md)
 
 [^2]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。格式说明请参阅：[游戏依赖包技术规格 - 清单文件格式](../../docs/reference/game-libs-packaging.md#清单文件格式)
 
-[^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](tools/FileCourier/README.md)
+[^3]: GitHub Actions 机密用于安全存储敏感信息，避免在日志中暴露。设置方式：进入仓库 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`，创建名为 `LF2_GAME_LIBS_URL` 的机密，值为压缩包下载地址。要深入了解安全最佳实践，请参考 [GitHub Actions 安全文档](https://docs.github.com/zh-cn/actions/security-guides/using-secrets-in-github-actions)
 
-[^4]: GitHub Actions 机密用于安全存储敏感信息，避免在日志中暴露。设置方式：进入仓库 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`，创建名为 `LF2_GAME_LIBS_URL` 的机密，值为压缩包下载地址。要深入了解安全最佳实践，请参考 [GitHub Actions 安全文档](https://docs.github.com/zh-cn/actions/security-guides/using-secrets-in-github-actions)
+[^4]: 游戏程序集作为编译时依赖，不随 Mod 分发。关于程序集分发的最佳实践，详见 [游戏依赖打包技术规格](../../docs/reference/game-libs-packaging.md)

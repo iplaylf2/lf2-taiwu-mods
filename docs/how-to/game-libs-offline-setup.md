@@ -15,13 +15,15 @@
 
 ### 第一步：整理游戏 DLL 文件
 
-根据 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 中的映射关系，将游戏程序集放置到对应目录。
+根据 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 中的映射关系[^1]，将游戏程序集放置到对应目录。
 
 #### 选项一：手动整理
 
-1. 查看 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 清单文件中的映射关系[^1]
-2. 将游戏 DLL 复制到 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录[^2]
+1. 根据清单文件中的映射关系整理文件
+2. 将游戏 DLL 放置到 `<临时目录>/game/<PackageId>/lib/` 目录[^2]
 3. 确保目录结构符合标准布局
+
+完成后，将生成的 `game/` 目录用于后续操作。
 
 #### 选项二：使用 FileCourier 自动整理（推荐）
 
@@ -30,12 +32,14 @@
 3. 运行命令：
 
    ```bash
-   ./FileCourier "<游戏安装目录>" "<仓库根目录>/projects/unmanaged-vendor/game" -m game-libs.manifest.yaml
+   ./FileCourier "<游戏安装目录>" "<临时输出目录>/game" -m game-libs.manifest.yaml
    ```
 
-FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录结构。
+FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录结构。完成后，将生成的 `game/` 目录用于后续操作。
 
 ### 第二步：本地打包
+
+将生成的 `game/` 目录复制到 `projects/unmanaged-vendor/` 下。
 
 在仓库根目录执行打包命令：
 

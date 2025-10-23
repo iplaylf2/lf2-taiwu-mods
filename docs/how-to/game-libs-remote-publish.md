@@ -31,37 +31,44 @@
 
 ## 操作指南
 
-### 第一步：准备游戏依赖压缩包
+### 第一步：整理游戏 DLL 文件
 
-#### 选项一：手动整理并压缩
+根据 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 中的映射关系[^1]，将游戏程序集放置到对应目录。
 
-1. 根据 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 中的映射关系整理文件[^1]
-2. 将游戏 DLL 放置到 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录[^2]
-3. 将整个 `game/` 目录压缩为单个 `.zip` 文件
+#### 选项一：手动整理
+
+1. 根据清单文件中的映射关系整理文件
+2. 将游戏 DLL 放置到 `<临时目录>/game/<PackageId>/lib/` 目录[^2]
+3. 确保目录结构符合标准布局
+
+完成后，将生成的 `game/` 目录用于后续操作。
 
 #### 选项二：使用 FileCourier 自动整理（推荐）
 
 1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的 FileCourier 可执行文件[^3]
-2. 运行自动整理命令：
+2. 将可执行文件与 `game-libs.manifest.yaml` 放在同一目录
+3. 运行命令：
 
    ```bash
    ./FileCourier "<游戏安装目录>" "<临时输出目录>/game" -m game-libs.manifest.yaml
    ```
 
-3. 将生成的 `game/` 目录压缩为 `.zip` 文件
+FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录结构。完成后，将生成的 `game/` 目录用于后续操作。
 
-4. **上传压缩包**：将压缩包上传到团队内部可访问的位置（如网盘、内部文件服务器等），获取下载地址。
+### 第二步：准备压缩包
 
-### 第二步：配置仓库机密
+将整理好的 `game/` 目录压缩为单个 `.zip` 文件，然后上传到团队内部可访问的位置（如网盘、内部文件服务器等），获取下载地址。
+
+### 第三步：配置仓库机密
 
 在 GitHub 仓库中设置必要的机密信息：
 
 1. 进入仓库 `Settings` > `Secrets and variables` > `Actions`
 2. 创建或更新以下机密：
-   - **`LF2_GAME_LIBS_URL`**：第一步中获得的压缩包下载地址
+   - **`LF2_GAME_LIBS_URL`**：第二步中获得的压缩包下载地址
    - **`LF2_NUGET_API_KEY`**（可选）：指定自定义 `Source` 时所需的 API 密钥
 
-### 第三步：触发发布工作流
+### 第四步：触发发布工作流
 
 1. 访问仓库的 `Actions` 页面
 2. 选择 `Publish Game Libraries` 工作流
@@ -77,7 +84,7 @@
 - 执行 `LF2PackGameLibs` 构建目标生成 NuGet 包[^4]
 - 推送包到目标私有源
 
-### 第四步：配置本地开发环境
+### 第五步：配置本地开发环境
 
 发布完成后，在本地配置 NuGet 源以使用远程私有包：
 
