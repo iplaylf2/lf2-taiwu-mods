@@ -36,10 +36,10 @@
 ### `upm/` 目录
 - **主要用途**：供高级场景下打包第三方库或 Unity UPM 库使用
 - **注意事项**：自动化工作流不会自动处理该目录
-- **操作指南**：具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)[^2]
+- **操作指南**：具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)
 
 > [!TIP]
-> [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 文件已经按照包 ID 详细列出了 `game/` 目录所需的完整映射关系[^3]。你可以直接按照此清单整理文件。
+> [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 文件已经按照包 ID 详细列出了 `game/` 目录所需的完整映射关系[^2]。你可以直接按照此清单整理文件。
 
 ---
 
@@ -66,7 +66,7 @@
 
 **推荐方式：使用 FileCourier 自动化工具**
 
-1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的可执行文件[^4]
+1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的可执行文件[^3]
 2. 将可执行文件与 `game-libs.manifest.yaml` 放在同一目录
 3. 运行命令：
 
@@ -87,11 +87,11 @@
 2. **准备游戏库压缩包**：将游戏 DLL 按 [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 的映射整理为 `game/` 目录结构，然后压缩为单个 `.zip` 文件。
    - 准备完成后，将压缩包上传到团队内部可访问的位置（如网盘、内部文件服务器等），获取下载地址。
 
-3. **配置仓库机密**：为避免在日志中暴露下载地址，工作流将从名为 `LF2_GAME_LIBS_URL` 的仓库机密中读取下载地址[^5]。
+3. **配置仓库机密**：为避免在日志中暴露下载地址，工作流将从名为 `LF2_GAME_LIBS_URL` 的仓库机密中读取下载地址[^4]。
 
 4. **运行工作流**：在你的仓库 `Actions` 页面找到 `Publish Game Libraries` 工作流。
 
-5. **提供参数并执行**：根据工作流的提示，提供游戏库的版本号。工作流会自动识别可打包的工程并生成对应的 NuGet包[^6]。
+5. **提供参数并执行**：根据工作流的提示，提供游戏库的版本号。工作流会自动识别可打包的工程并生成对应的 NuGet包。指定自定义 `source` 时，工作流会使用 `LF2_NUGET_API_KEY` 仓库机密获取 API 密钥进行鉴权。
 
 > [!WARNING]
 > **个人仓库的包可见性风险**
@@ -100,7 +100,7 @@
 > **解决方法**：在首次发布完成后，立即访问 GitHub Packages 页面，找到新发布的包，进入其设置页面将可见性更改为私有。组织仓库无此风险。
 
 > [!NOTE]
-> **工作流可能不会立即显示**[^6]
+> **工作流可能不会立即显示**：基于模板创建的仓库可能需要先修改工作流文件才能在 Actions 页面显示。关于本仓库的自动化构建体系，详见 [构建系统参考](../../docs/reference/build-system.md)。
 > 由于 [GitHub 的一个已知问题](https://github.com/orgs/community/discussions/25219)，基于模板创建的仓库，其工作流（Workflows）可能不会自动出现在 `Actions` 页面。如果 `Publish Game Libraries` 工作流没有显示，你可能需要对工作流文件（例如，在 `.github/workflows/` 目录下）进行一次重命名（或任意修改）并提交，才能触发 GitHub Actions 的识别。
 
 ### 必要目录结构：游戏核心程序集
@@ -135,15 +135,9 @@
 
 [^1]: 游戏程序集作为编译时依赖，不随 Mod 分发，既避免法律风险又减少 Mod 体积。关于程序集分发的最佳实践，详见 [游戏依赖打包技术规格](../../docs/reference/game-libs-packaging.md)
 
-[^2]: 依赖管理操作指南详细说明了第三方库的引入和处理方式。更多控制依赖内嵌的方法请参阅：[依赖管理操作指南](../../docs/how-to/dependency-management.md#控制依赖内嵌行为)
+[^2]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。格式说明请参阅：[游戏依赖包技术规格 - 清单文件格式](../../docs/reference/game-libs-packaging.md#清单文件格式)
 
-[^3]: 清单文件格式说明请参阅：[游戏依赖包技术规格 - 清单文件格式](../../docs/reference/game-libs-packaging.md#清单文件格式)
+[^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](tools/FileCourier/README.md)
 
-[^4]: FileCourier 工具文档请参阅：[FileCourier README](tools/FileCourier/README.md)。FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理
-
-[^5]: GitHub Actions 机密用于安全存储敏感信息，避免在日志中暴露。设置方式：进入仓库 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`，创建名为 `LF2_GAME_LIBS_URL` 的机密，值为压缩包下载地址。要深入了解安全最佳实践，请参考 [GitHub Actions 安全文档](https://docs.github.com/zh-cn/actions/security-guides/using-secrets-in-github-actions)
-
-[^6]: 指定自定义 `source` 时，工作流会使用 `LF2_NUGET_API_KEY` 仓库机密获取 API 密钥进行鉴权。
-
-[^7]: 工作流会自动识别 `projects/unmanaged-vendor/` 下标记为可打包的工程并生成对应的 NuGet 包。基于模板创建的仓库可能需要先修改工作流文件才能在 Actions 页面显示。关于本仓库的自动化构建体系，详见 [构建系统参考](../../docs/reference/build-system.md)
+[^4]: GitHub Actions 机密用于安全存储敏感信息，避免在日志中暴露。设置方式：进入仓库 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`，创建名为 `LF2_GAME_LIBS_URL` 的机密，值为压缩包下载地址。要深入了解安全最佳实践，请参考 [GitHub Actions 安全文档](https://docs.github.com/zh-cn/actions/security-guides/using-secrets-in-github-actions)
 

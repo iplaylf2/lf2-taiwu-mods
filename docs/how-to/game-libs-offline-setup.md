@@ -43,7 +43,7 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs
 ```
 
-该命令会扫描所有项目并生成 NuGet 包[^4]
+该命令会扫描所有项目并生成 NuGet 包[^4]。
 
 ### 第三步：启用本地 NuGet 源
 
@@ -125,3 +125,4 @@ dotnet restore
 [^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](../../projects/unmanaged-vendor/tools/FileCourier/README.md)
 
 [^4]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[游戏依赖包技术规格 - 打包目标](../reference/game-libs-packaging.md#打包目标)
+
