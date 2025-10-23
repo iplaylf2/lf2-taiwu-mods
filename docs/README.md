@@ -11,6 +11,7 @@
 - **参考资料**
   - [构建系统参考](./reference/build-system.md)
   - [游戏依赖包说明](./reference/game-dependencies.md)
+  - [游戏依赖包技术规格](./reference/game-libs-packaging.md)
   - [仓库目录结构](./reference/repository-layout.md)
 - **项目附录**
   - [`projects/mods/README.md`](../projects/mods/README.md)：面向玩家与开发者的仓库内 Mod 导览。

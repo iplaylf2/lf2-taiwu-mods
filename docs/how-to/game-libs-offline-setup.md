@@ -1,6 +1,6 @@
 # 离线环境下的游戏依赖准备
 
-当无法访问团队私有源或仅需在本机快速验证 Mod 时，可直接在仓库内打包并消费游戏依赖。详细背景、目录规范及更多可选项请参阅《[游戏依赖打包参考手册](../reference/game-libs-packaging.md)》。
+当无法访问团队私有源或仅需在本机快速验证 Mod 时，可直接在仓库内打包并消费游戏依赖。本指南提供完整的离线打包操作步骤。
 
 ## 适用场景
 
@@ -11,34 +11,118 @@
 > [!NOTE]
 > 本地方案与远程私有源方案互斥。启用本地源时请关闭远程源，避免混用；若需切换回远程方案，请参见《[使用 GitHub Actions 发布游戏依赖](./game-libs-remote-publish.md)》。
 
-## 快速步骤
+## 操作指南
 
-1. **整理 DLL（可选 FileCourier）**
-   按 `game-libs.manifest.yaml` 的映射将游戏 DLL 放入 `projects/unmanaged-vendor/game/<PackageId>/lib/`。如需自动分拣，可运行：
+### 第一步：整理游戏 DLL 文件
 
-   ```bash
-   ./FileCourier "<游戏安装目录>" "<输出目录>/game" -m game-libs.manifest.yaml
-   ```
+根据 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 中的映射关系，将游戏程序集放置到对应目录。
 
-   FileCourier 是一个跨平台文件分拣工具，可根据配置文件自动完成文件整理工作。[详细了解](../../projects/unmanaged-vendor/tools/FileCourier/README.md)
+#### 选项一：手动整理
 
-2. **本地打包**  
-   在仓库根目录执行：
+1. 查看 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 清单文件中的映射关系[^1]
+2. 将游戏 DLL 复制到 `projects/unmanaged-vendor/game/<PackageId>/lib/` 目录[^2]
+3. 确保目录结构符合标准布局
 
-   ```bash
-   dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs
-   ```
+#### 选项二：使用 FileCourier 自动整理（推荐）
 
-   打包结果写入 `.lf2.nupkg/`，供 `dotnet` 本地读取。
-
-3. **启用本地源并恢复依赖**
+1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的 FileCourier 可执行文件[^3]
+2. 将可执行文件与 `game-libs.manifest.yaml` 放在同一目录
+3. 运行命令：
 
    ```bash
-   dotnet nuget enable source local
-   dotnet restore
+   ./FileCourier "<游戏安装目录>" "<仓库根目录>/projects/unmanaged-vendor/game" -m game-libs.manifest.yaml
    ```
 
-> [!TIP]
-> 处理完离线任务后可运行 `dotnet nuget disable source local` 恢复到默认配置，不需要清理 `.lf2.nupkg/`。
+FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录结构。
+
+### 第二步：本地打包
+
+在仓库根目录执行打包命令：
+
+```bash
+dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGameLibs
+```
+
+该命令会扫描所有项目并生成 NuGet 包[^4]
+
+### 第三步：启用本地 NuGet 源
+
+启用预配置的本地 NuGet 源：
+
+```bash
+dotnet nuget enable source local
+```
+
+然后恢复项目依赖：
+
+```bash
+dotnet restore
+```
+
+此时 NuGet 会从 `.lf2.nupkg/` 目录读取本地生成的包。
+
+## 源管理
+
+### 切换到远程源
+
+完成离线开发后，如需切换回远程私有源：
+
+```bash
+dotnet nuget disable source local
+dotnet restore
+```
+
+### 源配置说明
+
+本地源的配置在根目录的 `nuget.config` 文件中：
+
+```xml
+<packageSources>
+  <add key="local" value="./.lf2.nupkg" />
+  <!-- 其他源配置 -->
+</packageSources>
+```
+
+启用/禁用操作会控制此源的可用性。
+
+## 故障排除
+
+### 常见问题
+
+**问题**：`dotnet restore` 报告找不到包
+- **解决**：确认第一步的 DLL 整理已完成，且第二步的打包操作成功执行
+- **检查**：查看 `.lf2.nupkg/` 目录是否生成了 `.nupkg` 文件
+
+**问题**：FileCourier 执行失败
+- **解决**：确认游戏安装目录路径正确，且具有读取权限
+- **检查**：确保 `game-libs.manifest.yaml` 文件存在且格式正确
+
+**问题**：本地包版本不匹配
+- **解决**：重新执行第二步的打包操作生成新版本
+- **注意**：游戏更新后需要重新整理所有 DLL 文件
+
+## 验证成功
+
+执行完所有步骤后，可以通过以下方式验证配置成功：
+
+1. **检查包恢复**：`dotnet restore` 应该无错误完成
+2. **验证编译**：`dotnet build` 应该能正常编译 Mod 项目
+3. **检查依赖**：在 Visual Studio 或 VS Code 中查看项目依赖是否正确引用
 
 执行完以上步骤后，Mod 工程便能在离线或受限网络环境中完成 `dotnet build` 与 `dotnet restore`。
+
+## 参考资料
+
+[^1]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。详细格式说明请参阅：[游戏依赖包技术规格 - 清单文件格式](../reference/game-libs-packaging.md#清单文件格式)
+
+[^2]: `<PackageId>/lib/` 目录结构遵循本仓库的包体系设计，区分 backend 和 frontend 两种目标框架。详细规范请参阅：[游戏依赖包技术规格 - 目录命名约定](../reference/game-libs-packaging.md#目录命名约定)
+
+[^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](../../projects/unmanaged-vendor/tools/FileCourier/README.md)
+
+[^4]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[游戏依赖包技术规格 - 打包目标](../reference/game-libs-packaging.md#打包目标)
+
+
+## 相关资源
+
+- **[使用 GitHub Actions 发布游戏依赖](./game-libs-remote-publish.md)** - 团队协作的远程发布方案
+- **[游戏依赖包说明](../reference/game-dependencies.md)** - 各依赖包的详细用途与引用场景
