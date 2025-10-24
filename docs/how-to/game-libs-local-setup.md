@@ -86,10 +86,10 @@ dotnet restore
 
 ## 参考资料
 
-[^1]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。详细格式说明请参阅：[游戏依赖包技术规格 - 清单文件格式](../reference/game-libs-packaging.md#清单文件格式)
+[^1]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。详细格式说明请参阅：[依赖基础设施 - 清单文件格式](../reference/dependency-infrastructure.md#清单文件格式)
 
-[^2]: `<PackageId>/lib/` 目录结构遵循本仓库的包体系设计，区分 backend 和 frontend 两种目标框架。详细规范请参阅：[游戏依赖包技术规格 - 目录命名约定](../reference/game-libs-packaging.md#目录命名约定)
+[^2]: `<PackageId>/lib/` 目录结构遵循本仓库的包体系设计，区分 backend 和 frontend 两种目标框架。详细规范请参阅：[依赖基础设施 - 目录命名约定](../reference/dependency-infrastructure.md#目录命名约定)
 
 [^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](../../projects/unmanaged-vendor/tools/FileCourier/README.md)
 
-[^4]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[游戏依赖包技术规格 - 打包目标](../reference/game-libs-packaging.md#打包目标)
+[^4]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[依赖基础设施 - 打包目标](../reference/dependency-infrastructure.md#打包目标)
