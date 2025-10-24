@@ -1,13 +1,15 @@
-using System.Linq.Expressions;
-using System.Reflection;
 using HarmonyLib;
+using LF2.Cecil.Helper.MonoMod;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.Utils;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace LF2.Cecil.Helper;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage
+[SuppressMessage
 ("Design", "CA1034:Nested types should not be visible", Justification = "<Pending>")
 ]
 public static class MethodSegmenter

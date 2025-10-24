@@ -2,7 +2,7 @@ using System.Reflection;
 using MonoMod.Cil;
 using MonoMod.Utils;
 
-namespace LF2.Cecil.Helper;
+namespace LF2.Cecil.Helper.MonoMod;
 
 public static class DynamicMethodDefinitionHelper
 {
