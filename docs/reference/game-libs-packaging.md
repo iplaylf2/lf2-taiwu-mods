@@ -62,7 +62,7 @@ projects/unmanaged-vendor/
 
 ### 版本管理机制
 
-游戏依赖包版本通过 `LF2TaiwuVersion` 属性统一管理，位于仓库根目录的 `Directory.Build.props` 文件中。升级游戏版本时需要：
+游戏依赖包版本通过 `LF2TaiwuVersion` 属性统一管理，位于仓库根目录的 [`Directory.Build.props`](../../Directory.Build.props) 文件中。升级游戏版本时需要：
 
 1. 更新 `LF2TaiwuVersion` 属性值
 2. 替换对应目录下的 DLL 文件
@@ -93,7 +93,7 @@ FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 mani
 系统支持两种包源模式：
 
 - **远程源**：通过 GitHub Actions 自动发布到私有 NuGet 源
-- **本地源**：使用 `nuget.config` 中预置的 `local` 源进行本地开发
+- **本地源**：使用 [`nuget.config`](../../nuget.config) 中预置的 `local` 源进行本地开发
 
 ## 技术约束
 

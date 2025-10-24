@@ -15,7 +15,7 @@
 
 ### 前置条件
 
-- **.NET SDK**：版本需满足 `global.json` 文件中的定义。
+- **.NET SDK**：版本需满足 [`global.json`](./global.json) 文件中的定义。
 - **GitHub PAT**：一个拥有 `read:packages` 权限的 [Personal Access Token](https://github.com/settings/tokens)。
   - 获取方式：访问链接，点击 "Generate new token (classic)"，选择权限时勾选 `read:packages`。
 

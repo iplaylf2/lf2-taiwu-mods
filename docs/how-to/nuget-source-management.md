@@ -35,7 +35,7 @@
 
 如果使用默认的 GitHub Packages：
 
-1. 打开仓库根目录的 `nuget.config` 文件
+1. 打开仓库根目录的 [`nuget.config`](../../nuget.config) 文件
 2. 在 `<packageSources>` 节中添加：
 
     ```xml
@@ -138,7 +138,7 @@ dotnet restore
 **问题**：FileCourier 执行失败
 
 - **解决**：确认游戏安装目录路径正确，且具有读取权限
-- **检查**：确保 `game-libs.manifest.yaml` 文件存在且格式正确
+- **检查**：确保 [`game-libs.manifest.yaml`](../../projects/unmanaged-vendor/game/game-libs.manifest.yaml) 文件存在且格式正确
 
 **问题**：本地包版本不匹配
 
