@@ -10,7 +10,7 @@ using System.Reflection;
 namespace LF2.Cecil.Helper;
 
 [SuppressMessage
-("Design", "CA1034:Nested types should not be visible", Justification = "<Pending>")
+("Design", "CA1034:Nested types should not be visible")
 ]
 public static class MethodSegmenter
 {

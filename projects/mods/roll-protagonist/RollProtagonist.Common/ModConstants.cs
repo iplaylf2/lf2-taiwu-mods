@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace RollProtagonist.Common;
 
-[System.Diagnostics.CodeAnalysis.SuppressMessage
-("Design", "CA1034:Nested types should not be visible", Justification = "<Pending>")
+[SuppressMessage
+("Design", "CA1034:Nested types should not be visible")
 ]
 public static class ModConstants
 {

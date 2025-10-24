@@ -7,7 +7,7 @@ namespace FileCourier.Manifest;
 /// Represents a single file courier entry read from a YAML manifest.
 /// </summary>
 [SuppressMessage
-("Maintainability", "CA1515:Consider making public types internal", Justification = "<Pending>")
+("Maintainability", "CA1515:Consider making public types internal")
 ]
 [YamlSerializable]
 public sealed class YamlManifestEntry
@@ -22,10 +22,10 @@ public sealed class YamlManifestEntry
     /// Gets or sets the collection of source file paths to copy.
     /// </summary>
     [SuppressMessage
-    ("Usage", "CA2227:Collection properties should be read only", Justification = "<Pending>")
+    ("Usage", "CA2227:Collection properties should be read only")
     ]
     [SuppressMessage
-    ("Design", "CA1002:Do not expose generic lists", Justification = "<Pending>")
+    ("Design", "CA1002:Do not expose generic lists")
     ]
     [YamlMember(Alias = ManifestFields.SourceFiles)]
     public List<string>? SourceFiles { get; set; }
