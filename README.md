@@ -25,7 +25,7 @@
 **VS Code / 命令行用户**：
 
 1. 将你的 GitHub 用户名和 PAT 配置为环境变量 `GITHUB_USERNAME` 和 `GITHUB_TOKEN`
-2. 在项目根目录运行 `dotnet restore`。该命令会自动拉取所有必要的 NuGet包，如果遇到依赖缺失问题，请参阅：[非托管依赖项设置指南](./projects/unmanaged-vendor/README.md)
+2. 在项目根目录运行 `dotnet restore`。该命令会自动拉取所有必要的 NuGet包
 
 > [!TIP]
 > **Visual Studio 用户**：如果遇到凭据配置或 Release 编译报错等问题，请查阅专门的[环境配置指南](./docs/how-to/visual-studio-setup.md)。
@@ -53,7 +53,7 @@
 
 ### 4. 构建与发布
 
-准备交付时，执行一次 `dotnet build -c Release -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）[^2]。更多自动化与高级用法见 [构建系统参考](./docs/reference/build-system.md)。
+准备交付时，执行一次 `dotnet build -c Release -t:LF2PublishMod -p:LF2Mod=<mod-name>` 即可产出游戏可识别的目录结构（默认输出在 `.lf2.publish/<mod-name>/`）[^2]。
 
 ## 进一步阅读
 
