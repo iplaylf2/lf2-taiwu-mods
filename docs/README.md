@@ -7,7 +7,7 @@
 - **操作指南**
   - [依赖管理操作指南](./how-to/dependency-management.md)
   - [本地源方案操作指南](./how-to/game-libs-local-setup.md)
-- [NuGet 源管理指南](./how-to/nuget-source-management.md)
+  - [NuGet 源管理指南](./how-to/nuget-source-management.md)
 - **参考资料**
   - [构建系统参考](./reference/build-system.md)
   - [游戏依赖包说明](./reference/game-dependencies.md)

@@ -77,7 +77,7 @@ dotnet restore
 
 > [!TIP]
 > **进阶指南**
-> 关于在不同 NuGet 源之间切换、版本管理、故障排除等更多内容，请参阅 [《NuGet 源管理高级指南》](./nuget-source-management.md)。
+> 关于在不同 NuGet 源之间切换、版本管理、故障排除等更多内容，请参阅 [《NuGet 源管理指南》](./nuget-source-management.md)。
 
 ## 相关资源
 
