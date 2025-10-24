@@ -92,8 +92,8 @@ FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 mani
 
 系统支持两种包源模式：
 
-- **远程私有源**：通过 GitHub Actions 自动发布到私有 NuGet 源
-- **本地源**：使用 `nuget.config` 中预置的 `local` 源进行离线开发
+- **远程源**：通过 GitHub Actions 自动发布到私有 NuGet 源
+- **本地源**：使用 `nuget.config` 中预置的 `local` 源进行本地开发
 
 ## 技术约束
 

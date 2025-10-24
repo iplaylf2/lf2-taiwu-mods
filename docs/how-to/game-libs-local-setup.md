@@ -1,15 +1,15 @@
-# 离线环境下的游戏依赖准备
+# 本地源方案操作指南
 
-当无法访问团队私有源或仅需在本机快速验证 Mod 时，可直接在仓库内打包并消费游戏依赖。本指南提供完整的离线打包操作步骤。
+当无法访问团队远程源或仅需在本机快速验证 Mod 时，可直接在仓库内打包并消费游戏依赖。本指南提供完整的本地打包操作步骤。
 
 ## 适用场景
 
-- 新加入项目但尚无私有源凭据。
+- 新加入项目但尚无远程源凭据。
 - 构建机或演示环境受限，无法访问 GitHub Packages／内部源。
 - 临时迭代或排查问题，不准备立即发布到远程源。
 
 > [!NOTE]
-> 本地方案与远程私有源方案互斥。启用本地源时请关闭远程源，避免混用；若需切换回远程方案，请参见《[使用 GitHub Actions 发布游戏依赖](./game-libs-remote-publish.md)》。
+> 本地方案与远程源方案互斥。启用本地源时请关闭远程源，避免混用；若需切换回远程方案，请参见 [非托管供应商依赖管理 - 远程源方案](../../projects/unmanaged-vendor/README.md#方案一远程源方案推荐)。
 
 ## 操作指南
 
@@ -65,49 +65,6 @@ dotnet restore
 
 此时 NuGet 会从 `.lf2.nupkg/` 目录读取本地生成的包。
 
-## 源管理
-
-### 切换到远程源
-
-完成离线开发后，如需切换回远程私有源：
-
-```bash
-dotnet nuget disable source local
-dotnet restore
-```
-
-### 源配置说明
-
-本地源的配置在根目录的 `nuget.config` 文件中：
-
-```xml
-<packageSources>
-  <add key="local" value="./.lf2.nupkg" />
-  <!-- 其他源配置 -->
-</packageSources>
-```
-
-启用/禁用操作会控制此源的可用性。
-
-## 故障排除
-
-### 常见问题
-
-**问题**：`dotnet restore` 报告找不到包
-
-- **解决**：确认第一步的 DLL 整理已完成，且第二步的打包操作成功执行
-- **检查**：查看 `.lf2.nupkg/` 目录是否生成了 `.nupkg` 文件
-
-**问题**：FileCourier 执行失败
-
-- **解决**：确认游戏安装目录路径正确，且具有读取权限
-- **检查**：确保 `game-libs.manifest.yaml` 文件存在且格式正确
-
-**问题**：本地包版本不匹配
-
-- **解决**：重新执行第二步的打包操作生成新版本
-- **注意**：游戏更新后需要重新整理所有 DLL 文件
-
 ## 验证成功
 
 执行完所有步骤后，可以通过以下方式验证配置成功：
@@ -116,11 +73,15 @@ dotnet restore
 2. **验证编译**：`dotnet build` 应该能正常编译 Mod 项目
 3. **检查依赖**：在 Visual Studio 或 VS Code 中查看项目依赖是否正确引用
 
-执行完以上步骤后，Mod 工程便能在离线或受限网络环境中完成 `dotnet build` 与 `dotnet restore`。
+执行完以上步骤后，Mod 工程便能完全使用本地生成的依赖包完成 `dotnet build` 与 `dotnet restore`。
+
+> [!TIP]
+> **进阶指南**
+> 关于在不同 NuGet 源之间切换、版本管理、故障排除等更多内容，请参阅 [《NuGet 源管理高级指南》](./nuget-source-management.md)。
 
 ## 相关资源
 
-- **[使用 GitHub Actions 发布游戏依赖](./game-libs-remote-publish.md)** - 团队协作的远程发布方案
+- **[远程源方案](../../projects/unmanaged-vendor/README.md#方案一远程源方案推荐)** - 团队协作的远程发布方案
 - **[游戏依赖包说明](../reference/game-dependencies.md)** - 各依赖包的详细用途与引用场景
 
 ## 参考资料

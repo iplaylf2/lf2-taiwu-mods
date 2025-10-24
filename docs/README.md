@@ -6,8 +6,8 @@
   - 根目录 `README.md`：了解模板特性、准备开发环境、创建首个 Mod。
 - **操作指南**
   - [依赖管理操作指南](./how-to/dependency-management.md)
-  - [离线环境下的游戏依赖准备](./how-to/game-libs-offline-setup.md)
-  - [使用 GitHub Actions 发布游戏依赖](./how-to/game-libs-remote-publish.md)
+  - [本地源方案操作指南](./how-to/game-libs-local-setup.md)
+- [NuGet 源管理指南](./how-to/nuget-source-management.md)
 - **参考资料**
   - [构建系统参考](./reference/build-system.md)
   - [游戏依赖包说明](./reference/game-dependencies.md)
@@ -22,7 +22,7 @@
 
 ## 快速任务映射
 
-- **首次搭建环境 / 创建新 Mod**：根目录 `README.md`、[离线依赖准备](./how-to/game-libs-offline-setup.md)。
-- **修复缺失的游戏程序集或第三方库**：[`projects/unmanaged-vendor/README.md`](../projects/unmanaged-vendor/README.md)、[使用 GitHub Actions 发布游戏依赖](./how-to/game-libs-remote-publish.md)。
+- **首次搭建环境 / 创建新 Mod**：根目录 `README.md`、[本地源方案操作指南](./how-to/game-libs-local-setup.md)。
+- **修复缺失的游戏程序集或第三方库**：[`projects/unmanaged-vendor/README.md`](../projects/unmanaged-vendor/README.md)。
 - **定制构建 / 发布流程**：[构建系统参考](./reference/build-system.md)（包含 [`LF2Mod.targets`](../projects/mods/LF2Mod.targets) 的详细说明）。
 - **查阅现有 Mod 实践**：[`projects/mods/README.md`](../projects/mods/README.md) 及其子目录源码。
