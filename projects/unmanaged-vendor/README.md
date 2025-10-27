@@ -99,13 +99,13 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 2. 在 `<packageSources>` 节中添加：
 
    ```xml
-   <add key="CustomSource" value="https://nuget.pkg.github.com/YourUsername/index.json" />
+   <add key="YourUsername" value="https://nuget.pkg.github.com/YourUsername/index.json" />
    ```
 
 3. 在 `<packageSourceMapping>` 节中为该源声明包匹配：
 
    ```xml
-   <packageSource key="CustomSource">
+   <packageSource key="YourUsername">
      <package pattern="LF2.Taiwu.*" />
    </packageSource>
    ```
@@ -114,10 +114,10 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 
    ```xml
    <packageSourceCredentials>
-     <CustomSource>
+     <YourUsername>
        <add key="Username" value="%GITHUB_USERNAME%" />
        <add key="ClearTextPassword" value="%GITHUB_TOKEN%" />
-     </CustomSource>
+     </YourUsername>
    </packageSourceCredentials>
    ```
 
