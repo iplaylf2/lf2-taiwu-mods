@@ -83,31 +83,38 @@
 
 完成本地开发后，如需切换回远程源：
 
-```bash
-dotnet nuget disable source local
-dotnet restore
-```
+1. 确保恢复命令使用默认配置文件（可显式指定 `--configfile nuget.config`）。
+2. 执行 `dotnet restore`，此时 `LF2.Taiwu.*` 将重新从远程源获取。
 
 #### 从远程源切换到本地源
 
 如果需要从远程源切换回本地源：
 
-1. 禁用远程源（在 `nuget.config` 中注释掉或删除对应的 `<add>` 条目）
-2. 按照本地源方案操作指南配置本地源
-3. 运行 `dotnet restore`
+1. 按照本地源方案生成 `.lf2.nupkg/` 中的包
+2. 使用专用的本地配置执行恢复：
+
+   ```bash
+   dotnet restore --configfile nuget.local.config
+   ```
 
 ### 本地源配置说明
 
-本地源的配置在根目录的 `nuget.config` 文件中：
+仓库提供了独立的 `nuget.local.config`，当需要临时使用本地包时，可搭配该文件执行恢复：
 
 ```xml
 <packageSources>
   <add key="local" value="./.lf2.nupkg" />
   <!-- 其他源配置 -->
 </packageSources>
+<packageSourceMapping>
+  <packageSource key="local">
+    <package pattern="LF2.Taiwu.*" />
+  </packageSource>
+  <!-- 其他映射 -->
+</packageSourceMapping>
 ```
 
-`dotnet nuget enable/disable source local` 命令会控制此源的可用性。
+执行 `dotnet restore --configfile nuget.local.config` 时，NuGet 会在保留公共源的同时，将 `LF2.Taiwu.*` 包优先解析到 `.lf2.nupkg/`。
 
 ### 游戏依赖版本管理
 

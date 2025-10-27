@@ -4,6 +4,7 @@ callvirt
 castclass
 codeball
 coderabbitai
+configfile
 contentfiles
 cysharp
 docstrings

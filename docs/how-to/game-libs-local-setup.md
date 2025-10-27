@@ -49,21 +49,15 @@ dotnet build ./projects/unmanaged-vendor/game/game.slnx -c Release -t:LF2PackGam
 
 该命令会扫描所有项目并生成 NuGet 包[^4]。
 
-### 第三步：启用本地 NuGet 源
+### 第三步：使用本地配置恢复依赖
 
-启用预配置的本地 NuGet 源：
-
-```bash
-dotnet nuget enable source local
-```
-
-然后恢复项目依赖：
+仓库提供了专用的 `nuget.local.config` 文件，用于在本地优先读取 `.lf2.nupkg/` 目录下的包。执行：
 
 ```bash
-dotnet restore
+dotnet restore --configfile nuget.local.config
 ```
 
-此时 NuGet 会从 `.lf2.nupkg/` 目录读取本地生成的包。
+该命令会在保持公共源可用的同时，为 `LF2.Taiwu.*` 映射到本地目录，实现本地依赖的独立恢复。
 
 ## 验证成功
 
