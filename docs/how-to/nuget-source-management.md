@@ -39,14 +39,29 @@
 2. 在 `<packageSources>` 节中添加：
 
     ```xml
-    <add key="YourUsername" value="https://nuget.pkg.github.com/YourUsername/index.json" />
+    <add key="CustomSource" value="https://nuget.pkg.github.com/YourUsername/index.json" />
     ```
 
-3. 配置访问凭据：
-    - 设置环境变量 `GITHUB_USERNAME` 为你的 GitHub 用户名
-    - 设置环境变量 `GITHUB_TOKEN` 为有 `read:packages` 权限的 PAT
+3. 在 `<packageSourceMapping>` 节中为该源声明包匹配：
 
-4. 恢复依赖：
+    ```xml
+    <packageSource key="CustomSource">
+      <package pattern="LF2.Taiwu.*" />
+    </packageSource>
+    ```
+
+4. 在 `<packageSourceCredentials>` 中配置访问凭据，例如引用环境变量：
+
+    ```xml
+    <packageSourceCredentials>
+      <CustomSource>
+        <add key="Username" value="%GITHUB_USERNAME%" />
+        <add key="ClearTextPassword" value="%GITHUB_TOKEN%" />
+      </CustomSource>
+    </packageSourceCredentials>
+    ```
+
+5. 恢复依赖：
 
     ```bash
     dotnet restore
@@ -56,7 +71,7 @@
 
 如果推送到自定义 NuGet 源：
 
-1. 在 `nuget.config` 中添加对应的源地址
+1. 在 `nuget.config` 中添加对应的源地址，并在 `<packageSourceMapping>` 节中为该源添加 `LF2.Taiwu.*` 匹配规则
 2. 根据源的要求配置相应的访问凭据
 3. 运行 `dotnet restore` 验证配置
 
