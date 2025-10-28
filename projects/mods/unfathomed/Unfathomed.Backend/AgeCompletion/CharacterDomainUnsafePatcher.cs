@@ -54,11 +54,11 @@ internal static class CharacterDomainUnsafePatcher
 
         const byte characterArg = 4;
 
-        _ = instructions.TryGetLoc(11, out var elementObjectsLoc);
+        _ = matcher.TryGetLoc(11, out var elementObjectsLoc);
 
         // const byte ageGroup1Loc = 2;
 
-        _ = instructions.TryGetLoc(14, out var ageGroup2Loc);
+        _ = matcher.TryGetLoc(14, out var ageGroup2Loc);
 
         var ageGroupTupleType = typeof((sbyte, sbyte));
         var item1Field = AccessTools.Field
