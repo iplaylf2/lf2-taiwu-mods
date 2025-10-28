@@ -42,11 +42,28 @@
     <add key="YourUsername" value="https://nuget.pkg.github.com/YourUsername/index.json" />
     ```
 
-3. 配置访问凭据：
-    - 设置环境变量 `GITHUB_USERNAME` 为你的 GitHub 用户名
-    - 设置环境变量 `GITHUB_TOKEN` 为有 `read:packages` 权限的 PAT
+3. 在 `<packageSourceMapping>` 节中为该源声明包匹配：
 
-4. 恢复依赖：
+    ```xml
+    <packageSource key="YourUsername">
+      <package pattern="LF2.Taiwu.*" />
+    </packageSource>
+    ```
+
+4. 在 `<packageSourceCredentials>` 中配置访问凭据，例如引用环境变量：
+
+    ```xml
+    <packageSourceCredentials>
+      <YourUsername>
+        <add key="Username" value="%GITHUB_USERNAME%" />
+        <add key="ClearTextPassword" value="%GITHUB_TOKEN%" />
+      </YourUsername>
+    </packageSourceCredentials>
+    ```
+
+    执行命令前，请确保在当前终端设置 `GITHUB_USERNAME` 与 `GITHUB_TOKEN` 环境变量，其中 `GITHUB_TOKEN` 必须拥有 `read:packages` 权限[^1]。
+
+5. 恢复依赖：
 
     ```bash
     dotnet restore
@@ -56,7 +73,7 @@
 
 如果推送到自定义 NuGet 源：
 
-1. 在 `nuget.config` 中添加对应的源地址
+1. 在 `nuget.config` 中添加对应的源地址，并在 `<packageSourceMapping>` 节中为该源添加 `LF2.Taiwu.*` 匹配规则
 2. 根据源的要求配置相应的访问凭据
 3. 运行 `dotnet restore` 验证配置
 
@@ -68,31 +85,37 @@
 
 完成本地开发后，如需切换回远程源：
 
-```bash
-dotnet nuget disable source local
-dotnet restore
-```
+- 使用默认配置执行 `dotnet restore`（默认读取 `nuget.config`），此时 `LF2.Taiwu.*` 将重新从远程源获取。
 
 #### 从远程源切换到本地源
 
 如果需要从远程源切换回本地源：
 
-1. 禁用远程源（在 `nuget.config` 中注释掉或删除对应的 `<add>` 条目）
-2. 按照本地源方案操作指南配置本地源
-3. 运行 `dotnet restore`
+1. 按照本地源方案生成 `.lf2.nupkg/` 中的包
+2. 使用专用的本地配置执行恢复：
+
+   ```bash
+   dotnet restore --configfile nuget.local.config
+   ```
 
 ### 本地源配置说明
 
-本地源的配置在根目录的 `nuget.config` 文件中：
+仓库提供了独立的 `nuget.local.config`，当需要临时使用本地包时，可搭配该文件执行恢复：
 
 ```xml
 <packageSources>
   <add key="local" value="./.lf2.nupkg" />
   <!-- 其他源配置 -->
 </packageSources>
+<packageSourceMapping>
+  <packageSource key="local">
+    <package pattern="LF2.Taiwu.*" />
+  </packageSource>
+  <!-- 其他映射 -->
+</packageSourceMapping>
 ```
 
-`dotnet nuget enable/disable source local` 命令会控制此源的可用性。
+执行 `dotnet restore --configfile nuget.local.config` 时，NuGet 会在保留公共源的同时，将 `LF2.Taiwu.*` 包优先解析到 `.lf2.nupkg/`。
 
 ### 游戏依赖版本管理
 
@@ -175,3 +198,14 @@ dotnet restore
 - **解决**：重新执行打包操作生成新版本
 - **注意**：游戏更新后需要重新整理所有 DLL 文件
 - **验证**：检查 `Directory.Build.props` 中的 `LF2TaiwuVersion` 版本设置
+
+## 相关资源
+
+- **[`nuget.config`](../../nuget.config)** - 默认源、凭据与映射配置示例
+- **[依赖基础设施](../reference/dependency-infrastructure.md)** - 游戏依赖包体系与打包流程
+- **[GitHub Docs: Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)** - PAT 权限说明
+- **[NuGet CLI 文档：环境变量](https://learn.microsoft.com/nuget/reference/cli-reference/cli-ref-environment-variables)** - 在命令行中配置凭据所需的环境变量说明
+
+## 参考资料
+
+[^1]: 可在运行 `dotnet restore` 前通过 `export GITHUB_USERNAME=...`、`export GITHUB_TOKEN=...`（或等效方式）设置；令牌需具备 `read:packages` 权限。

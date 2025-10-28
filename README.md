@@ -60,12 +60,17 @@
 - **[文档索引](./docs/README.md)**：浏览完整的文档分类，按需跳转到操作指南与参考资料。
 - **[仓库内 Mod 导览](./projects/mods/README.md)**：查看目前包含的 Mod 列表、状态与源码路径。
 
+## 相关资源
+
+- **[仓库目录结构](./docs/reference/repository-layout.md)** - 了解模板约定的项目命名与目录职责。
+- **[构建系统参考 - Mod 打包使用指南](./docs/reference/build-system.md#mod-打包使用指南)** - 深入掌握 `LF2PublishMod` 打包目标的工作流程。
+
 ## 贡献与反馈
 
 欢迎通过提交 Issue 或 Pull Request 来为本项目做出贡献。
 
 ## 参考资料
 
-[^1]: `.Backend` 和 `.Frontend` 后缀是构建系统识别项目类型的关键约定。系统会据此自动配置相应的依赖和构建参数。更多约定说明请参阅：[仓库目录结构](./docs/reference/repository-layout.md)
+[^1]: `.Backend` 和 `.Frontend` 后缀是构建系统识别项目类型的关键约定，系统会据此自动配置相应的依赖和构建参数。
 
-[^2]: `LF2PublishMod` 是构建系统提供的发布目标，详细机制请参阅：[构建系统参考 - Mod 打包使用指南](./docs/reference/build-system.md#mod-打包使用指南)
+[^2]: `LF2PublishMod` 是构建系统提供的发布目标，负责产出符合游戏规范的发布目录结构。

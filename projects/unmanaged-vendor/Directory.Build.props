@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(IsPackable)' == 'true'">
+        <Deterministic>true</Deterministic>
         <PlatformTarget>anycpu</PlatformTarget>
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <NoWarn>$(NoWarn);NU5131</NoWarn>
