@@ -133,7 +133,7 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 
 ### 方案二：本地打包方案
 
-对于快速验证或无法联网的场景，可以选择本地打包方案。具体操作步骤请参阅 [本地源方案操作指南](../../docs/how-to/game-libs-local-setup.md)。更多策略与可选项请参考 [游戏依赖包技术规格](../../docs/reference/game-libs-packaging.md)。
+对于快速验证或无法联网的场景，可以选择本地打包方案。具体操作步骤请参阅 [本地源方案操作指南](../../docs/how-to/game-libs-local-setup.md)。更多策略与可选项请参考 [《依赖基础设施》](../../docs/reference/dependency-infrastructure.md)。
 
 ---
 
@@ -153,9 +153,9 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 
 ## 参考资料
 
-[^1]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。详细格式说明请参阅：[游戏依赖包技术规格 - 清单文件格式](../../docs/reference/game-libs-packaging.md#清单文件格式)
-[^2]: `<PackageId>/lib/` 目录结构遵循本仓库的包体系设计，区分 backend 和 frontend 两种目标框架。详细规范请参阅：[游戏依赖包技术规格 - 目录命名约定](../../docs/reference/game-libs-packaging.md#目录命名约定)
+[^1]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。详细格式说明请参阅：[《依赖基础设施》 - 清单文件格式](../../docs/reference/dependency-infrastructure.md#清单文件格式)
+[^2]: `<PackageId>/lib/` 目录结构遵循本仓库的包体系设计，区分 backend 和 frontend 两种目标框架。详细规范请参阅：[《依赖基础设施》 - 目录命名约定](../../docs/reference/dependency-infrastructure.md#目录命名约定)
 [^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](tools/FileCourier/README.md)
 [^4]: GitHub Actions 机密用于安全存储敏感信息，避免在日志中暴露。设置方式：进入仓库 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`，创建名为 `LF2_GAME_LIBS_URL` 的机密，值为压缩包下载地址。要深入了解安全最佳实践，请参考 [GitHub Actions 安全文档](https://docs.github.com/zh-cn/actions/security-guides/using-secrets-in-github-actions)
-[^5]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[游戏依赖包技术规格 - 打包目标](../../docs/reference/game-libs-packaging.md#打包目标)
-[^6]: 游戏程序集作为编译时依赖，不随 Mod 分发。关于程序集分发的最佳实践，详见 [游戏依赖打包技术规格](../../docs/reference/game-libs-packaging.md)
+[^5]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[《依赖基础设施》 - 打包目标](../../docs/reference/dependency-infrastructure.md#打包目标)
+[^6]: 游戏程序集作为编译时依赖，不随 Mod 分发。关于程序集分发的最佳实践，详见 [《依赖基础设施》](../../docs/reference/dependency-infrastructure.md)

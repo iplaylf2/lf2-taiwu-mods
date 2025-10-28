@@ -83,8 +83,7 @@
 
 完成本地开发后，如需切换回远程源：
 
-1. 确保恢复命令使用默认配置文件（可显式指定 `--configfile nuget.config`）。
-2. 执行 `dotnet restore`，此时 `LF2.Taiwu.*` 将重新从远程源获取。
+- 使用默认配置执行 `dotnet restore`（默认读取 `nuget.config`），此时 `LF2.Taiwu.*` 将重新从远程源获取。
 
 #### 从远程源切换到本地源
 
