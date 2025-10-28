@@ -9,7 +9,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
-        HarmonyInstance.PatchArray
+        HarmonyInstance.PatchMultiple
         ([
             typeof(CombatCheat.CollapseCatchOdds),
             typeof(CombatCheat.MissMe),
