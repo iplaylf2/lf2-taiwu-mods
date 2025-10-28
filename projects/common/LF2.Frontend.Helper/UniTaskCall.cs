@@ -76,6 +76,5 @@ public sealed class UniTaskCall
     <
         int,
         UniTaskCompletionSource<SerializableModData>
-    >
-    CallRegistry = new();
+    > CallRegistry = new();
 }

@@ -31,71 +31,59 @@ public static class MethodSegmenter
 
     public static T CreateLeftSegment<T>(LeftConfig<T> config) where T : Delegate
     {
-        InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
+        using var sourceMethod = new DynamicMethodDefinition(config.Prototype);
+        using var ilContext = new ILContext(sourceMethod.Definition);
 
-        using (dynamicMethod)
-        using (ilContext)
-        {
-            ilContext.Invoke
-            (
-                ilContext =>
-                {
-                    GuardOriginalReturns(ilContext, config.Prototype);
-                    InjectSplitPoint(ilContext, config.InjectSplitPoint);
-                }
-            );
+        ilContext.Invoke
+        (
+            ilContext =>
+            {
+                GuardOriginalReturns(ilContext, config.Prototype.ReturnType);
+                InjectSplitPoint(ilContext, config.InjectSplitPoint);
+            }
+        );
 
-            return dynamicMethod.Generate().CreateDelegate<T>();
-        }
+        return CreateDelegate<T>(sourceMethod);
     }
 
     public static T CreateRightSegment<T>(RightConfig<T> config) where T : Delegate
     {
-        InitILContext<T>(config.Prototype, out var dynamicMethod, out var ilContext);
+        using var sourceMethod = new DynamicMethodDefinition(config.Prototype);
+        using var ilContext = new ILContext(sourceMethod.Definition);
 
-        using (dynamicMethod)
-        using (ilContext)
-        {
-            ilContext.Invoke
-            (
-                ilContext =>
-                {
-                    var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
-                    RestoreExecutionContext(ilContext, label);
-                }
-            );
-
-            return dynamicMethod.Generate().CreateDelegate<T>();
-        }
-    }
-
-    private static void InitILContext<T>
-    (
-        MethodBase prototype,
-        out DynamicMethodDefinition dynamicMethod,
-        out ILContext ilContext
-    ) where T : Delegate
-    {
-        var delegateType = typeof(T).GetMethod("Invoke")!;
-        dynamicMethod = DynamicMethodDefinitionHelper.CreateFrom
+        ilContext.Invoke
         (
-            prototype,
-            delegateType.ReturnType,
-            [.. delegateType.GetParameters().Select(x => x.ParameterType)]
+            ilContext =>
+            {
+                var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
+
+                RestoreExecutionContext(ilContext, label);
+            }
         );
-        ilContext = new ILContext(dynamicMethod.Definition);
+
+        return CreateDelegate<T>(sourceMethod);
     }
 
-    private static void GuardOriginalReturns(ILContext ilContext, MethodInfo prototype)
+    private static T CreateDelegate<T>(DynamicMethodDefinition sourceMethod) where T : Delegate
+    {
+        using var targetMethod = DynamicMethodDefinitionHelper.CreateSkeleton<T>();
+
+        targetMethod.Definition.Body = sourceMethod.Definition.Body.Clone(targetMethod.Definition);
+        targetMethod.OwnerType = sourceMethod.OwnerType;
+
+        return targetMethod.Generate().CreateDelegate<T>();
+    }
+
+    private static void GuardOriginalReturns(ILContext ilContext, Type returnType)
     {
         var ilCursor = new ILCursor(ilContext);
 
         ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
-        Action @do = prototype.ReturnType switch
+        Action @do = returnType switch
         {
             var x when x == typeof(void) => () => PatchVoidReturns(retCursors),
-            { IsValueType: true } => () => PatchValueReturns(retCursors, prototype.ReturnType),
+            var x when x is { IsValueType: true } => () => PatchValueReturns(retCursors, x),
             _ => () => PatchObjectReturns(retCursors)
         };
 
@@ -125,7 +113,6 @@ public static class MethodSegmenter
         _ = ilCursor.Emit(OpCodes.Br, continuationLabel);
 
         injectContinuationPoint(ilCursor);
-
         ilCursor.MarkLabel(continuationLabel);
 
         return continuationLabel;
@@ -159,33 +146,31 @@ public static class MethodSegmenter
         var stackValueParams = preservedStackTypes.Select(Expression.Parameter).ToArray();
         var isSplitReturnParam = Expression.Parameter(typeof(bool));
         var variablesParam = Expression.Parameter(typeof(object[]));
-        ParameterExpression[] parameters = [.. stackValueParams, isSplitReturnParam, variablesParam];
-
+        var parameters = Array.AsReadOnly([.. stackValueParams, isSplitReturnParam, variablesParam]);
         var objectType = typeof(object);
-
         var lambda = Expression
-            .Lambda
+        .Lambda
+        (
+            Expression.New
             (
-                Expression.New
+                AccessTools.FirstConstructor
                 (
-                    AccessTools.FirstConstructor
-                    (
-                        typeof(Tuple<object[], bool, object[]>),
-                        x => x.GetParameters().Length == 3
-                    ),
-                    Expression.NewArrayInit
-                    (
-                        typeof(object),
-                        stackValueParams.Select
-                        (
-                            x => x.Type.IsValueType ? Expression.Convert(x, objectType) : (Expression)x
-                        )
-                    ),
-                    isSplitReturnParam,
-                    variablesParam
+                    typeof(Tuple<object[], bool, object[]>),
+                    x => x.GetParameters().Length == 3
                 ),
-                parameters
-            );
+                Expression.NewArrayInit
+                (
+                    typeof(object),
+                    stackValueParams.Select
+                    (
+                        x => x.Type.IsValueType ? Expression.Convert(x, objectType) : (Expression)x
+                    )
+                ),
+                isSplitReturnParam,
+                variablesParam
+            ),
+            parameters
+        );
 
         return ExpressionHelper.ToStaticMethod(lambda);
     }

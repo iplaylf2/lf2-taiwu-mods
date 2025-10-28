@@ -1,31 +1,18 @@
-using System.Reflection;
-using MonoMod.Cil;
 using MonoMod.Utils;
 
 namespace LF2.Cecil.Helper.MonoMod;
 
 public static class DynamicMethodDefinitionHelper
 {
-    public static DynamicMethodDefinition CreateFrom
-    (
-        MethodBase prototype,
-        Type returnType,
-        Type[] parameterTypes
-    )
+    public static DynamicMethodDefinition CreateSkeleton<T>() where T : Delegate
     {
-        using var prototypeDMD = new DynamicMethodDefinition(prototype);
-        using var prototypeContext = new ILContext(prototypeDMD.Definition);
+        var delegateType = typeof(T).GetMethod("Invoke")!;
 
-        var result = new DynamicMethodDefinition
+        return new
         (
-            prototypeDMD.Name,
-            returnType,
-            parameterTypes
+            delegateType.Name,
+            delegateType.ReturnType,
+            [.. delegateType.GetParameters().Select(x => x.ParameterType)]
         );
-
-        result.Definition.Body = prototypeContext.Body.Clone(result.Definition);
-        result.OwnerType = prototypeDMD.OwnerType;
-
-        return result;
     }
 }
