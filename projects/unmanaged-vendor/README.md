@@ -32,19 +32,19 @@
 
 ##### 第一步：整理游戏 DLL 文件
 
-根据 [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 中的映射关系[^1]，将游戏程序集放置到对应目录。
+根据 [`game-libs.manifest.yaml`](game/game-libs.manifest.yaml) 中的映射关系，将游戏程序集放置到对应目录。
 
 ###### 选项一：手动整理
 
 1. 根据清单文件中的映射关系整理文件
-2. 将游戏 DLL 放置到 `<临时目录>/game/<PackageId>/lib/` 目录[^2]
+2. 将游戏 DLL 放置到 `<临时目录>/game/<PackageId>/lib/` 目录[^1]
 3. 确保目录结构符合标准布局
 
 完成后，将生成的 `game/` 目录用于后续操作。
 
 ###### 选项二：使用 FileCourier 自动整理（推荐）
 
-1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的 FileCourier 可执行文件[^3]
+1. 从 [GitHub Releases](https://github.com/iplaylf2/lf2-taiwu-mods/releases) 下载对应平台的 FileCourier 可执行文件[^2]
 2. 将可执行文件与 `game-libs.manifest.yaml` 放在同一目录
 3. 运行命令：
 
@@ -64,7 +64,7 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 
 1. 进入仓库 `Settings` > `Secrets and variables` > `Actions`
 2. 创建或更新以下机密：
-   - **`LF2_GAME_LIBS_URL`**：第二步中获得的压缩包下载地址[^4]
+   - **`LF2_GAME_LIBS_URL`**：用于存放第二步获得的压缩包下载地址[^3]
    - **`LF2_NUGET_API_KEY`**（可选）：指定自定义 `Source` 时所需的 API 密钥
 
 ##### 第四步：触发发布工作流
@@ -80,7 +80,7 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 
 - 从 `LF2_GAME_LIBS_URL` 下载压缩包
 - 解压并覆盖 `projects/unmanaged-vendor/game/` 目录
-- 执行 `LF2PackGameLibs` 构建目标生成 NuGet 包[^5]
+- 执行 `LF2PackGameLibs` 构建目标生成 NuGet 包[^4]
 - 推送包到目标远程源
 
 > [!NOTE]
@@ -129,11 +129,11 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 
 > [!TIP]
 > **进阶指南**
-> 关于包的安全性、源管理、故障排除等更多内容，请参阅 [《NuGet 源管理指南》](../../docs/how-to/nuget-source-management.md)。
+> 关于包的安全性、源管理、故障排除等更多内容，请参阅 [NuGet 源管理指南](../../docs/how-to/nuget-source-management.md)。
 
 ### 方案二：本地打包方案
 
-对于快速验证或无法联网的场景，可以选择本地打包方案。具体操作步骤请参阅 [本地源方案操作指南](../../docs/how-to/game-libs-local-setup.md)。更多策略与可选项请参考 [《依赖基础设施》](../../docs/reference/dependency-infrastructure.md)。
+对于快速验证或无法联网的场景，可以选择本地打包方案。具体操作步骤请参阅 [本地源方案操作指南](../../docs/how-to/game-libs-local-setup.md)。更多策略与可选项请参考 [依赖基础设施](../../docs/reference/dependency-infrastructure.md)。
 
 ---
 
@@ -142,8 +142,7 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 ### `game/` 目录
 
 - **主要用途**：用于生成《太吾绘卷》官方程序集包
-- **使用场景**：供 Mod 在编译阶段引用所需的游戏程序集[^6]
-- **重要说明**：这些包默认不会随 Mod 一起分发，仅作为编译时依赖
+- **使用场景**：供 Mod 在编译阶段引用所需的游戏程序集[^5]
 
 ### `upm/` 目录
 
@@ -151,11 +150,17 @@ FileCourier 会自动按照 manifest 复制所需文件并生成正确的目录�
 - **注意事项**：自动化工作流不会自动处理该目录
 - **操作指南**：具体做法请参考 [依赖管理操作指南](../../docs/how-to/dependency-management.md)
 
+## 相关资源
+
+- **[依赖基础设施](../../docs/reference/dependency-infrastructure.md)** - 游戏依赖包体系、清单结构与目录规范
+- **[本地源方案操作指南](../../docs/how-to/game-libs-local-setup.md)** - 在本地整理并消费游戏依赖的完整流程
+- **[NuGet 源管理指南](../../docs/how-to/nuget-source-management.md)** - 远程源配置、凭据管理与常见问题排查
+- **[FileCourier 工具文档](tools/FileCourier/README.md)** - manifest 驱动的文件分拣工具说明
+
 ## 参考资料
 
-[^1]: 清单文件定义了游戏 DLL 文件到包目录的映射规则，是自动化文件整理的核心配置。详细格式说明请参阅：[《依赖基础设施》 - 清单文件格式](../../docs/reference/dependency-infrastructure.md#清单文件格式)
-[^2]: `<PackageId>/lib/` 目录结构遵循本仓库的包体系设计，区分 backend 和 frontend 两种目标框架。详细规范请参阅：[《依赖基础设施》 - 目录命名约定](../../docs/reference/dependency-infrastructure.md#目录命名约定)
-[^3]: FileCourier 是本仓库提供的跨平台文件分拣工具，支持基于 manifest 的自动化文件整理。详细了解其功能请参阅：[FileCourier 工具文档](tools/FileCourier/README.md)
-[^4]: GitHub Actions 机密用于安全存储敏感信息，避免在日志中暴露。设置方式：进入仓库 `Settings` > `Secrets and variables` > `Actions` > `New repository secret`，创建名为 `LF2_GAME_LIBS_URL` 的机密，值为压缩包下载地址。要深入了解安全最佳实践，请参考 [GitHub Actions 安全文档](https://docs.github.com/zh-cn/actions/security-guides/using-secrets-in-github-actions)
-[^5]: `LF2PackGameLibs` 是构建系统提供的打包目标，能够自动识别项目类型并生成对应的 NuGet 包。详细机制请参阅：[《依赖基础设施》 - 打包目标](../../docs/reference/dependency-infrastructure.md#打包目标)
-[^6]: 游戏程序集作为编译时依赖，不随 Mod 分发。关于程序集分发的最佳实践，详见 [《依赖基础设施》](../../docs/reference/dependency-infrastructure.md)
+[^1]: `lib/backend`、`lib/frontend` 等目录约定用于区分后端与前端程序集，确保构建系统选择正确模板。
+[^2]: FileCourier 是本仓库提供的 manifest 驱动分拣工具，可自动复制并整理所需 DLL。
+[^3]: `LF2_GAME_LIBS_URL` 机密用于安全存放游戏 DLL 压缩包的下载地址，避免在日志中曝光。
+[^4]: `LF2PackGameLibs` 构建目标负责将整理好的 DLL 打包成 NuGet 包，并交由后续流程推送到目标源。
+[^5]: 游戏程序集在本流程中仅作为编译期依赖，不会随 Mod 发布一同分发。

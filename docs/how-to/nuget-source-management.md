@@ -61,6 +61,8 @@
     </packageSourceCredentials>
     ```
 
+    执行命令前，请确保在当前终端设置 `GITHUB_USERNAME` 与 `GITHUB_TOKEN` 环境变量，其中 `GITHUB_TOKEN` 必须拥有 `read:packages` 权限[^1]。
+
 5. 恢复依赖：
 
     ```bash
@@ -196,3 +198,14 @@
 - **解决**：重新执行打包操作生成新版本
 - **注意**：游戏更新后需要重新整理所有 DLL 文件
 - **验证**：检查 `Directory.Build.props` 中的 `LF2TaiwuVersion` 版本设置
+
+## 相关资源
+
+- **[`nuget.config`](../../nuget.config)** - 默认源、凭据与映射配置示例
+- **[依赖基础设施](../reference/dependency-infrastructure.md)** - 游戏依赖包体系与打包流程
+- **[GitHub Docs: Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)** - PAT 权限说明
+- **[NuGet CLI 文档：环境变量](https://learn.microsoft.com/nuget/reference/cli-reference/cli-ref-environment-variables)** - 在命令行中配置凭据所需的环境变量说明
+
+## 参考资料
+
+[^1]: 可在运行 `dotnet restore` 前通过 `export GITHUB_USERNAME=...`、`export GITHUB_TOKEN=...`（或等效方式）设置；令牌需具备 `read:packages` 权限。
