@@ -5,7 +5,7 @@ using GameData.Domains.Character.Creation;
 using GameData.Domains.Character.Display;
 using GameData.Domains.Mod;
 using HarmonyLib;
-using LF2.Cecil.Helper;
+using LF2.Cecil.Helper.MethodSegmentation;
 using LF2.Frontend.Helper;
 using LF2.Game.Helper.Communication;
 using LF2.Kit.Extensions;
@@ -153,12 +153,11 @@ internal static class DoStartNewGamePatcher
     }
 
     private sealed class BeforeRollConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig
-        <
-            Func<UI_NewGame, Tuple<object[], bool, object[]>>
-        >((MethodInfo)origin)
+        ISplitConfig<Func<UI_NewGame, Tuple<object[], bool, object[]>>>
     {
-        protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
+        public MethodInfo Prototype { get; } = (MethodInfo)origin;
+
+        public IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
             var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
 
@@ -175,9 +174,11 @@ internal static class DoStartNewGamePatcher
     }
 
     private sealed class AfterRollConfig(MethodBase origin) :
-        MethodSegmenter.RightConfig<Action<UI_NewGame, object[]>>((MethodInfo)origin)
+    IContinuationConfig<Action<UI_NewGame, object[]>>
     {
-        protected override void InjectContinuationPoint(ILCursor ilCursor)
+        public MethodInfo Prototype { get; } = (MethodInfo)origin;
+
+        public void InjectContinuationPoint(ILCursor ilCursor)
         {
             var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
 

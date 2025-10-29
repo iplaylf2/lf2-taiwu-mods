@@ -7,7 +7,7 @@ using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
 using LF2.Backend.Helper;
-using LF2.Cecil.Helper;
+using LF2.Cecil.Helper.MethodSegmentation;
 using LF2.Game.Helper.Communication;
 using MonoMod.Cil;
 using RollProtagonist.Common;
@@ -129,12 +129,11 @@ internal static class RollProtagonistBuilder
     }
 
     private class RollOperationConfig(MethodBase origin) :
-        MethodSegmenter.LeftConfig<CreateProtagonistFlow.RollOperation>
-        (
-            (MethodInfo)origin
-        )
+    ISplitConfig<CreateProtagonistFlow.RollOperation>
     {
-        protected override IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
+        public MethodInfo Prototype { get; } = (MethodInfo)origin;
+
+        public IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
         {
             var offlineCreateProtagonist =
             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
@@ -151,11 +150,11 @@ internal static class RollProtagonistBuilder
     }
 
     private class CommitOperationConfig(MethodBase origin) :
-        MethodSegmenter.RightConfig<CreateProtagonistFlow.CommitOperation>(
-            (MethodInfo)origin
-        )
+    IContinuationConfig<CreateProtagonistFlow.CommitOperation>
     {
-        protected override void InjectContinuationPoint(ILCursor ilCursor)
+        public MethodInfo Prototype { get; } = (MethodInfo)origin;
+
+        public void InjectContinuationPoint(ILCursor ilCursor)
         {
             var offlineCreateProtagonist =
             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));

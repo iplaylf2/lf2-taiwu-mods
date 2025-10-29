@@ -3,33 +3,14 @@ using LF2.Cecil.Helper.MonoMod;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.Utils;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace LF2.Cecil.Helper;
+namespace LF2.Cecil.Helper.MethodSegmentation;
 
-[SuppressMessage
-("Design", "CA1034:Nested types should not be visible")
-]
 public static class MethodSegmenter
 {
-    public abstract class LeftConfig<T>(MethodInfo prototype) where T : Delegate
-    {
-        protected internal MethodInfo Prototype => prototype;
-        protected internal abstract IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor);
-    }
-
-    public abstract class RightConfig<T>
-    (
-        MethodInfo prototype
-    ) where T : Delegate
-    {
-        protected internal MethodInfo Prototype => prototype;
-        protected internal abstract void InjectContinuationPoint(ILCursor ilCursor);
-    }
-
-    public static T CreateLeftSegment<T>(LeftConfig<T> config) where T : Delegate
+    public static T CreateLeftSegment<T>(ISplitConfig<T> config) where T : Delegate
     {
         using var sourceMethod = new DynamicMethodDefinition(config.Prototype);
         using var ilContext = new ILContext(sourceMethod.Definition);
@@ -46,7 +27,7 @@ public static class MethodSegmenter
         return CreateDelegate<T>(sourceMethod);
     }
 
-    public static T CreateRightSegment<T>(RightConfig<T> config) where T : Delegate
+    public static T CreateRightSegment<T>(IContinuationConfig<T> config) where T : Delegate
     {
         using var sourceMethod = new DynamicMethodDefinition(config.Prototype);
         using var ilContext = new ILContext(sourceMethod.Definition);
