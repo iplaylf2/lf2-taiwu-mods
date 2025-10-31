@@ -100,13 +100,16 @@
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/Redzen.dll
 
-- target-dir: Taiwu.Google.Protobuf/lib/frontend
+- target-dir: Taiwu.NLog/lib/backend
   source-files:
-    - ./The Scroll of Taiwu_Data/Managed/Google.Protobuf.dll
-
+    - Backend/NLog.dll
 - target-dir: Taiwu.NLog/lib/frontend
   source-files:
     - ./The Scroll of Taiwu_Data/Managed/NLog.dll
+
+- target-dir: Taiwu.Google.Protobuf/lib/frontend
+  source-files:
+    - ./The Scroll of Taiwu_Data/Managed/Google.Protobuf.dll
 
 - target-dir: Taiwu.Spine/lib/frontend
   source-files:
