@@ -25,11 +25,42 @@ internal static class DoStartNewGamePatcher
     {
         Game.ClockAndLogInfo("RefactorDoStartNewGame started", false);
 
-        var beforeRoll = MethodSegmenter.CreateLeftSegment(new BeforeRollConfig(origin));
+        static IEnumerable<Type> BeforeRollSplitPoint(ILCursor ilCursor)
+        {
+            var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
+
+            _ = ilCursor
+            .GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()))
+            .Remove();
+
+            return
+            [
+                typeof(int),
+                typeof(ProtagonistCreationInfo)
+            ];
+        }
+
+        static void AfterRollContinuationPoint(ILCursor ilCursor)
+        {
+            var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
+
+            _ = ilCursor.GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
+            ilCursor.Index++;
+        }
+
+        var beforeRoll = MethodSegmenter.CreateLeftSegment<Func<UI_NewGame, Tuple<object[], bool, object[]>>>
+        (
+            (MethodInfo)origin,
+            BeforeRollSplitPoint
+        );
 
         Game.ClockAndLogInfo($"{nameof(beforeRoll)} generated", false);
 
-        var afterRoll = MethodSegmenter.CreateRightSegment(new AfterRollConfig(origin));
+        var afterRoll = MethodSegmenter.CreateRightSegment<Action<UI_NewGame, object[]>>
+        (
+            (MethodInfo)origin,
+            AfterRollContinuationPoint
+        );
 
         Game.ClockAndLogInfo($"{nameof(afterRoll)}  generated", false);
 
@@ -150,41 +181,6 @@ internal static class DoStartNewGamePatcher
     private static void Cleanup()
     {
         CharacterDisplay?.Destroy();
-    }
-
-    private sealed class BeforeRollConfig(MethodBase origin) :
-        ISplitConfig<Func<UI_NewGame, Tuple<object[], bool, object[]>>>
-    {
-        public MethodInfo Prototype { get; } = (MethodInfo)origin;
-
-        public IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
-        {
-            var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
-
-            _ = ilCursor
-            .GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()))
-            .Remove();
-
-            return
-            [
-                typeof(int),
-                typeof(ProtagonistCreationInfo)
-            ];
-        }
-    }
-
-    private sealed class AfterRollConfig(MethodBase origin) :
-    IContinuationConfig<Action<UI_NewGame, object[]>>
-    {
-        public MethodInfo Prototype { get; } = (MethodInfo)origin;
-
-        public void InjectContinuationPoint(ILCursor ilCursor)
-        {
-            var createProtagonist = CharacterDomainMethod.Call.CreateProtagonist;
-
-            _ = ilCursor.GotoNext(x => x.MatchCallOrCallvirt(createProtagonist.GetMethodInfo()));
-            ilCursor.Index++;
-        }
     }
 
     private static async UniTask ExecuteInitial(ProtagonistCreationInfo creationInfo)

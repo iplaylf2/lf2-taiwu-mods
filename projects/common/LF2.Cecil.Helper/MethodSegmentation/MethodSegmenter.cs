@@ -10,33 +10,43 @@ namespace LF2.Cecil.Helper.MethodSegmentation;
 
 public static class MethodSegmenter
 {
-    public static T CreateLeftSegment<T>(ISplitConfig<T> config) where T : Delegate
+    public static T CreateLeftSegment<T>
+    (
+        MethodInfo prototype,
+        Func<ILCursor, IEnumerable<Type>> injectSplitPoint
+    )
+    where T : Delegate
     {
-        using var sourceMethod = new DynamicMethodDefinition(config.Prototype);
+        using var sourceMethod = new DynamicMethodDefinition(prototype);
         using var ilContext = new ILContext(sourceMethod.Definition);
 
         ilContext.Invoke
         (
             ilContext =>
             {
-                GuardOriginalReturns(ilContext, config.Prototype.ReturnType);
-                InjectSplitPoint(ilContext, config.InjectSplitPoint);
+                GuardOriginalReturns(ilContext, prototype.ReturnType);
+                InjectSplitPoint(ilContext, injectSplitPoint);
             }
         );
 
         return CreateDelegate<T>(sourceMethod);
     }
 
-    public static T CreateRightSegment<T>(IContinuationConfig<T> config) where T : Delegate
+    public static T CreateRightSegment<T>
+    (
+        MethodInfo prototype,
+        Action<ILCursor> injectContinuationPoint
+    )
+    where T : Delegate
     {
-        using var sourceMethod = new DynamicMethodDefinition(config.Prototype);
+        using var sourceMethod = new DynamicMethodDefinition(prototype);
         using var ilContext = new ILContext(sourceMethod.Definition);
 
         ilContext.Invoke
         (
             ilContext =>
             {
-                var label = InjectContinuationPoint(ilContext, config.InjectContinuationPoint);
+                var label = InjectContinuationPoint(ilContext, injectContinuationPoint);
 
                 RestoreExecutionContext(ilContext, label);
             }

@@ -25,11 +25,47 @@ internal static class RollProtagonistBuilder
     {
         AdaptableLog.Info("CreateFlow started");
 
-        var roll = MethodSegmenter.CreateLeftSegment(new RollOperationConfig(origin));
+        static IEnumerable<Type> RollOperationSplitPoint(ILCursor ilCursor)
+        {
+            var offlineCreateProtagonist =
+            AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+
+            _ = ilCursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
+                x => x.MatchStloc(out var _)
+            );
+
+            return [];
+        }
+
+        static void CommitOperationContinuationPoint(ILCursor ilCursor)
+        {
+            var offlineCreateProtagonist =
+            AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
+
+            _ = ilCursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
+                x => x.MatchStloc(out var _)
+            );
+        }
+
+        var roll = MethodSegmenter.CreateLeftSegment<CreateProtagonistFlow.RollOperation>
+        (
+            (MethodInfo)origin,
+            RollOperationSplitPoint
+        );
 
         AdaptableLog.Info($"{nameof(roll)} generated");
 
-        var commit = MethodSegmenter.CreateRightSegment(new CommitOperationConfig(origin));
+        var commit = MethodSegmenter.CreateRightSegment<CreateProtagonistFlow.CommitOperation>
+        (
+            (MethodInfo)origin,
+            CommitOperationContinuationPoint
+        );
 
         AdaptableLog.Info($"{nameof(commit)} generated");
 
@@ -126,46 +162,6 @@ internal static class RollProtagonistBuilder
             FavorabilityToTaiwu = 0,
             IsInteractedCharacter = false
         };
-    }
-
-    private class RollOperationConfig(MethodBase origin) :
-    ISplitConfig<CreateProtagonistFlow.RollOperation>
-    {
-        public MethodInfo Prototype { get; } = (MethodInfo)origin;
-
-        public IEnumerable<Type> InjectSplitPoint(ILCursor ilCursor)
-        {
-            var offlineCreateProtagonist =
-            AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
-
-            _ = ilCursor.GotoNext
-            (
-                MoveType.After,
-                x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
-                x => x.MatchStloc(out var _)
-            );
-
-            return [];
-        }
-    }
-
-    private class CommitOperationConfig(MethodBase origin) :
-    IContinuationConfig<CreateProtagonistFlow.CommitOperation>
-    {
-        public MethodInfo Prototype { get; } = (MethodInfo)origin;
-
-        public void InjectContinuationPoint(ILCursor ilCursor)
-        {
-            var offlineCreateProtagonist =
-            AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
-
-            _ = ilCursor.GotoNext
-            (
-                MoveType.After,
-                x => x.MatchCallOrCallvirt(offlineCreateProtagonist),
-                x => x.MatchStloc(out var _)
-            );
-        }
     }
 
     private static CreateProtagonistFlow? creationFlow;
