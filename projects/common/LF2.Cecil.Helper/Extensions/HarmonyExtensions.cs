@@ -2,9 +2,9 @@ using HarmonyLib;
 
 namespace LF2.Cecil.Helper.Extensions;
 
-public static class HarmonyExtension
+public static class HarmonyExtensions
 {
-    public static void PatchMultiple(this Harmony harmony, IEnumerable<Type> patchers)
+    public static void PatchMultiple(this Harmony harmony, params IEnumerable<Type> patchers)
     {
         foreach (var patcher in patchers)
         {

@@ -14,7 +14,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
     public override void Initialize()
     {
         HarmonyInstance.PatchMultiple
-        ([
+        (
             typeof(AgeCompletion.AiConditionPatcher),
             typeof(AgeCompletion.BuildingDomainPatcher),
             typeof(AgeCompletion.CharacterDomainPatcher),
@@ -38,8 +38,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 
             typeof(FertilityCompletion.PregnantStatePatcher),
 
-            typeof(RandomCompletion.RedzenHelperPatcher),
-        ]);
+            typeof(RandomCompletion.RedzenHelperPatcher)
+        );
 
         try
         {

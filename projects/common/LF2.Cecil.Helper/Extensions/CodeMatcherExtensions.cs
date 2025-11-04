@@ -3,7 +3,7 @@ using HarmonyLib;
 
 namespace LF2.Cecil.Helper.Extensions;
 
-public static class CodeMatcherExtension
+public static class CodeMatcherExtensions
 {
     public static bool TryGetLoc(this CodeMatcher codeMatcher, int index, out LocalBuilder? loc)
     {

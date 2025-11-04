@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace LF2.Kit.Extensions;
 
-public static class ObjectArrayExtension
+public static class ObjectArrayExtensions
 {
     public static ITuple AsTuple(this object[] objects)
     {
