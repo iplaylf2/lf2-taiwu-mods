@@ -6,7 +6,7 @@ using MonoMod.Utils;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace LF2.Cecil.Helper.MethodSegmentation;
+namespace LF2.Cecil.Helper;
 
 public static class MethodSegmenter
 {
@@ -71,14 +71,14 @@ public static class MethodSegmenter
 
         ilCursor.FindNext(out var retCursors, (x) => x.MatchRet());
 
-        Action @do = returnType switch
+        Action doPatch = returnType switch
         {
             var x when x == typeof(void) => () => PatchVoidReturns(retCursors),
             var x when x is { IsValueType: true } => () => PatchValueReturns(retCursors, x),
             _ => () => PatchObjectReturns(retCursors)
         };
 
-        @do();
+        doPatch();
     }
 
     private static void InjectSplitPoint(ILContext ilContext, Func<ILCursor, IEnumerable<Type>> injectSplitPoint)

@@ -7,7 +7,7 @@ using GameData.Domains.Mod;
 using GameData.Utilities;
 using HarmonyLib;
 using LF2.Backend.Helper;
-using LF2.Cecil.Helper.MethodSegmentation;
+using LF2.Cecil.Helper;
 using LF2.Game.Helper.Communication;
 using MonoMod.Cil;
 using RollProtagonist.Common;

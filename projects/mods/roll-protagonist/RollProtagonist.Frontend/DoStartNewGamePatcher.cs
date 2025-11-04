@@ -5,7 +5,7 @@ using GameData.Domains.Character.Creation;
 using GameData.Domains.Character.Display;
 using GameData.Domains.Mod;
 using HarmonyLib;
-using LF2.Cecil.Helper.MethodSegmentation;
+using LF2.Cecil.Helper;
 using LF2.Frontend.Helper;
 using LF2.Game.Helper.Communication;
 using LF2.Kit.Extensions;
