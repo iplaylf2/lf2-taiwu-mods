@@ -2,18 +2,15 @@ using Cysharp.Threading.Tasks;
 using FrameWork;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
-using GameData.Domains.Character.Display;
-using GameData.Domains.Mod;
 using HarmonyLib;
 using LF2.Cecil.Helper;
 using LF2.Frontend.Helper;
-using LF2.Game.Helper.Communication;
 using LF2.Kit.Extensions;
 using MonoMod.Cil;
-using RollProtagonist.Common;
+using RollProtagonist.Frontend.NewGamePlus.Core;
 using System.Reflection;
 
-namespace RollProtagonist.Frontend;
+namespace RollProtagonist.Frontend.NewGamePlus.Patching;
 
 [HarmonyPatch(typeof(UI_NewGame), "DoStartNewGame")]
 internal static class DoStartNewGamePatcher
@@ -68,6 +65,8 @@ internal static class DoStartNewGamePatcher
         {
             Game.ClockAndLogInfo("DoStartNewGame", false);
 
+            var modId = RequireModId();
+
             var (stackValues, isRoll, variables) = beforeRoll(uiNewGame);
 
             if (!isRoll)
@@ -100,7 +99,7 @@ internal static class DoStartNewGamePatcher
 
             Game.ClockAndLogInfo("Before roll completed", false);
 
-            await ExecuteInitial(creationInfo);
+            await NewGameModWorkflow.ExecuteInitial(modId, creationInfo);
 
             Game.ClockAndLogInfo("Execute Initial completed", false);
 
@@ -108,7 +107,7 @@ internal static class DoStartNewGamePatcher
 
             while (isRolling)
             {
-                var character = await ExecuteRoll();
+                var character = await NewGameModWorkflow.ExecuteRoll(modId);
 
                 var viewArg = new ArgumentBox();
                 _ = viewArg.Set("Data", character);
@@ -183,39 +182,9 @@ internal static class DoStartNewGamePatcher
         CharacterDisplay?.Destroy();
     }
 
-    private static async UniTask ExecuteInitial(ProtagonistCreationInfo creationInfo)
+    private static string RequireModId()
     {
-        var data = new SerializableModData();
-        data.Set
-        (
-            ModConstants.Method.ExecuteInitial.Parameters.creationInfo,
-            StringSerializer.Serialize(creationInfo)
-        );
-
-        _ = await UniTaskCall.Default.CallModMethod
-        (
-            ModIdStr!,
-            nameof(ModConstants.Method.ExecuteInitial),
-            data
-        );
-    }
-
-    private static async UniTask<CharacterDisplayDataForTooltip> ExecuteRoll()
-    {
-        var data = await UniTaskCall.Default.CallModMethod
-        (
-            ModIdStr!,
-            nameof(ModConstants.Method.ExecuteRoll),
-            new SerializableModData()
-        );
-
-        _ = data.Get
-        (
-            ModConstants.Method.ExecuteRoll.ReturnValue.character,
-            out CharacterDisplayDataForTooltip character
-        );
-
-        return character;
+        return ModIdStr ?? throw new InvalidOperationException("ModIdStr must be initialized before rolling protagonist.");
     }
 
     private static UIElement? CharacterDisplay;

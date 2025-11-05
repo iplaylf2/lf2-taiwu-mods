@@ -1,3 +1,4 @@
+using RollProtagonist.Backend.CharacterCreationPlus.Patching;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace RollProtagonist.Backend;
@@ -7,7 +8,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
-        RollProtagonistBuilder.ModIdStr = ModIdStr;
-        HarmonyInstance.PatchAll(typeof(RollProtagonistBuilder));
+        CreateProtagonistPatch.ModIdStr = ModIdStr;
+        HarmonyInstance.PatchAll(typeof(CreateProtagonistPatch));
     }
 }

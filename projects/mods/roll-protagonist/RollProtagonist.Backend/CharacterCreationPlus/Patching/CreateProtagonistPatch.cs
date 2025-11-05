@@ -12,18 +12,19 @@ using LF2.Game.Helper.Communication;
 using MonoMod.Cil;
 using RollProtagonist.Common;
 using System.Reflection;
+using RollProtagonist.Backend.CharacterCreationPlus.Core;
 
-namespace RollProtagonist.Backend;
+namespace RollProtagonist.Backend.CharacterCreationPlus.Patching;
 
 [HarmonyPatch(typeof(CharacterDomain), nameof(CharacterDomain.CreateProtagonist))]
-internal static class RollProtagonistBuilder
+internal static class CreateProtagonistPatch
 {
     public static string? ModIdStr { get; set; }
 
     [HarmonyILManipulator]
     private static void BuildCreationFlow(MethodBase origin)
     {
-        AdaptableLog.Info("CreateFlow started");
+        AdaptableLog.Info("CreateProtagonist patch started");
 
         static IEnumerable<Type> RollOperationSplitPoint(ILCursor ilCursor)
         {

@@ -4,7 +4,7 @@ using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Utilities;
 
-namespace RollProtagonist.Backend;
+namespace RollProtagonist.Backend.CharacterCreationPlus.Core;
 
 internal class CreateProtagonistFlow
 {

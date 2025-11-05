@@ -1,3 +1,4 @@
+using RollProtagonist.Frontend.NewGamePlus.Patching;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace RollProtagonist.Frontend;

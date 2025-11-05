@@ -1,7 +1,7 @@
 using HarmonyLib;
 using LF2.Frontend.Helper;
 
-namespace RollProtagonist.Frontend;
+namespace RollProtagonist.Frontend.NewGamePlus.Patching;
 
 [HarmonyPatch(typeof(MouseTipBase), "LateUpdate")]
 internal static class MouseTipCharacterCompletePatcher
