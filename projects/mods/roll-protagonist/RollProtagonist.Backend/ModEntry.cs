@@ -1,4 +1,4 @@
-using RollProtagonist.Backend.CharacterCreationPlus.Patching;
+using RollProtagonist.Backend.CharacterCreationPlus.Patches;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace RollProtagonist.Backend;

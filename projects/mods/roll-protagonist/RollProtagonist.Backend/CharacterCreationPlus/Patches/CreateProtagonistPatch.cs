@@ -14,7 +14,7 @@ using RollProtagonist.Common;
 using System.Reflection;
 using RollProtagonist.Backend.CharacterCreationPlus.Core;
 
-namespace RollProtagonist.Backend.CharacterCreationPlus.Patching;
+namespace RollProtagonist.Backend.CharacterCreationPlus.Patches;
 
 [HarmonyPatch(typeof(CharacterDomain), nameof(CharacterDomain.CreateProtagonist))]
 internal static class CreateProtagonistPatch
