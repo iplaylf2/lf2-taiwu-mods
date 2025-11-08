@@ -1,3 +1,4 @@
+using LF2.Kit.Service;
 using RollProtagonist.Frontend.NewGamePlus.Patching;
 using TaiwuModdingLib.Core.Plugin;
 
@@ -12,5 +13,17 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 
         DoStartNewGamePatcher.ModIdStr = ModIdStr;
         HarmonyInstance.PatchAll(typeof(DoStartNewGamePatcher));
+    }
+
+    public override void Dispose()
+    {
+        try
+        {
+            ModServiceRegistry.Clear();
+        }
+        finally
+        {
+            base.Dispose();
+        }
     }
 }

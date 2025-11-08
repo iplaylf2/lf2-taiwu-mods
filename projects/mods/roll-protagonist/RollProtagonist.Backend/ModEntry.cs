@@ -1,3 +1,4 @@
+using LF2.Kit.Service;
 using RollProtagonist.Backend.CharacterCreationPlus.Patches;
 using TaiwuModdingLib.Core.Plugin;
 
@@ -10,5 +11,17 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
     {
         CreateProtagonistPatch.ModIdStr = ModIdStr;
         HarmonyInstance.PatchAll(typeof(CreateProtagonistPatch));
+    }
+
+    public override void Dispose()
+    {
+        try
+        {
+            ModServiceRegistry.Clear();
+        }
+        finally
+        {
+            base.Dispose();
+        }
     }
 }
