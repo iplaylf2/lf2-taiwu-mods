@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using LF2.Kit.Service;
 using RollProtagonist.Backend.CharacterCreationPlus.Patches;
+using RollProtagonist.Common;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace RollProtagonist.Backend;
@@ -7,10 +9,12 @@ namespace RollProtagonist.Backend;
 [PluginConfig("roll-protagonist", "lf2", "1.0.0")]
 public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
+    [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
     public override void Initialize()
     {
-        CreateProtagonistPatch.ModIdStr = ModIdStr;
-        HarmonyInstance.PatchAll(typeof(CreateProtagonistPatch));
+        _ = ModServiceRegistry.Add(new ModConfig(ModIdStr));
+
+        HarmonyInstance.PatchAll(typeof(CharacterDomainPatch));
     }
 
     public override void Dispose()

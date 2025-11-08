@@ -9,10 +9,10 @@ public static class ModServiceRegistry
 {
     private static readonly ConcurrentDictionary<Type, IDisposable> services = new();
 
-    public static void Add<TService>(TService service)
+    public static TService Add<TService>(TService service)
         where TService : IDisposable
     {
-        _ = services.AddOrUpdate
+        return (TService)services.AddOrUpdate
         (
             typeof(TService),
             service,

@@ -4,7 +4,6 @@ using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Domains.Character.Display;
 using GameData.Domains.Mod;
-using GameData.Utilities;
 using HarmonyLib;
 using LF2.Backend.Helper;
 using LF2.Cecil.Helper;
@@ -13,24 +12,27 @@ using MonoMod.Cil;
 using RollProtagonist.Common;
 using System.Reflection;
 using RollProtagonist.Backend.CharacterCreationPlus.Core;
+using LF2.Game.Helper;
+using LF2.Kit.Service;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RollProtagonist.Backend.CharacterCreationPlus.Patches;
 
-[HarmonyPatch(typeof(CharacterDomain), nameof(CharacterDomain.CreateProtagonist))]
-internal static class CreateProtagonistPatch
+[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
+[HarmonyPatch(typeof(CharacterDomain))]
+internal static class CharacterDomainPatch
 {
-    public static string? ModIdStr { get; set; }
-
     [HarmonyILManipulator]
-    private static void BuildCreationFlow(MethodBase origin)
+    [HarmonyPatch(nameof(CharacterDomain.CreateProtagonist))]
+    private static void CreateProtagonistTap(MethodBase originMethod)
     {
-        AdaptableLog.Info("CreateProtagonist patch started");
+        StructuredLogger.Info("BuildCreationFlow started");
 
-        static IEnumerable<Type> RollOperationSplitPoint(ILCursor ilCursor)
-        {
-            var offlineCreateProtagonist =
+        var offlineCreateProtagonist =
             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
 
+        IEnumerable<Type> RollOperationSplitPoint(ILCursor ilCursor)
+        {
             _ = ilCursor.GotoNext
             (
                 MoveType.After,
@@ -41,11 +43,8 @@ internal static class CreateProtagonistPatch
             return [];
         }
 
-        static void CommitOperationContinuationPoint(ILCursor ilCursor)
+        void CommitOperationContinuationPoint(ILCursor ilCursor)
         {
-            var offlineCreateProtagonist =
-            AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
-
             _ = ilCursor.GotoNext
             (
                 MoveType.After,
@@ -56,25 +55,27 @@ internal static class CreateProtagonistPatch
 
         var roll = MethodSegmenter.CreateLeftSegment<CreateProtagonistFlow.RollOperation>
         (
-            (MethodInfo)origin,
+            (MethodInfo)originMethod,
             RollOperationSplitPoint
         );
 
-        AdaptableLog.Info($"{nameof(roll)} generated");
+        StructuredLogger.Info("method generated", new { roll });
 
         var commit = MethodSegmenter.CreateRightSegment<CreateProtagonistFlow.CommitOperation>
         (
-            (MethodInfo)origin,
+            (MethodInfo)originMethod,
             CommitOperationContinuationPoint
         );
 
-        AdaptableLog.Info($"{nameof(commit)} generated");
+        StructuredLogger.Info("method generated", new { commit });
 
-        creationFlow = new CreateProtagonistFlow(roll, commit);
+        var creationFlow = ModServiceRegistry.Add(new CreateProtagonistFlow(roll, commit));
+
+        _ = ModServiceRegistry.TryGet(out ModConfig? config);
 
         TaskCall.AddModMethod
         (
-            ModIdStr!,
+            config!.ModIdStr,
             nameof(ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
@@ -93,7 +94,7 @@ internal static class CreateProtagonistPatch
 
         TaskCall.AddModMethod
         (
-            ModIdStr!,
+            config!.ModIdStr,
             nameof(ModConstants.Method.ExecuteRoll),
             (context, _) =>
             {
@@ -113,9 +114,12 @@ internal static class CreateProtagonistPatch
     }
 
     [HarmonyPrefix]
-    private static bool CreateProtagonist(ref int __result)
+    [HarmonyPatch(nameof(CharacterDomain.CreateProtagonist))]
+    private static bool CreateProtagonistPrefix(ref int __result)
     {
-        __result = creationFlow!.ExecuteCommit();
+        _ = ModServiceRegistry.TryGet(out CreateProtagonistFlow? flow);
+
+        __result = flow!.ExecuteCommit();
 
         return false;
     }
@@ -164,6 +168,4 @@ internal static class CreateProtagonistPatch
             IsInteractedCharacter = false
         };
     }
-
-    private static CreateProtagonistFlow? creationFlow;
 }

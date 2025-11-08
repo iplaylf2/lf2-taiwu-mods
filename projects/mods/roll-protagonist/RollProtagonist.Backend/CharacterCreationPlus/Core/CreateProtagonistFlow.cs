@@ -6,7 +6,7 @@ using GameData.Utilities;
 
 namespace RollProtagonist.Backend.CharacterCreationPlus.Core;
 
-internal class CreateProtagonistFlow
+internal class CreateProtagonistFlow : IDisposable
 {
     public CreateProtagonistFlow
     (
@@ -127,6 +127,11 @@ internal class CreateProtagonistFlow
     private static Character ExtractCharacter(object[] variables)
     {
         return (Character)variables.Find(x => x is Character);
+    }
+
+    public void Dispose()
+    {
+        creationFlow.Dispose();
     }
 
     private enum CreationPhase
