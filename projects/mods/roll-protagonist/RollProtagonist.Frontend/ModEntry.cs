@@ -1,5 +1,7 @@
+using LF2.Cecil.Helper.Extensions;
 using LF2.Kit.Service;
-using RollProtagonist.Frontend.NewGamePlus.Patching;
+using RollProtagonist.Common;
+using RollProtagonist.Frontend.NewGamePlus.Patches;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace RollProtagonist.Frontend;
@@ -9,10 +11,13 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
-        HarmonyInstance.PatchAll(typeof(MouseTipCharacterCompletePatcher));
+        _ = ModServiceRegistry.Add(new ModConfig(ModIdStr));
 
-        DoStartNewGamePatcher.ModIdStr = ModIdStr;
-        HarmonyInstance.PatchAll(typeof(DoStartNewGamePatcher));
+        HarmonyInstance.PatchMultiple
+        (
+            typeof(MouseTipBasePatch),
+            typeof(UI_NewGamePatch)
+        );
     }
 
     public override void Dispose()

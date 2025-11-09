@@ -6,7 +6,7 @@ using GameData.Utilities;
 
 namespace RollProtagonist.Backend.CharacterCreationPlus.Core;
 
-internal class CreateProtagonistFlow : IDisposable
+internal sealed class CreateProtagonistFlow : IDisposable
 {
     public CreateProtagonistFlow
     (

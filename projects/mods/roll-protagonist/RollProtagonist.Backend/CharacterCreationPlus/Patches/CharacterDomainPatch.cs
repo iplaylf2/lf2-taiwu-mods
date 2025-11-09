@@ -26,7 +26,7 @@ internal static class CharacterDomainPatch
     [HarmonyPatch(nameof(CharacterDomain.CreateProtagonist))]
     private static void CreateProtagonistTap(MethodBase originMethod)
     {
-        StructuredLogger.Info("BuildCreationFlow started");
+        StructuredLogger.Info("CreateProtagonistTap started");
 
         var offlineCreateProtagonist =
             AccessTools.Method(typeof(Character), nameof(Character.OfflineCreateProtagonist));
@@ -59,7 +59,7 @@ internal static class CharacterDomainPatch
             RollOperationSplitPoint
         );
 
-        StructuredLogger.Info("method generated", new { roll });
+        StructuredLogger.Info("method generated", new { method = nameof(roll) });
 
         var commit = MethodSegmenter.CreateRightSegment<CreateProtagonistFlow.CommitOperation>
         (
@@ -67,7 +67,7 @@ internal static class CharacterDomainPatch
             CommitOperationContinuationPoint
         );
 
-        StructuredLogger.Info("method generated", new { commit });
+        StructuredLogger.Info("method generated", new { method = nameof(commit) });
 
         var creationFlow = ModServiceRegistry.Add(new CreateProtagonistFlow(roll, commit));
 
@@ -75,7 +75,7 @@ internal static class CharacterDomainPatch
 
         TaskCall.AddModMethod
         (
-            config!.ModIdStr,
+            config!.ModId,
             nameof(ModConstants.Method.ExecuteInitial),
             (context, data) =>
             {
@@ -94,7 +94,7 @@ internal static class CharacterDomainPatch
 
         TaskCall.AddModMethod
         (
-            config!.ModIdStr,
+            config!.ModId,
             nameof(ModConstants.Method.ExecuteRoll),
             (context, _) =>
             {

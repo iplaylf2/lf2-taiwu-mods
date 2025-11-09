@@ -2,9 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace RollProtagonist.Common;
 
-public record ModConfig
+public sealed record ModConfig
 (
-    string ModIdStr
+    string ModId
 ) : IDisposable
 {
     [SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize")]
