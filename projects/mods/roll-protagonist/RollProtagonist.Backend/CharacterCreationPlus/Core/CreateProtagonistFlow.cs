@@ -70,10 +70,6 @@ internal sealed class CreateProtagonistFlow : IDisposable
 
     public ProtagonistCreationInfo? CreationInfo { get; private set; }
 
-    protected abstract record PhaseResult { }
-    protected record RollResult(Character Character) : PhaseResult;
-    protected record CommitResult(int Data) : PhaseResult;
-
     private IEnumerator<PhaseResult> BuildCreationFlow(RollOperation roll, CommitOperation commit)
     {
         object[] stateVariables = [];
@@ -143,3 +139,8 @@ internal sealed class CreateProtagonistFlow : IDisposable
     private CreationPhase currentPhase = CreationPhase.Roll;
     private DataContext? dataContext;
 }
+
+
+internal abstract record PhaseResult { }
+internal record RollResult(Character Character) : PhaseResult;
+internal record CommitResult(int Data) : PhaseResult;
