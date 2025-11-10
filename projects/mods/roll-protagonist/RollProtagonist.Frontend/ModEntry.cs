@@ -11,7 +11,7 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin
 {
     public override void Initialize()
     {
-        _ = ModServiceRegistry.Add(new ModConfig(ModIdStr));
+        _ = ModServiceRegistry.Add(() => new ModConfig(ModIdStr));
 
         HarmonyInstance.PatchMultiple
         (

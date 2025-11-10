@@ -78,7 +78,7 @@ internal static class UI_NewGamePatch
 
         _ = ModServiceRegistry.Add
         (
-            new NewGameRollFlow(config!.ModId, beforeRoll, afterRoll, CharacterDisplay!)
+            () => new NewGameRollFlow(config!.ModId, beforeRoll, afterRoll, CharacterDisplay!)
         );
     }
 

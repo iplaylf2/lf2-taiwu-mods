@@ -7,18 +7,16 @@ using GameData.Domains.Mod;
 using HarmonyLib;
 using LF2.Backend.Helper;
 using LF2.Cecil.Helper;
+using LF2.Game.Helper;
 using LF2.Game.Helper.Communication;
+using LF2.Kit.Service;
 using MonoMod.Cil;
+using RollProtagonist.Backend.CharacterCreationPlus.Core;
 using RollProtagonist.Common;
 using System.Reflection;
-using RollProtagonist.Backend.CharacterCreationPlus.Core;
-using LF2.Game.Helper;
-using LF2.Kit.Service;
-using System.Diagnostics.CodeAnalysis;
 
 namespace RollProtagonist.Backend.CharacterCreationPlus.Patches;
 
-[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope")]
 [HarmonyPatch(typeof(CharacterDomain))]
 internal static class CharacterDomainPatch
 {
@@ -69,7 +67,7 @@ internal static class CharacterDomainPatch
 
         StructuredLogger.Info("method generated", new { method = nameof(commit) });
 
-        var creationFlow = ModServiceRegistry.Add(new CreateProtagonistFlow(roll, commit));
+        var creationFlow = ModServiceRegistry.Add(() => new CreateProtagonistFlow(roll, commit));
 
         _ = ModServiceRegistry.TryGet(out ModConfig? config);
 

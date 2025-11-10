@@ -9,14 +9,18 @@ public static class ModServiceRegistry
 {
     private static readonly ConcurrentDictionary<Type, IDisposable> services = new();
 
-    public static TService Add<TService>(TService service)
+    public static TService Add<TService>(Func<TService> factory)
         where TService : IDisposable
     {
         return (TService)services.AddOrUpdate
         (
             typeof(TService),
-            service,
-            (_, old) => { old.Dispose(); return service; }
+            _ => factory(),
+            (_, old) =>
+            {
+                old.Dispose();
+                return factory();
+            }
         );
     }
 
