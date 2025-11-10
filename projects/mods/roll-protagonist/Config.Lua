@@ -3,7 +3,7 @@ return {
 	Source = 0,
 	FileId = 1,
 	Version = "0.0.0.1",
-	GameVersion = "0.0.78.30-test",
+	GameVersion = "0.0.79.50-test",
 	Author = "我玩LF2",
 	Description = "开局roll主角",
 	TagList = {
@@ -16,10 +16,10 @@ return {
 	HasArchive = false,
 	NeedRestartWhenSettingChanged = false,
 	BackendPlugins = {
-		[1] = "RollProtagonist.Backend/RollProtagonist.Backend.dll"
+		[1] = "RollProtagonist.Backend.dll"
 	},
 	FrontendPlugins = {
-		[1] = "RollProtagonist.Frontend/RollProtagonist.Frontend.dll",
+		[1] = "RollProtagonist.Frontend.dll",
 	},
 	Cover = nil,
 	WorkshopCover = nil,
