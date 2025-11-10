@@ -8,7 +8,7 @@ using RollProtagonist.Common;
 
 namespace RollProtagonist.Frontend.NewGamePlus.Core;
 
-internal static class CreateProtagonistFlow
+internal static class CreateProtagonistAdapter
 {
     public static async UniTask ExecuteInitial(string modId, ProtagonistCreationInfo creationInfo)
     {

@@ -7,7 +7,7 @@ using LF2.Kit.Extensions;
 
 namespace RollProtagonist.Frontend.NewGamePlus.Core;
 
-internal sealed class NewGameRollFlow
+internal sealed class NewGameRollCoordinator
 (
     string modId,
     Func<UI_NewGame, Tuple<object[], bool, object[]>> beforeRoll,
@@ -51,7 +51,7 @@ internal sealed class NewGameRollFlow
 
         StructuredLogger.Info("Before roll completed");
 
-        await CreateProtagonistFlow.ExecuteInitial(modId, creationInfo);
+        await CreateProtagonistAdapter.ExecuteInitial(modId, creationInfo);
 
         StructuredLogger.Info("Execute Initial completed");
 
@@ -59,7 +59,7 @@ internal sealed class NewGameRollFlow
 
         while (isRolling)
         {
-            var character = await CreateProtagonistFlow.ExecuteRoll(modId);
+            var character = await CreateProtagonistAdapter.ExecuteRoll(modId);
 
             var viewArg = new ArgumentBox();
             _ = viewArg.Set("Data", character);

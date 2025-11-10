@@ -24,14 +24,9 @@ internal static class UI_NewGamePatch
 
         var CharacterDisplay = ModResourceFactory.CreateModCopy
         (
-            () =>
+            () => new()
             {
-                var path = UIElement.MouseTipCharacterComplete._path;
-
-                return new UIElement
-                {
-                    _path = path
-                };
+                _path = UIElement.MouseTipCharacterComplete._path
             }
         );
 
@@ -78,7 +73,7 @@ internal static class UI_NewGamePatch
 
         _ = ModServiceRegistry.Add
         (
-            () => new NewGameRollFlow(config!.ModId, beforeRoll, afterRoll, CharacterDisplay!)
+            () => new NewGameRollCoordinator(config!.ModId, beforeRoll, afterRoll, CharacterDisplay!)
         );
     }
 
@@ -86,7 +81,7 @@ internal static class UI_NewGamePatch
     [HarmonyPatch(nameof(UI_NewGame.DoStartNewGame))]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        _ = ModServiceRegistry.TryGet(out NewGameRollFlow? service);
+        _ = ModServiceRegistry.TryGet(out NewGameRollCoordinator? service);
 
         service!.Execute(__instance).Forget();
 
