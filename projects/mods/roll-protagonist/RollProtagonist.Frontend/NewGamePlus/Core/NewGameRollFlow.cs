@@ -67,7 +67,7 @@ internal sealed class NewGameRollFlow
             characterDisplay.SetOnInitArgs(viewArg);
             characterDisplay.Show();
 
-            Game.ClockAndLogInfo("Execute Roll completed", false);
+            StructuredLogger.Info("Execute Roll completed");
 
             while (true)
             {
@@ -75,14 +75,14 @@ internal sealed class NewGameRollFlow
                 {
                     isRolling = false;
 
-                    Game.ClockAndLogInfo("enter", false);
+                    StructuredLogger.Info("enter");
 
                     break;
                 }
 
                 if (CommonCommandKit.Shift.Check(characterDisplay))
                 {
-                    Game.ClockAndLogInfo("roll", false);
+                    StructuredLogger.Info("roll");
 
                     break;
                 }
