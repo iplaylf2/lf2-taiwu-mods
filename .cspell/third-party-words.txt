@@ -10,6 +10,7 @@ cysharp
 docstrings
 elif
 firstpass
+fody
 imgui
 iplaylf2
 kawai
