@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LF2.Kit.Service;
 
@@ -24,7 +25,7 @@ public static class ModServiceRegistry
         );
     }
 
-    public static bool TryGet<TService>(out TService? service)
+    public static bool TryGet<TService>([NotNullWhen(true)] out TService? service)
         where TService : IDisposable
     {
         if (services.TryGetValue(typeof(TService), out var value))

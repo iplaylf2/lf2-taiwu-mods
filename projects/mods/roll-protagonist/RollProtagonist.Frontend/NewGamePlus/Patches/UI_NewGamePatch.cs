@@ -81,9 +81,9 @@ internal static class UI_NewGamePatch
     [HarmonyPatch(nameof(UI_NewGame.DoStartNewGame))]
     private static bool DoStartNewGamePrefix(UI_NewGame __instance)
     {
-        _ = ModServiceRegistry.TryGet(out NewGameRollCoordinator? service);
+        _ = ModServiceRegistry.TryGet(out NewGameRollCoordinator? coordinator);
 
-        service!.Execute(__instance).Forget();
+        coordinator!.Execute(__instance).Forget();
 
         return false;
     }

@@ -27,7 +27,7 @@ internal static class CreateProtagonistFlowTaskBinder
                 );
                 var info = StringSerializer.Deserialize<ProtagonistCreationInfo>(infoString);
 
-                flow.ExecuteInitial(context, info!);
+                flow.ExecuteInitial(context, info);
 
                 return new SerializableModData();
             }
@@ -46,7 +46,7 @@ internal static class CreateProtagonistFlowTaskBinder
                 serializableModData.Set
                 (
                     ModConstants.Method.ExecuteRoll.ReturnValue.character,
-                    BuildCharacterDisplayData(character, flow.CreationInfo!, context)
+                    BuildCharacterDisplayData(character, flow.CreationInfo, context)
                 );
 
                 return serializableModData;
@@ -77,7 +77,7 @@ internal static class CreateProtagonistFlowTaskBinder
             Attraction = character.GetBaseAttraction(),
             AvatarRelatedData = new()
             {
-                AvatarData = new(creationInfo!.Avatar),
+                AvatarData = new(creationInfo.Avatar),
                 DisplayAge = character.GetCurrAge(),
                 ClothingDisplayId = creationInfo.ClothingTemplateId
             },

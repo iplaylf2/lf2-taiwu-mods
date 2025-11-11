@@ -3,6 +3,7 @@ using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RollProtagonist.Backend.CharacterCreationPlus.Core;
 
@@ -41,6 +42,7 @@ internal sealed class CreateProtagonistFlow : IDisposable
         CreationInfo = info;
     }
 
+    [MemberNotNull(nameof(CreationInfo))]
     public Character ExecuteRoll()
     {
         if (CreationInfo is null)
