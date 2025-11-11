@@ -47,4 +47,13 @@
 
         <ProjectReference Include="$(LF2CommonDir)/LF2.Game.Helper/LF2.Game.Helper.csproj" />
     </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
+        <AssemblyAttribute Include="System.Security.Permissions.SecurityPermission">
+            <_Parameter1>System.Security.Permissions.SecurityAction.RequestMinimum</_Parameter1>
+            <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+            <SkipVerification>true</SkipVerification>
+            <SkipVerification_IsLiteral>true</SkipVerification_IsLiteral>
+        </AssemblyAttribute>
+    </ItemGroup>
 </Project>
