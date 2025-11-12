@@ -19,13 +19,27 @@ public sealed class ModuleWeaver : BaseModuleWeaver
         if (HasSecurityPermissionAttribute(ModuleDefinition.Assembly))
         {
             WriteDebug($"{SecurityPermissionFullName} already present, skipping weaving.");
+
             return;
         }
 
-        var attributeCtor = ResolveSecurityPermissionConstructor();
-        var (securityActionType, requestMinimumValue) = ResolveSecurityActionInfo();
+        var requestMinimumArgument = ResolveRequestMinimumArgument();
+        var attributeCtor = ResolveSecurityPermissionConstructor(requestMinimumArgument.Type);
 
-        InjectAttribute(attributeCtor, securityActionType, requestMinimumValue);
+        var attribute = new CustomAttribute(attributeCtor);
+
+        attribute.ConstructorArguments.Add(requestMinimumArgument);
+
+        attribute.Properties.Add
+        (
+            new CecilCustomAttributeNamedArgument
+            (
+                SkipVerificationPropertyName,
+                new CustomAttributeArgument(ModuleDefinition.TypeSystem.Boolean, true)
+            )
+        );
+
+        ModuleDefinition.Assembly.CustomAttributes.Add(attribute);
 
         WriteInfo($"Injected {AttributeDescription}.");
     }
@@ -39,7 +53,14 @@ public sealed class ModuleWeaver : BaseModuleWeaver
     {
         foreach (var attribute in assembly.CustomAttributes)
         {
-            if (attribute.AttributeType.Resolve() is not { Namespace: SecurityPermissionsNamespace, Name: SecurityPermissionAttributeName })
+            if
+            (
+                attribute.AttributeType.Resolve() is not
+                {
+                    Namespace: SecurityPermissionsNamespace,
+                    Name: SecurityPermissionAttributeName
+                }
+            )
             {
                 continue;
             }
@@ -50,90 +71,75 @@ public sealed class ModuleWeaver : BaseModuleWeaver
         return false;
     }
 
-    private void InjectAttribute(MethodReference attributeCtor, TypeReference securityActionType, object requestMinimumValue)
+    private MethodReference ResolveSecurityPermissionConstructor(TypeReference securityActionType)
     {
-        var attribute = new CustomAttribute(attributeCtor);
-
-        attribute.ConstructorArguments.Add(new CustomAttributeArgument(securityActionType, requestMinimumValue));
-
-        attribute.Properties.Add
-        (
-            new CecilCustomAttributeNamedArgument
-            (
-                SkipVerificationPropertyName,
-                new CustomAttributeArgument(ModuleDefinition.TypeSystem.Boolean, true)
-            )
-        );
-
-        ModuleDefinition.Assembly.CustomAttributes.Add(attribute);
-    }
-
-    private MethodReference ResolveSecurityPermissionConstructor()
-    {
-        var attributeType = FindRequiredType(SecurityPermissionAttributeName);
+        var attributeType = FindSecurityPermissionsType(SecurityPermissionAttributeName);
         var ctorDefinition = attributeType.Methods.FirstOrDefault
         (
             method =>
                 method.IsConstructor &&
                 method.Parameters.Count == 1 &&
-                method.Parameters[0].ParameterType.Namespace == SecurityPermissionsNamespace &&
-                method.Parameters[0].ParameterType.Name == SecurityActionTypeName
+                method.Parameters[0].ParameterType.FullName == securityActionType.FullName
         );
 
         return ctorDefinition == null
-            ? throw new WeavingException($"{SecurityPermissionAttributeName}({SecurityActionTypeName}) constructor missing in referenced assemblies.")
-            : ModuleDefinition.ImportReference(ctorDefinition);
+        ? throw new WeavingException
+        (
+            $"{SecurityPermissionAttributeName}({SecurityActionTypeName}) constructor missing in referenced assemblies."
+        )
+        : ModuleDefinition.ImportReference(ctorDefinition);
     }
 
-    private (TypeReference SecurityActionType, object RequestMinimumValue) ResolveSecurityActionInfo()
+    private CustomAttributeArgument ResolveRequestMinimumArgument()
     {
-        var securityActionDefinition = FindRequiredType(SecurityActionTypeName);
-        var requestMinimumField = securityActionDefinition.Fields.FirstOrDefault(field => field.Name == SecurityActionRequestMinimumField);
+        var securityActionDefinition = FindSecurityPermissionsType(SecurityActionTypeName);
+        var requestMinimumField = securityActionDefinition
+        .Fields
+        .FirstOrDefault(field => field.Name == SecurityActionRequestMinimumField);
 
-        if (requestMinimumField?.Constant is not { } constantValue)
+        if (requestMinimumField.Constant is not { } constantValue)
         {
-            throw new WeavingException($"{RequestMinimumConstantFullName} constant missing in referenced assemblies.");
+            throw new WeavingException
+            (
+                $"{RequestMinimumConstantFullName} constant missing in referenced assemblies."
+            );
         }
 
         var securityActionType = ModuleDefinition.ImportReference(securityActionDefinition);
-        return (securityActionType, constantValue);
+        return new CustomAttributeArgument(securityActionType, constantValue);
     }
 
-    private TypeDefinition FindRequiredType(string typeName)
+    private TypeDefinition FindSecurityPermissionsType(string typeName)
     {
         foreach (var module in EnumerateCandidateModules())
         {
-            var type = module.Types.FirstOrDefault(t => t.Namespace == SecurityPermissionsNamespace && t.Name == typeName);
+            var type = module
+            .Types
+            .FirstOrDefault
+            (
+                t => t.Namespace == SecurityPermissionsNamespace && t.Name == typeName
+            );
+
             if (type != null)
             {
                 return type;
             }
         }
 
-        throw new WeavingException($"Failed to resolve '{SecurityPermissionsNamespace}.{typeName}' in target assembly references.");
+        throw new WeavingException
+        (
+            $"Failed to resolve '{SecurityPermissionsNamespace}.{typeName}' in target assembly references."
+        );
     }
 
     private IEnumerable<ModuleDefinition> EnumerateCandidateModules()
     {
         yield return ModuleDefinition;
 
-        if (_referenceModulesCache is { } cachedModules)
-        {
-            foreach (var cached in cachedModules)
-            {
-                yield return cached;
-            }
-
-            yield break;
-        }
-
         if (AssemblyResolver == null)
         {
-            _referenceModulesCache = [];
             yield break;
         }
-
-        var resolvedModules = new List<ModuleDefinition>();
 
         foreach (var reference in ModuleDefinition.AssemblyReferences)
         {
@@ -153,11 +159,8 @@ public sealed class ModuleWeaver : BaseModuleWeaver
                 continue;
             }
 
-            resolvedModules.Add(resolvedModule);
             yield return resolvedModule;
         }
-
-        _referenceModulesCache = resolvedModules;
     }
 
     private const string SecurityPermissionsNamespace = "System.Security.Permissions";
@@ -165,10 +168,13 @@ public sealed class ModuleWeaver : BaseModuleWeaver
     private const string SecurityActionTypeName = "SecurityAction";
     private const string SecurityActionRequestMinimumField = "RequestMinimum";
     private const string SkipVerificationPropertyName = "SkipVerification";
-    private static readonly string SecurityPermissionFullName = $"{SecurityPermissionsNamespace}.{SecurityPermissionAttributeName}";
-    private static readonly string SecurityActionFullName = $"{SecurityPermissionsNamespace}.{SecurityActionTypeName}";
-    private static readonly string RequestMinimumConstantFullName = $"{SecurityActionFullName}.{SecurityActionRequestMinimumField}";
-    private static readonly string AttributeDescription = $"{SecurityPermissionAttributeName}({SecurityActionTypeName}.{SecurityActionRequestMinimumField}, {SkipVerificationPropertyName} = true)";
+    private const string SecurityPermissionFullName
+    = $"{SecurityPermissionsNamespace}.{SecurityPermissionAttributeName}";
+    private const string SecurityActionFullName
+    = $"{SecurityPermissionsNamespace}.{SecurityActionTypeName}";
+    private const string RequestMinimumConstantFullName
+    = $"{SecurityActionFullName}.{SecurityActionRequestMinimumField}";
+    private const string AttributeDescription
+    = $"{SecurityPermissionAttributeName}({SecurityActionTypeName}.{SecurityActionRequestMinimumField}, {SkipVerificationPropertyName} = true)";
 
-    private List<ModuleDefinition>? _referenceModulesCache;
 }
