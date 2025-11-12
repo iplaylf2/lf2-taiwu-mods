@@ -20,6 +20,12 @@
         <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
 
         <LF2NeedFrontendReference>true</LF2NeedFrontendReference>
+
+        <WeaverConfiguration>
+            <Weavers>
+                <LF2.Weavers.SecurityPermission />
+            </Weavers>
+        </WeaverConfiguration>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true'">
@@ -49,11 +55,14 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
-        <AssemblyAttribute Include="System.Security.Permissions.SecurityPermission">
-            <_Parameter1>System.Security.Permissions.SecurityAction.RequestMinimum</_Parameter1>
-            <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
-            <SkipVerification>true</SkipVerification>
-            <SkipVerification_IsLiteral>true</SkipVerification_IsLiteral>
-        </AssemblyAttribute>
+        <PackageReference Include="Fody">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+
+        <ProjectReference Include="$(LF2FodyDir)/LF2.Weavers.SecurityPermission/LF2.Weavers.SecurityPermission.csproj">
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+            <OutputItemType>WeaverFiles</OutputItemType>
+        </ProjectReference>
     </ItemGroup>
 </Project>

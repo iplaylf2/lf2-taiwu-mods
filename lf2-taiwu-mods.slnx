@@ -23,6 +23,6 @@
     <Project Path="projects/mods/uni-task-support/UniTaskSupport.Frontend/UniTaskSupport.Frontend.csproj" />
   </Folder>
   <Folder Name="/projects/fody/">
-    <Project Path="projects/fody/LF2.Fody.NoOp/LF2.Fody.NoOp.csproj" />
+    <Project Path="projects/fody/LF2.Weavers.SecurityPermission/LF2.Weavers.SecurityPermission.csproj" />
   </Folder>
 </Solution>

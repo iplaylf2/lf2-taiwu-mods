@@ -7,7 +7,7 @@
 
 ## 新增 Weaver 的步骤
 
-1. 在 `projects/fody/` 下创建一个以 `LF2.Fody.*` 命名的文件夹，例如 `LF2.Fody.NoOp/`。
+1. 在 `projects/fody/` 下创建一个以 `LF2.Weavers.*` 命名的文件夹，例如 `LF2.Weavers.SecurityPermission/`。
 2. 在文件夹中创建最小化的 `*.csproj`（通常 `<Project Sdk="Microsoft.NET.Sdk" />` 即可），其余的通用配置由上层 Props 注入。
 3. 添加 `ModuleWeaver` 实现，并根据需求扩展辅助类型。
 4. 在 `lf2-taiwu-mods.slnx` 中引入该项目，以便在 IDE 中调试与共享。
@@ -16,4 +16,4 @@
 
 ## 示例
 
-`LF2.Fody.NoOp` 展示了一个最小实现：它引用 `BaseModuleWeaver` 并输出一条日志，方便验证管道是否正常工作。后续添加的 Weaver 可以以它为模板进行迭代。
+`LF2.Weavers.SecurityPermission` 展示了一个最小实现：它会在程序集后期注入 `SecurityPermissionAttribute`，从而让前端程序集保留被编译器拒绝的废弃声明。后续添加的 Weaver 可以以它为模板进行迭代。
