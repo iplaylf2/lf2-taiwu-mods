@@ -7,21 +7,6 @@
     <Project Path="projects/common/LF2.Game.Helper/LF2.Game.Helper.csproj" />
     <Project Path="projects/common/LF2.Kit/LF2.Kit.csproj" />
   </Folder>
-  <Folder Name="/projects/mods/" />
-  <Folder Name="/projects/mods/roll-protagonist/">
-    <Project Path="projects/mods/roll-protagonist/RollProtagonist.Backend/RollProtagonist.Backend.csproj" />
-    <Project Path="projects/mods/roll-protagonist/RollProtagonist.Common/RollProtagonist.Common.csproj" />
-    <Project Path="projects/mods/roll-protagonist/RollProtagonist.Frontend/RollProtagonist.Frontend.csproj" />
-  </Folder>
-  <Folder Name="/projects/mods/tired-sl/">
-    <Project Path="projects/mods/tired-sl/TiredSL.Backend/TiredSL.Backend.csproj" />
-  </Folder>
-  <Folder Name="/projects/mods/unfathomed/">
-    <Project Path="projects/mods/unfathomed/Unfathomed.Backend/Unfathomed.Backend.csproj" />
-  </Folder>
-  <Folder Name="/projects/mods/uni-task-support/">
-    <Project Path="projects/mods/uni-task-support/UniTaskSupport.Frontend/UniTaskSupport.Frontend.csproj" />
-  </Folder>
   <Folder Name="/projects/fody/">
     <Project Path="projects/fody/LF2.Weavers.SecurityPermission/LF2.Weavers.SecurityPermission.csproj" />
   </Folder>
