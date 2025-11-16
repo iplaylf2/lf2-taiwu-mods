@@ -20,6 +20,12 @@
         <TargetFramework>$(LF2FrontendTargetFramework)</TargetFramework>
 
         <LF2NeedFrontendReference>true</LF2NeedFrontendReference>
+
+        <WeaverConfiguration>
+            <Weavers>
+                <LF2.Weavers.SecurityPermission />
+            </Weavers>
+        </WeaverConfiguration>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(LF2IsModEntry)' == 'true'">
@@ -46,5 +52,17 @@
         </PackageReference>
 
         <ProjectReference Include="$(LF2CommonDir)/LF2.Game.Helper/LF2.Game.Helper.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(LF2IsFrontend)' == 'true'">
+        <PackageReference Include="Fody">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+
+        <ProjectReference Include="$(LF2FodyDir)/LF2.Weavers.SecurityPermission/LF2.Weavers.SecurityPermission.csproj">
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+            <OutputItemType>WeaverFiles</OutputItemType>
+        </ProjectReference>
     </ItemGroup>
 </Project>

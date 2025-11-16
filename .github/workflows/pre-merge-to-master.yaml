@@ -66,3 +66,21 @@ jobs:
         run: |
           set -euo pipefail
           dotnet build "${{ matrix.solution }}" -c Release
+
+  build-check-status:
+    name: Build Checks Status
+    needs: build-check
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Wait for Build Matrix
+        run: |
+          result="${{ needs.build-check.result }}"
+          level="notice"
+          if [ "$result" != "success" ]; then
+            level="error"
+          fi
+          echo "::${level}::Build matrix completed with status: $result"
+          if [ "$result" != "success" ]; then
+            exit 1
+          fi

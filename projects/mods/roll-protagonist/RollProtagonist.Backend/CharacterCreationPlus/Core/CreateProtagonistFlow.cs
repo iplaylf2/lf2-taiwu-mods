@@ -3,10 +3,11 @@ using GameData.Domains;
 using GameData.Domains.Character;
 using GameData.Domains.Character.Creation;
 using GameData.Utilities;
+using System.Diagnostics.CodeAnalysis;
 
-namespace RollProtagonist.Backend;
+namespace RollProtagonist.Backend.CharacterCreationPlus.Core;
 
-internal class CreateProtagonistFlow
+internal sealed class CreateProtagonistFlow : IDisposable
 {
     public CreateProtagonistFlow
     (
@@ -41,6 +42,7 @@ internal class CreateProtagonistFlow
         CreationInfo = info;
     }
 
+    [MemberNotNull(nameof(CreationInfo))]
     public Character ExecuteRoll()
     {
         if (CreationInfo is null)
@@ -69,10 +71,6 @@ internal class CreateProtagonistFlow
     }
 
     public ProtagonistCreationInfo? CreationInfo { get; private set; }
-
-    protected abstract record PhaseResult { }
-    protected record RollResult(Character Character) : PhaseResult;
-    protected record CommitResult(int Data) : PhaseResult;
 
     private IEnumerator<PhaseResult> BuildCreationFlow(RollOperation roll, CommitOperation commit)
     {
@@ -129,6 +127,11 @@ internal class CreateProtagonistFlow
         return (Character)variables.Find(x => x is Character);
     }
 
+    public void Dispose()
+    {
+        creationFlow.Dispose();
+    }
+
     private enum CreationPhase
     {
         Commit = 0, Roll = 1,
@@ -138,3 +141,8 @@ internal class CreateProtagonistFlow
     private CreationPhase currentPhase = CreationPhase.Roll;
     private DataContext? dataContext;
 }
+
+
+internal abstract record PhaseResult { }
+internal record RollResult(Character Character) : PhaseResult;
+internal record CommitResult(int Data) : PhaseResult;

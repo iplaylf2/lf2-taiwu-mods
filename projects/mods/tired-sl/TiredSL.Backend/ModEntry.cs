@@ -9,8 +9,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 {
     public override void Initialize()
     {
-        HarmonyInstance.PatchArray
-        ([
+        HarmonyInstance.PatchMultiple
+        (
             typeof(CombatCheat.CollapseCatchOdds),
             typeof(CombatCheat.MissMe),
             typeof(CombatCheat.FullCombatAI),
@@ -22,8 +22,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
             typeof(NpcCheat.CherishBooks),
 
             typeof(SkillBreakoutCheat.BrightenUp),
-            typeof(SkillBreakoutCheat.NoCostOnFailMove),
-        ]);
+            typeof(SkillBreakoutCheat.NoCostOnFailMove)
+        );
     }
 
     public override void OnModSettingUpdate()

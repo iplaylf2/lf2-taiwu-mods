@@ -1,13 +1,20 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Emit;
 using HarmonyLib;
 
 namespace LF2.Cecil.Helper.Extensions;
 
-public static class CodeInstructionsExtension
+public static class CodeMatcherExtensions
 {
-    public static bool TryGetLoc(this IEnumerable<CodeInstruction> instructions, int index, out LocalBuilder? loc)
+    public static bool TryGetLoc
+    (
+        this CodeMatcher codeMatcher,
+        int index,
+        [NotNullWhen(true)] out LocalBuilder? loc
+    )
     {
-        var matcher = new CodeMatcher(instructions)
+        _ = codeMatcher
+        .Start()
         .MatchStartForward
         (
             new CodeMatch
@@ -18,15 +25,13 @@ public static class CodeInstructionsExtension
             )
         );
 
-        if (matcher.IsInvalid)
+        if (codeMatcher.IsInvalid)
         {
             loc = null;
-
             return false;
         }
 
-        loc = matcher.Operand as LocalBuilder;
-
+        loc = (LocalBuilder)codeMatcher.Operand;
         return true;
     }
 }

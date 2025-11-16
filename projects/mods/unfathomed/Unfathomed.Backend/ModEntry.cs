@@ -1,5 +1,6 @@
 ﻿using LF2.Cecil.Helper.Extensions;
 using LF2.Game.Helper;
+using System.Diagnostics.CodeAnalysis;
 using TaiwuModdingLib.Core.Plugin;
 
 namespace Unfathomed.Backend;
@@ -7,13 +8,13 @@ namespace Unfathomed.Backend;
 [PluginConfig("unfathomed", "lf2", "1.0.0")]
 public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage
-    ("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")
+    [SuppressMessage
+    ("Design", "CA1031:Do not catch general exception types")
     ]
     public override void Initialize()
     {
-        HarmonyInstance.PatchArray
-        ([
+        HarmonyInstance.PatchMultiple
+        (
             typeof(AgeCompletion.AiConditionPatcher),
             typeof(AgeCompletion.BuildingDomainPatcher),
             typeof(AgeCompletion.CharacterDomainPatcher),
@@ -37,8 +38,8 @@ public class ModEntry : TaiwuRemakeHarmonyPlugin, IDisposable
 
             typeof(FertilityCompletion.PregnantStatePatcher),
 
-            typeof(RandomCompletion.RedzenHelperPatcher),
-        ]);
+            typeof(RandomCompletion.RedzenHelperPatcher)
+        );
 
         try
         {

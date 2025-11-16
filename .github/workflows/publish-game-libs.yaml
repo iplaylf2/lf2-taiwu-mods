@@ -111,7 +111,7 @@ jobs:
           dotnet build "$sln_root_dir/$sln_file" \
               -t:LF2PackGameLibs \
               -c Release \
-              -p:Version="$version" \
+              -p:Version="$version"
 
       - name: Publish to NuGet Source
         run: |
